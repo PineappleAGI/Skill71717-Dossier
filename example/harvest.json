@@ -1,0 +1,1441 @@
+{
+  "request": {
+    "topic": "Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only",
+    "discipline": "Machine learning / robotics / computer vision",
+    "year_from": 2020,
+    "year_to": 2026,
+    "material_tracks": [
+      "key_reference",
+      "research",
+      "industry",
+      "thesis",
+      "preprint"
+    ],
+    "max_results": 50,
+    "audience": "lit_review",
+    "seed_queries": [
+      "DreamerV3 mastering diverse domains world models",
+      "Learning Universal Policies via Text-Guided Video Generation UniPi",
+      "Genie Generative Interactive Environments DeepMind",
+      "GAIA-1 generative world model autonomous driving Wayve",
+      "Cosmos world foundation model Physical AI NVIDIA",
+      "Diffusion for World Modeling DIAMOND Atari",
+      "Diffusion Models Are Real-Time Game Engines GameNGen",
+      "VideoPoet zero-shot video generation",
+      "video generation models as world simulators OpenAI Sora",
+      "AVID adapting video diffusion models to world models",
+      "pre-trained video generative models as world simulators",
+      "model-based reinforcement learning world models survey"
+    ],
+    "seed_materials": [
+      {
+        "id": "arxiv:2301.04104",
+        "title": "Mastering Diverse Domains through World Models",
+        "authors": [
+          "Danijar Hafner",
+          "Jurgis Pasukonis",
+          "Jimmy Ba",
+          "Timothy Lillicrap"
+        ],
+        "year": 2023,
+        "venue": "arXiv",
+        "url": "https://arxiv.org/abs/2301.04104",
+        "type": "preprint",
+        "track": "key_reference",
+        "open_access": true,
+        "citation_count": 1800,
+        "abstract": "DreamerV3 learns a model of the environment and improves its behavior by imagining future trajectories across many domains with fixed hyperparameters.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      },
+      {
+        "id": "arxiv:2402.15391",
+        "title": "Genie: Generative Interactive Environments",
+        "authors": [
+          "Jake Bruce",
+          "Michael Dennis",
+          "Ashley Edwards",
+          "Jack Parker-Holder",
+          "Yuge Shi",
+          "Tim Rocktäschel"
+        ],
+        "year": 2024,
+        "venue": "Google DeepMind",
+        "organization": "Google DeepMind",
+        "url": "https://arxiv.org/abs/2402.15391",
+        "type": "preprint",
+        "track": "key_reference",
+        "open_access": true,
+        "citation_count": 700,
+        "abstract": "Genie learns a generative interactive environment from unlabeled Internet videos, enabling action-controllable virtual worlds.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      },
+      {
+        "id": "arxiv:2302.02648",
+        "title": "Learning Universal Policies via Text-Guided Video Generation",
+        "authors": [
+          "Yilun Du",
+          "Sherry Yang",
+          "Bo Dai",
+          "Hanjun Dai",
+          "Ofir Nachum",
+          "Joshua B. Tenenbaum",
+          "Dale Schuurmans",
+          "Pieter Abbeel"
+        ],
+        "year": 2023,
+        "venue": "ICLR",
+        "url": "https://arxiv.org/abs/2302.02648",
+        "type": "journal",
+        "track": "research",
+        "open_access": true,
+        "citation_count": 650,
+        "abstract": "UniPi casts sequential decision making as text-conditioned video generation, then infers actions from generated frames.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      },
+      {
+        "id": "arxiv:2405.12399",
+        "title": "Diffusion for World Modeling: Visual Details Matter in Atari",
+        "authors": [
+          "Eloi Alonso",
+          "Adam Jelley",
+          "Vincent Micheli",
+          "Anssi Kanervisto",
+          "Amos Storkey",
+          "Tim Pearce",
+          "François Fleuret"
+        ],
+        "year": 2024,
+        "venue": "NeurIPS",
+        "url": "https://arxiv.org/abs/2405.12399",
+        "type": "journal",
+        "track": "research",
+        "open_access": true,
+        "citation_count": 280,
+        "abstract": "DIAMOND is a diffusion-based world model arguing that high-fidelity visual detail improves imagined rollouts used for planning.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      },
+      {
+        "id": "arxiv:2309.17080",
+        "title": "GAIA-1: A Generative World Model for Autonomous Driving",
+        "authors": [
+          "Anthony Hu",
+          "Lloyd Russell",
+          "Hudson Yeo",
+          "Zak Murez",
+          "George Fedoseev",
+          "Alex Kendall",
+          "Jamie Shotton",
+          "Gianluca Corrado"
+        ],
+        "year": 2023,
+        "venue": "Wayve Technical Report",
+        "organization": "Wayve",
+        "url": "https://arxiv.org/abs/2309.17080",
+        "type": "preprint",
+        "track": "industry",
+        "open_access": true,
+        "citation_count": 900,
+        "abstract": "GAIA-1 generates realistic driving scenarios from video, text, and action inputs for autonomous-driving world modeling.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      },
+      {
+        "id": "arxiv:2501.03575",
+        "title": "Cosmos World Foundation Model Platform for Physical AI",
+        "authors": [
+          "NVIDIA"
+        ],
+        "year": 2025,
+        "venue": "NVIDIA Technical Report",
+        "organization": "NVIDIA",
+        "url": "https://arxiv.org/abs/2501.03575",
+        "type": "preprint",
+        "track": "industry",
+        "open_access": true,
+        "citation_count": 150,
+        "abstract": "NVIDIA Cosmos presents world foundation models aimed at Physical AI and embodied simulation workflows.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      },
+      {
+        "id": "web:openai-sora-world-simulators",
+        "title": "Video generation models as world simulators",
+        "authors": [
+          "OpenAI"
+        ],
+        "year": 2024,
+        "venue": "OpenAI Research Blog",
+        "organization": "OpenAI",
+        "url": "https://openai.com/index/video-generation-models-as-world-simulators/",
+        "type": "web",
+        "track": "industry",
+        "open_access": true,
+        "citation_count": null,
+        "abstract": "OpenAI technical note introducing Sora and arguing video generation models are progressing toward general-purpose world simulators.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      },
+      {
+        "id": "arxiv:2408.14837",
+        "title": "Diffusion Models Are Real-Time Game Engines",
+        "authors": [
+          "Dani Valevski",
+          "Yaniv Leviathan",
+          "Moab Arar",
+          "Shlomi Fruchter"
+        ],
+        "year": 2024,
+        "venue": "arXiv",
+        "url": "https://arxiv.org/abs/2408.14837",
+        "type": "preprint",
+        "track": "preprint",
+        "open_access": true,
+        "citation_count": 220,
+        "abstract": "GameNGen shows a neural model can simulate DOOM in real time via diffusion, testing generative dynamics as interactive engines.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      },
+      {
+        "id": "arxiv:2312.14125",
+        "title": "VideoPoet: A Large Language Model for Zero-Shot Video Generation",
+        "authors": [
+          "Dan Kondratyuk",
+          "Lijun Yu",
+          "Xiuye Gu",
+          "José Lezama",
+          "Jonathan Huang",
+          "Lu Jiang"
+        ],
+        "year": 2023,
+        "venue": "arXiv",
+        "url": "https://arxiv.org/abs/2312.14125",
+        "type": "preprint",
+        "track": "preprint",
+        "open_access": true,
+        "citation_count": 550,
+        "abstract": "VideoPoet is a language-model approach to zero-shot video generation — a media-generation reference class versus planner/simulator systems.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      },
+      {
+        "id": "openalex:W4389473504",
+        "title": "Trust-Region Based Policy Optimization for Efficient Reinforcement Learning",
+        "authors": [
+          "Hepfeng Li"
+        ],
+        "year": 2023,
+        "venue": "PhD Dissertation, University of Rhode Island",
+        "url": "https://doi.org/10.23860/diss-li-hepfeng-2023",
+        "doi": "10.23860/diss-li-hepfeng-2023",
+        "type": "thesis",
+        "track": "thesis",
+        "open_access": true,
+        "citation_count": 5,
+        "abstract": "Doctoral dissertation on trust-region policy optimization for sample-efficient reinforcement learning, adjacent background for world-model control methods.",
+        "source_apis": [
+          "seed"
+        ],
+        "pinned": true
+      }
+    ],
+    "submitted_at": "2026-07-28T00:00:00+00:00",
+    "skill": "pineapple-71717"
+  },
+  "harvested_at": "2026-07-28T06:42:14Z",
+  "count": 50,
+  "cite_threshold_used": 362,
+  "materials": [
+    {
+      "id": "arxiv:2301.04104",
+      "title": "Mastering Diverse Domains through World Models",
+      "authors": [
+        "Danijar Hafner",
+        "Jurgis Pasukonis",
+        "Jimmy Ba",
+        "Timothy Lillicrap"
+      ],
+      "year": 2023,
+      "venue": "arXiv",
+      "url": "https://arxiv.org/abs/2301.04104",
+      "type": "preprint",
+      "track": "key_reference",
+      "open_access": true,
+      "citation_count": 1800,
+      "abstract": "DreamerV3 learns a model of the environment and improves its behavior by imagining future trajectories across many domains with fixed hyperparameters.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "arxiv:2402.15391",
+      "title": "Genie: Generative Interactive Environments",
+      "authors": [
+        "Jake Bruce",
+        "Michael Dennis",
+        "Ashley Edwards",
+        "Jack Parker-Holder",
+        "Yuge Shi",
+        "Tim Rocktäschel"
+      ],
+      "year": 2024,
+      "venue": "Google DeepMind",
+      "organization": "Google DeepMind",
+      "url": "https://arxiv.org/abs/2402.15391",
+      "type": "preprint",
+      "track": "key_reference",
+      "open_access": true,
+      "citation_count": 700,
+      "abstract": "Genie learns a generative interactive environment from unlabeled Internet videos, enabling action-controllable virtual worlds.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "arxiv:2302.02648",
+      "title": "Learning Universal Policies via Text-Guided Video Generation",
+      "authors": [
+        "Yilun Du",
+        "Sherry Yang",
+        "Bo Dai",
+        "Hanjun Dai",
+        "Ofir Nachum",
+        "Joshua B. Tenenbaum",
+        "Dale Schuurmans",
+        "Pieter Abbeel"
+      ],
+      "year": 2023,
+      "venue": "ICLR",
+      "url": "https://arxiv.org/abs/2302.02648",
+      "type": "journal",
+      "track": "research",
+      "open_access": true,
+      "citation_count": 650,
+      "abstract": "UniPi casts sequential decision making as text-conditioned video generation, then infers actions from generated frames.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "arxiv:2405.12399",
+      "title": "Diffusion for World Modeling: Visual Details Matter in Atari",
+      "authors": [
+        "Eloi Alonso",
+        "Adam Jelley",
+        "Vincent Micheli",
+        "Anssi Kanervisto",
+        "Amos Storkey",
+        "Tim Pearce",
+        "François Fleuret"
+      ],
+      "year": 2024,
+      "venue": "NeurIPS",
+      "url": "https://arxiv.org/abs/2405.12399",
+      "type": "journal",
+      "track": "research",
+      "open_access": true,
+      "citation_count": 280,
+      "abstract": "DIAMOND is a diffusion-based world model arguing that high-fidelity visual detail improves imagined rollouts used for planning.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "arxiv:2309.17080",
+      "title": "GAIA-1: A Generative World Model for Autonomous Driving",
+      "authors": [
+        "Anthony Hu",
+        "Lloyd Russell",
+        "Hudson Yeo",
+        "Zak Murez",
+        "George Fedoseev",
+        "Alex Kendall",
+        "Jamie Shotton",
+        "Gianluca Corrado"
+      ],
+      "year": 2023,
+      "venue": "Wayve Technical Report",
+      "organization": "Wayve",
+      "url": "https://arxiv.org/abs/2309.17080",
+      "type": "preprint",
+      "track": "industry",
+      "open_access": true,
+      "citation_count": 900,
+      "abstract": "GAIA-1 generates realistic driving scenarios from video, text, and action inputs for autonomous-driving world modeling.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "arxiv:2501.03575",
+      "title": "Cosmos World Foundation Model Platform for Physical AI",
+      "authors": [
+        "NVIDIA"
+      ],
+      "year": 2025,
+      "venue": "NVIDIA Technical Report",
+      "organization": "NVIDIA",
+      "url": "https://arxiv.org/abs/2501.03575",
+      "type": "preprint",
+      "track": "industry",
+      "open_access": true,
+      "citation_count": 150,
+      "abstract": "NVIDIA Cosmos presents world foundation models aimed at Physical AI and embodied simulation workflows.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "web:openai-sora-world-simulators",
+      "title": "Video generation models as world simulators",
+      "authors": [
+        "OpenAI"
+      ],
+      "year": 2024,
+      "venue": "OpenAI Research Blog",
+      "organization": "OpenAI",
+      "url": "https://openai.com/index/video-generation-models-as-world-simulators/",
+      "type": "web",
+      "track": "industry",
+      "open_access": true,
+      "citation_count": null,
+      "abstract": "OpenAI technical note introducing Sora and arguing video generation models are progressing toward general-purpose world simulators.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "arxiv:2408.14837",
+      "title": "Diffusion Models Are Real-Time Game Engines",
+      "authors": [
+        "Dani Valevski",
+        "Yaniv Leviathan",
+        "Moab Arar",
+        "Shlomi Fruchter"
+      ],
+      "year": 2024,
+      "venue": "arXiv",
+      "url": "https://arxiv.org/abs/2408.14837",
+      "type": "preprint",
+      "track": "preprint",
+      "open_access": true,
+      "citation_count": 220,
+      "abstract": "GameNGen shows a neural model can simulate DOOM in real time via diffusion, testing generative dynamics as interactive engines.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "arxiv:2312.14125",
+      "title": "VideoPoet: A Large Language Model for Zero-Shot Video Generation",
+      "authors": [
+        "Dan Kondratyuk",
+        "Lijun Yu",
+        "Xiuye Gu",
+        "José Lezama",
+        "Jonathan Huang",
+        "Lu Jiang"
+      ],
+      "year": 2023,
+      "venue": "arXiv",
+      "url": "https://arxiv.org/abs/2312.14125",
+      "type": "preprint",
+      "track": "preprint",
+      "open_access": true,
+      "citation_count": 550,
+      "abstract": "VideoPoet is a language-model approach to zero-shot video generation — a media-generation reference class versus planner/simulator systems.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "openalex:W4389473504",
+      "title": "Trust-Region Based Policy Optimization for Efficient Reinforcement Learning",
+      "authors": [
+        "Hepfeng Li"
+      ],
+      "year": 2023,
+      "venue": "PhD Dissertation, University of Rhode Island",
+      "url": "https://doi.org/10.23860/diss-li-hepfeng-2023",
+      "doi": "10.23860/diss-li-hepfeng-2023",
+      "type": "thesis",
+      "track": "thesis",
+      "open_access": true,
+      "citation_count": 5,
+      "abstract": "Doctoral dissertation on trust-region policy optimization for sample-efficient reinforcement learning, adjacent background for world-model control methods.",
+      "source_apis": [
+        "seed"
+      ],
+      "pinned": true
+    },
+    {
+      "id": "openalex:W3140854437",
+      "title": "Review of deep learning: concepts, CNN architectures, challenges, applications, future directions",
+      "authors": [
+        "Laith Alzubaidi",
+        "Jinglan Zhang",
+        "Amjad J. Humaidi",
+        "Ayad Q. Al-Dujaili",
+        "Ye Duan",
+        "Omran Al-Shamma",
+        "José Santamaría",
+        "Mohammed A. Fadhel",
+        "Muthana Al‐Amidie",
+        "Laith Farhan"
+      ],
+      "year": 2021,
+      "venue": "Journal Of Big Data",
+      "url": "https://journalofbigdata.springeropen.com/counter/pdf/10.1186/s40537-021-00444-8",
+      "doi": "10.1186/s40537-021-00444-8",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 7685,
+      "abstract": "In the last few years, the deep learning (DL) computing paradigm has been deemed the Gold Standard in the machine learning (ML) community. Moreover, it has gradually become the most widely used computational approach in the field of ML, thus achieving outstanding results on several complex cognitive tasks, matching or even beating those provided by human performance. One of the benefits of DL is the ability to learn massive amounts of data. The DL field has grown fast in the last few years and it has been extensively used to successfully address a wide range of traditional applications. More importantly, DL has outperformed well-known ML techniques in many domains, e.g., cybersecurity, natural language processing, bioinformatics, robotics and control, and medical information processing, among many others. Despite it has been contributed several works reviewing the State-of-the-Art on DL, all of them only tackled one aspect of the DL, which leads to an overall lack of knowledge about it. Therefore, in this contribution, we propose using a more holistic approach in order to provide a more suitable starting point from which to develop a full understanding of DL. Specifically, this review attempts to provide a more comprehensive survey of the most important aspects of DL and including those enhancements recently added to the field. In particular, this paper outlines the importance of DL, presents the types of DL techniques and networks. It then presents convolutional neural networks (CNNs) which the most utilized DL network type and describes the development of CNNs architectures together with their main features, e.g., starting with the AlexNet network and closing with the High-Resolution network (HR.Net). Finally, we further present the challenges and suggested solutions to help researchers understand the existing research gaps. It is followed by a list of the major DL applications. Computational tools including FPGA, GPU, and CPU are summarized along with a descripti",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "key_reference"
+    },
+    {
+      "id": "openalex:W2995022099",
+      "title": "Advances and Open Problems in Federated Learning",
+      "authors": [
+        "Peter Kairouz",
+        "H. Brendan McMahan",
+        "Brendan Avent",
+        "Aurélien Bellet",
+        "Mehdi Bennis",
+        "Arjun Nitin Bhagoji",
+        "Kallista Bonawitz",
+        "Zachary Charles",
+        "Graham Cormode",
+        "Rachel Cummings",
+        "Rafael G. L. D’Oliveira",
+        "Hubert Eichner"
+      ],
+      "year": 2020,
+      "venue": "Foundations and Trends® in Machine Learning",
+      "url": "https://doi.org/10.1561/2200000083",
+      "doi": "10.1561/2200000083",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 4942,
+      "abstract": "Federated learning (FL) is a machine learning setting where many clients (e.g., mobile devices or whole organizations) collaboratively train a model under the orchestration of a central server (e.g., service provider), while keeping the training data decentralized. FL embodies the principles of focused data collection and minimization, and can mitigate many of the systemic privacy risks and costs resulting from traditional, centralized machine learning and data science approaches. Motivated by the explosive growth in FL research, this monograph discusses recent advances and presents an extensive collection of open problems and challenges.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "key_reference"
+    },
+    {
+      "id": "openalex:W3168997536",
+      "title": "A Survey of Convolutional Neural Networks: Analysis, Applications, and Prospects",
+      "authors": [
+        "Zewen Li",
+        "Fan Liu",
+        "Wenjie Yang",
+        "Shouheng Peng",
+        "Jun Zhou"
+      ],
+      "year": 2021,
+      "venue": "IEEE Transactions on Neural Networks and Learning Systems",
+      "url": "http://hdl.handle.net/10072/405164",
+      "doi": "10.1109/tnnls.2021.3084827",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 4932,
+      "abstract": "A convolutional neural network (CNN) is one of the most significant networks in the deep learning field. Since CNN made impressive achievements in many areas, including but not limited to computer vision and natural language processing, it attracted much attention from both industry and academia in the past few years. The existing reviews mainly focus on CNN's applications in different scenarios without considering CNN from a general perspective, and some novel ideas proposed recently are not covered. In this review, we aim to provide some novel ideas and prospects in this fast-growing field. Besides, not only 2-D convolution but also 1-D and multidimensional ones are involved. First, this review introduces the history of CNN. Second, we provide an overview of various convolutions. Third, some classic and advanced CNN models are introduced; especially those key points making them reach state-of-the-art results. Fourth, through experimental analysis, we draw some conclusions and provide several rules of thumb for functions and hyperparameter selection. Fifth, the applications of 1-D, 2-D, and multidimensional convolution are covered. Finally, some open issues and promising directions for CNN are discussed as guidelines for future work.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "key_reference"
+    },
+    {
+      "id": "openalex:W3153990350",
+      "title": "Machine learning and deep learning",
+      "authors": [
+        "Christian Janiesch",
+        "Patrick Zschech",
+        "Kai Heinrich"
+      ],
+      "year": 2021,
+      "venue": "Electronic Markets",
+      "url": "https://link.springer.com/content/pdf/10.1007/s12525-021-00475-2.pdf",
+      "doi": "10.1007/s12525-021-00475-2",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 2534,
+      "abstract": "Abstract Today, intelligent systems that offer artificial intelligence capabilities often rely on machine learning. Machine learning describes the capacity of systems to learn from problem-specific training data to automate the process of analytical model building and solve associated tasks. Deep learning is a machine learning concept based on artificial neural networks. For many applications, deep learning models outperform shallow machine learning models and traditional data analysis approaches. In this article, we summarize the fundamentals of machine learning and deep learning to generate a broader understanding of the methodical underpinning of current intelligent systems. In particular, we provide a conceptual distinction between relevant terms and concepts, explain the process of automated analytical model building through machine learning and deep learning, and discuss the challenges that arise when implementing such intelligent systems in the field of electronic markets and networked business. These naturally go beyond technological aspects and highlight issues in human-machine interaction and artificial intelligence servitization.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "key_reference"
+    },
+    {
+      "id": "openalex:W4386142022",
+      "title": "Interpreting Black-Box Models: A Review on Explainable Artificial Intelligence",
+      "authors": [
+        "Vikas Hassija",
+        "Vinay Chamola",
+        "Atmesh Mahapatra",
+        "Abhinandan Singal",
+        "Divyansh Goel",
+        "Kaizhu Huang",
+        "Simone Scardapane",
+        "Indro Spinelli",
+        "Mufti Mahmud",
+        "Amir Hussain"
+      ],
+      "year": 2023,
+      "venue": "Cognitive Computation",
+      "url": "https://link.springer.com/content/pdf/10.1007/s12559-023-10179-8.pdf",
+      "doi": "10.1007/s12559-023-10179-8",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 1831,
+      "abstract": "Abstract Recent years have seen a tremendous growth in Artificial Intelligence (AI)-based methodological development in a broad range of domains. In this rapidly evolving field, large number of methods are being reported using machine learning (ML) and Deep Learning (DL) models. Majority of these models are inherently complex and lacks explanations of the decision making process causing these models to be termed as 'Black-Box'. One of the major bottlenecks to adopt such models in mission-critical application domains, such as banking, e-commerce, healthcare, and public services and safety, is the difficulty in interpreting them. Due to the rapid proleferation of these AI models, explaining their learning and decision making process are getting harder which require transparency and easy predictability. Aiming to collate the current state-of-the-art in interpreting the black-box models, this study provides a comprehensive analysis of the explainable AI (XAI) models. To reduce false negative and false positive outcomes of these back-box models, finding flaws in them is still difficult and inefficient. In this paper, the development of XAI is reviewed meticulously through careful selection and analysis of the current state-of-the-art of XAI research. It also provides a comprehensive and in-depth evaluation of the XAI frameworks and their efficacy to serve as a starting point of XAI for applied and theoretical researchers. Towards the end, it highlights emerging and critical issues pertaining to XAI research to showcase major, model-specific trends for better explanation, enhanced transparency, and improved prediction accuracy.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "key_reference"
+    },
+    {
+      "id": "openalex:W4206484811",
+      "title": "A Metaverse: Taxonomy, Components, Applications, and Open Challenges",
+      "authors": [
+        "Sangmin Park",
+        "Young‐Gab Kim"
+      ],
+      "year": 2022,
+      "venue": "IEEE Access",
+      "url": "https://ieeexplore.ieee.org/ielx7/6287639/9668973/09667507.pdf",
+      "doi": "10.1109/access.2021.3140175",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 1789,
+      "abstract": "Unlike previous studies on the Metaverse based on Second Life, the current Metaverse is based on the social value of Generation Z that online and offline selves are not different. With the technological development of deep learning-based high-precision recognition models and natural generation models, Metaverse is being strengthened with various factors, from mobile-based always-on access to connectivity with reality using virtual currency. The integration of enhanced social activities and neural-net methods requires a new definition of Metaverse suitable for the present, different from the previous Metaverse. This paper divides the concepts and essential techniques necessary for realizing the Metaverse into three components (i.e., hardware, software, and contents) and three approaches (i.e., user interaction, implementation, and application) rather than marketing or hardware approach to conduct a comprehensive analysis. Furthermore, we describe essential methods based on three components and techniques to Metaverse&#x2019;s representative Ready Player One, Roblox, and Facebook research in the domain of films, games, and studies. Finally, we summarize the limitations and directions for implementing the immersive Metaverse as social influences, constraints, and open challenges.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "key_reference"
+    },
+    {
+      "id": "openalex:W3003667836",
+      "title": "Digital Twin: Values, Challenges and Enablers From a Modeling Perspective",
+      "authors": [
+        "Adil Rasheed",
+        "Omer San",
+        "Trond Kvamsdal"
+      ],
+      "year": 2020,
+      "venue": "IEEE Access",
+      "url": "https://ieeexplore.ieee.org/ielx7/6287639/8948470/08972429.pdf",
+      "doi": "10.1109/access.2020.2970143",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 1763,
+      "abstract": "Digital twin can be defined as a virtual representation of a physical asset enabled through data and simulators for real-time prediction, optimization, monitoring, controlling, and improved decision making. Recent advances in computational pipelines, multiphysics solvers, artificial intelligence, big data cybernetics, data processing and management tools bring the promise of digital twins and their impact on society closer to reality. Digital twinning is now an important and emerging trend in many applications. Also referred to as a computational megamodel, device shadow, mirrored system, avatar or a synchronized virtual prototype, there can be no doubt that a digital twin plays a transformative role not only in how we design and operate cyber-physical intelligent systems, but also in how we advance the modularity of multi-disciplinary systems to tackle fundamental barriers not addressed by the current, evolutionary modeling practices. In this work, we review the recent status of methodologies and techniques related to the construction of digital twins mostly from a modeling perspective. Our aim is to provide a detailed coverage of the current challenges and enabling technologies along with recommendations and reflections for various stakeholders.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "key_reference"
+    },
+    {
+      "id": "openalex:W2953303875",
+      "title": "A Survey of Autonomous Driving: <i>Common Practices and Emerging Technologies</i>",
+      "authors": [
+        "Ekim Yurtsever",
+        "Jacob Lambert",
+        "Alexander Carballo",
+        "Kazuya Takeda"
+      ],
+      "year": 2020,
+      "venue": "IEEE Access",
+      "url": "https://ieeexplore.ieee.org/ielx7/6287639/8948470/09046805.pdf",
+      "doi": "10.1109/access.2020.2983149",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 1744,
+      "abstract": "Automated driving systems (ADSs) promise a safe, comfortable and efficient driving experience. However, fatalities involving vehicles equipped with ADSs are on the rise. The full potential of ADSs cannot be realized unless the robustness of state-of-the-art is improved further. This paper discusses unsolved problems and surveys the technical aspect of automated driving. Studies regarding present challenges, high-level system architectures, emerging methodologies and core functions including localization, mapping, perception, planning, and human machine interfaces, were thoroughly reviewed. Furthermore, many state-of-the-art algorithms were implemented and compared on our own platform in a real-world driving setting. The paper concludes with an overview of available datasets and tools for ADS development.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "key_reference"
+    },
+    {
+      "id": "openalex:W3154736008",
+      "title": "Cybersickness in current-generation virtual reality head-mounted displays: systematic review and outlook",
+      "authors": [
+        "Polona Caserman",
+        "Augusto García-Agúndez",
+        "Alvar Gámez Zerban",
+        "Stefan Göbel"
+      ],
+      "year": 2021,
+      "venue": "Virtual Reality",
+      "url": "https://link.springer.com/content/pdf/10.1007/s10055-021-00513-6.pdf",
+      "doi": "10.1007/s10055-021-00513-6",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 347,
+      "abstract": "Abstract Cybersickness (CS) is a term used to refer to symptoms, such as nausea, headache, and dizziness that users experience during or after virtual reality immersion. Initially discovered in flight simulators, commercial virtual reality (VR) head-mounted displays (HMD) of the current generation also seem to cause CS, albeit in a different manner and severity. The goal of this work is to summarize recent literature on CS with modern HMDs, to determine the specificities and profile of immersive VR-caused CS, and to provide an outlook for future research areas. A systematic review was performed on the databases IEEE Xplore, PubMed, ACM, and Scopus from 2013 to 2019 and 49 publications were selected. A summarized text states how different VR HMDs impact CS, how the nature of movement in VR HMDs contributes to CS, and how we can use biosensors to detect CS. The results of the meta-analysis show that although current-generation VR HMDs cause significantly less CS ( $$p&lt;0.001$$ <mml:math xmlns:mml=\"http://www.w3.org/1998/Math/MathML\"> <mml:mrow> <mml:mi>p</mml:mi> <mml:mo>&lt;</mml:mo> <mml:mn>0.001</mml:mn> </mml:mrow> </mml:math> ), some symptoms remain as intense. Further results show that the nature of movement and, in particular, sensory mismatch as well as perceived motion have been the leading cause of CS. We suggest an outlook on future research, including the use of galvanic skin response to evaluate CS in combination with the golden standard (Simulator Sickness Questionnaire, SSQ) as well as an update on the subjective evaluation scores of the SSQ.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4402155831",
+      "title": "Multimodal Large Language Models in Health Care: Applications, Challenges, and Future Outlook",
+      "authors": [
+        "Rawan AlSaad",
+        "Alaa Abd‐Alrazaq",
+        "Sabri Boughorbel",
+        "Arfan Ahmed",
+        "Max-Antoine Renault",
+        "Rafat Damseh",
+        "Javaid I. Sheikh"
+      ],
+      "year": 2024,
+      "venue": "Journal of Medical Internet Research",
+      "url": "https://www.jmir.org/2024/1/e59505/PDF",
+      "doi": "10.2196/59505",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 267,
+      "abstract": "In the complex and multidimensional field of medicine, multimodal data are prevalent and crucial for informed clinical decisions. Multimodal data span a broad spectrum of data types, including medical images (eg, MRI and CT scans), time-series data (eg, sensor data from wearable devices and electronic health records), audio recordings (eg, heart and respiratory sounds and patient interviews), text (eg, clinical notes and research articles), videos (eg, surgical procedures), and omics data (eg, genomics and proteomics). While advancements in large language models (LLMs) have enabled new applications for knowledge retrieval and processing in the medical field, most LLMs remain limited to processing unimodal data, typically text-based content, and often overlook the importance of integrating the diverse data modalities encountered in clinical practice. This paper aims to present a detailed, practical, and solution-oriented perspective on the use of multimodal LLMs (M-LLMs) in the medical field. Our investigation spanned M-LLM foundational principles, current and potential applications, technical and ethical challenges, and future research directions. By connecting these elements, we aimed to provide a comprehensive framework that links diverse aspects of M-LLMs, offering a unified vision for their future in health care. This approach aims to guide both future research and practical implementations of M-LLMs in health care, positioning them as a paradigm shift toward integrated, multimodal data-driven medical practice. We anticipate that this work will spark further discussion and inspire the development of innovative approaches in the next generation of medical M-LLM systems.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4324290234",
+      "title": "Blockchain Meets Metaverse and Digital Asset Management: A Comprehensive Survey",
+      "authors": [
+        "Vu Tuan Truong",
+        "Long Bao Le",
+        "Dusit Niyato"
+      ],
+      "year": 2023,
+      "venue": "IEEE Access",
+      "url": "https://ieeexplore.ieee.org/ielx7/6287639/6514899/10068493.pdf",
+      "doi": "10.1109/access.2023.3257029",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 241,
+      "abstract": "Envisioned to be the next-generation Internet, the metaverse has been attracting enormous attention from both the academia and industry. The metaverse can be viewed as a 3D immersive virtual world, where people use Augmented/Virtual Reality (AR/VR) devices to access and interact with others through digital avatars. While early versions of the metaverse exist in several Massively Multiplayer Online (MMO) games, the full-flesh metaverse is expected to be more complex and enabled by various advanced technologies. Blockchain is one of the crucial technologies that could revolutionize the metaverse to become a decentralized and democratic virtual society with its own economic and governance system. Realizing the importance of blockchain for the metaverse, our goal in this paper is to provide a comprehensive survey that clarifies the role of blockchain in the metaverse including in-depth analysis of digital asset management. To this end, we discuss how blockchain can enable the metaverse from different perspectives, ranging from user applications to virtual services and the blockchain-enabled economic system. Furthermore, we describe how blockchain can shape the metaverse from the system perspective, including various solutions for the decentralized governance system and data management. The potential of blockchain for security and privacy aspects of the metaverse infrastructure is also figured out, while a full flow of blockchain-based digital asset management for the metaverse is investigated. Finally, we discuss a wide range of open challenges of the blockchain-empowered metaverse.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W3083484791",
+      "title": "Multimodal teaching, learning and training in virtual reality: a review and case study",
+      "authors": [
+        "Stéphanie Philippe",
+        "Alexis D. Souchet",
+        "Petros Lameras",
+        "Panagiotis Petridis",
+        "Julien Caporal",
+        "Gildas Coldeboeuf",
+        "Hadrien Duzan"
+      ],
+      "year": 2020,
+      "venue": "Virtual Reality & Intelligent Hardware",
+      "url": "https://doi.org/10.1016/j.vrih.2020.07.008",
+      "doi": "10.1016/j.vrih.2020.07.008",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 217,
+      "abstract": "It is becoming increasingly prevalent in digital learning research to encompass an array of different meanings, spaces, processes, and teaching strategies for discerning a global perspective on constructing the student learning experience. Multimodality is an emergent phenomenon that may influence how digital learning is designed, especially when employed in highly interactive and immersive learning environments such as Virtual Reality (VR). VR environments may aid students' efforts to be active learners through consciously attending to, and reflecting on, critique leveraging reflexivity and novel meaning-making most likely to lead to a conceptual change. This paper employs eleven industrial case-studies to highlight the application of multimodal VR-based teaching and training as a pedagogically rich strategy that may be designed, mapped and visualized through distinct VR-design elements and features. The outcomes of the use cases contribute to discern in-VR multimodal teaching as an emerging discourse that couples system design-based paradigms with embodied, situated and reflective praxis in spatial, emotional and temporal VR learning environments.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W3016364508",
+      "title": "Advantages and Constraints of a Hybrid Model K-12 E-Learning Assistant Chatbot",
+      "authors": [
+        "Eric Hsiao‐Kuang Wu",
+        "Chun-Han Lin",
+        "Yu‐Yen Ou",
+        "Chen-Zhong Liu",
+        "Wei-Kai Wang",
+        "Chi-Yun Chao"
+      ],
+      "year": 2020,
+      "venue": "IEEE Access",
+      "url": "https://ieeexplore.ieee.org/ielx7/6287639/8948470/09069183.pdf",
+      "doi": "10.1109/access.2020.2988252",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 199,
+      "abstract": "E-Learning has become more and more popular in recent years with the advance of new technologies. Using their mobile devices, people can expand their knowledge anytime and anywhere. E-Learning also makes it possible for people to manage their learning progression freely and follow their own learning style. However, studies show that E-Learning can cause the user to experience feelings of isolation and detachment due to the lack of human-like interactions in most E-Learning platforms. These feelings could reduce the user's motivation to learn. In this paper, we explore and evaluate how well current chatbot technologies assist users' learning on E-Learning platforms and how these technologies could possibly reduce problems such as feelings of isolation and detachment. For evaluation, we specifically designed a chatbot to be an E-Learning assistant. The NLP core of our chatbot is based on two different models: a retrieval-based model and a QANet model. We designed this two-model hybrid chatbot to be used alongside an E-Learning platform. The core response context of our chatbot is not only designed with course materials in mind but also everyday conversation and chitchat, which make it feel more like a human companion. Experiment and questionnaire evaluation results show that chatbots could be helpful in learning and could potentially reduce E-Learning users' feelings of isolation and detachment. Our chatbot also performed better than the teacher counselling service in the E-Learning platform on which the chatbot is based.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4385431115",
+      "title": "ConceptFusion: Open-set multimodal 3D mapping",
+      "authors": [
+        "Krishna Murthy Jatavallabhula",
+        "Alihusein Kuwajerwala",
+        "Qiao Gu",
+        "Mohd Omama",
+        "Ganesh Iyer",
+        "Soroush Saryazdi",
+        "Tao Chen",
+        "Alaa Maalouf",
+        "Shuang Li",
+        "Nikhil Keetha",
+        "Ayush Tewari",
+        "Joshua B. Tenenbaum"
+      ],
+      "year": 2023,
+      "venue": "",
+      "url": "https://doi.org/10.15607/rss.2023.xix.066",
+      "doi": "10.15607/rss.2023.xix.066",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 193,
+      "abstract": "modalities such as natural language, images, and audio.We demonstrate that pixel-aligned open-set features can be fused into 3D maps via traditional SLAM and multi-view fusion approaches.This enables effective zero-shot spatial reasoning, not needing any additional training or finetuning, and retains long-tailed concepts better than supervised approaches, outperforming them by more than 40% margin on 3D IoU.We extensively evaluate ConceptFusion on a number of real-world datasets, simulated home environments, a real-world tabletop manipulation task, and an autonomous driving platform.We showcase new avenues for blending foundation models with 3D open-set multimodal mapping.We encourage the reader to view the demos on our project page: https://concept-fusion.github.io/",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W3153454949",
+      "title": "An Efficient Anomaly Recognition Framework Using an Attention Residual LSTM in Surveillance Videos",
+      "authors": [
+        "Waseem Ullah",
+        "Amin Ullah",
+        "Tanveer Hussain",
+        "Zulfiqar Ahmad Khan",
+        "Sung Wook Baik"
+      ],
+      "year": 2021,
+      "venue": "Sensors",
+      "url": "https://www.mdpi.com/1424-8220/21/8/2811/pdf?version=1618913949",
+      "doi": "10.3390/s21082811",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 185,
+      "abstract": "Video anomaly recognition in smart cities is an important computer vision task that plays a vital role in smart surveillance and public safety but is challenging due to its diverse, complex, and infrequent occurrence in real-time surveillance environments. Various deep learning models use significant amounts of training data without generalization abilities and with huge time complexity. To overcome these problems, in the current work, we present an efficient light-weight convolutional neural network (CNN)-based anomaly recognition framework that is functional in a surveillance environment with reduced time complexity. We extract spatial CNN features from a series of video frames and feed them to the proposed residual attention-based long short-term memory (LSTM) network, which can precisely recognize anomalous activity in surveillance videos. The representative CNN features with the residual blocks concept in LSTM for sequence learning prove to be effective for anomaly detection and recognition, validating our model's effective usage in smart cities video surveillance. Extensive experiments on the real-world benchmark UCF-Crime dataset validate the effectiveness of the proposed model within complex surveillance environments and demonstrate that our proposed model outperforms state-of-the-art models with a 1.77%, 0.76%, and 8.62% increase in accuracy on the UCF-Crime, UMN and Avenue datasets, respectively.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4398238904",
+      "title": "Google Gemini as a next generation AI educational tool: a review of emerging educational technology",
+      "authors": [
+        "Muhammad Imran",
+        "Norah Almusharraf"
+      ],
+      "year": 2024,
+      "venue": "Smart Learning Environments",
+      "url": "https://link.springer.com/content/pdf/10.1186/s40561-024-00310-z.pdf",
+      "doi": "10.1186/s40561-024-00310-z",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 181,
+      "abstract": "Abstract This emerging technology report discusses Google Gemini as a multimodal generative AI tool and presents its revolutionary potential for future educational technology. It introduces Gemini and its features, including versatility in processing data from text, image, audio, and video inputs and generating diverse content types. This study discusses recent empirical studies, technology in practice, and the relationship between Gemini technology and the educational landscape. This report further explores Gemini’s relevance for future educational endeavors and practical applications in emerging technologies. Also, it discusses the significant challenges and ethical considerations that must be addressed to ensure its responsible and effective integration into the educational landscape.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4391610180",
+      "title": "Generative artificial intelligence in drug discovery: basic framework, recent advances, challenges, and opportunities",
+      "authors": [
+        "Amit Gangwal",
+        "M. Azim Ansari",
+        "Iqrar Ahmad",
+        "Abul Kalam Azad",
+        "Vinoth Kumarasamy",
+        "Vetriselvan Subramaniyan",
+        "Ling Shing Wong"
+      ],
+      "year": 2024,
+      "venue": "Frontiers in Pharmacology",
+      "url": "https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2024.1331062/pdf",
+      "doi": "10.3389/fphar.2024.1331062",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 168,
+      "abstract": "There are two main ways to discover or design small drug molecules. The first involves fine-tuning existing molecules or commercially successful drugs through quantitative structure-activity relationships and virtual screening. The second approach involves generating new molecules through de novo drug design or inverse quantitative structure-activity relationship. Both methods aim to get a drug molecule with the best pharmacokinetic and pharmacodynamic profiles. However, bringing a new drug to market is an expensive and time-consuming endeavor, with the average cost being estimated at around $2.5 billion. One of the biggest challenges is screening the vast number of potential drug candidates to find one that is both safe and effective. The development of artificial intelligence in recent years has been phenomenal, ushering in a revolution in many fields. The field of pharmaceutical sciences has also significantly benefited from multiple applications of artificial intelligence, especially drug discovery projects. Artificial intelligence models are finding use in molecular property prediction, molecule generation, virtual screening, synthesis planning, repurposing, among others. Lately, generative artificial intelligence has gained popularity across domains for its ability to generate entirely new data, such as images, sentences, audios, videos, novel chemical molecules, etc. Generative artificial intelligence has also delivered promising results in drug discovery and development. This review article delves into the fundamentals and framework of various generative artificial intelligence models in the context of drug discovery via de novo drug design approach. Various basic and advanced models have been discussed, along with their recent applications. The review also explores recent examples and advances in the generative artificial intelligence approach, as well as the challenges and ongoing efforts to fully harness the potential of generative artificial intelligence",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4378746725",
+      "title": "Recent advancements in multimodal human–robot interaction",
+      "authors": [
+        "Hang Su",
+        "Wen Qi",
+        "Jiahao Chen",
+        "Chenguang Yang",
+        "Juan Sandoval",
+        "Med Amine Laribi"
+      ],
+      "year": 2023,
+      "venue": "Frontiers in Neurorobotics",
+      "url": "https://www.frontiersin.org/articles/10.3389/fnbot.2023.1084000/pdf",
+      "doi": "10.3389/fnbot.2023.1084000",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 165,
+      "abstract": "Robotics have advanced significantly over the years, and human-robot interaction (HRI) is now playing an important role in delivering the best user experience, cutting down on laborious tasks, and raising public acceptance of robots. New HRI approaches are necessary to promote the evolution of robots, with a more natural and flexible interaction manner clearly the most crucial. As a newly emerging approach to HRI, multimodal HRI is a method for individuals to communicate with a robot using various modalities, including voice, image, text, eye movement, and touch, as well as bio-signals like EEG and ECG. It is a broad field closely related to cognitive science, ergonomics, multimedia technology, and virtual reality, with numerous applications springing up each year. However, little research has been done to summarize the current development and future trend of HRI. To this end, this paper systematically reviews the state of the art of multimodal HRI on its applications by summing up the latest research articles relevant to this field. Moreover, the research development in terms of the input signal and the output signal is also covered in this manuscript.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4389266910",
+      "title": "Multimodal Human–Robot Interaction for Human‐Centric Smart Manufacturing: A Survey",
+      "authors": [
+        "Tian Wang",
+        "Pai Zheng",
+        "Shufei Li",
+        "Lihui Wang"
+      ],
+      "year": 2023,
+      "venue": "Advanced Intelligent Systems",
+      "url": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/aisy.202300359",
+      "doi": "10.1002/aisy.202300359",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 165,
+      "abstract": "Human–robot interaction (HRI) has escalated in notability in recent years, and multimodal communication and control strategies are necessitated to guarantee a secure, efficient, and intelligent HRI experience. In spite of the considerable focus on multimodal HRI, comprehensive disquisitions delineating various modalities and intricately analyzing their combinations remain elusive, consequently limiting holistic understanding and future advancements. This article aspires to bridge this inadequacy by conducting a profound exploration of multimodal HRI, predominantly concentrating on four principal modalities: vision, auditory and language, haptics, and physiological sensing. An extensive review encapsulating algorithmic dissection, interface devices, and applicative dimensions forms part of this discourse. This manuscript distinctively combines multimodal HRI with cognitive science, deeply probing into the three dimensions, perception, cognition, and action, thereby demystifying algorithms intrinsic to multimodal HRI. Finally, it accentuates the empirical challenges and contours preemptive trajectories for multimodal HRI in human‐centric smart manufacturing.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4394606408",
+      "title": "Foundations &amp; Trends in Multimodal Machine Learning: Principles, Challenges, and Open Questions",
+      "authors": [
+        "Paul Pu Liang",
+        "Amir Zadeh",
+        "Louis‐Philippe Morency"
+      ],
+      "year": 2024,
+      "venue": "ACM Computing Surveys",
+      "url": "https://dl.acm.org/doi/pdf/10.1145/3656580",
+      "doi": "10.1145/3656580",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 161,
+      "abstract": "Multimodal machine learning is a vibrant multi-disciplinary research field that aims to design computer agents with intelligent capabilities such as understanding, reasoning, and learning through integrating multiple communicative modalities, including linguistic, acoustic, visual, tactile, and physiological messages. With the recent interest in video understanding, embodied autonomous agents, text-to-image generation, and multisensor fusion in application domains such as healthcare and robotics, multimodal machine learning has brought unique computational and theoretical challenges to the machine learning community given the heterogeneity of data sources and the interconnections often found between modalities. However, the breadth of progress in multimodal research has made it difficult to identify the common themes and open questions in the field. By synthesizing a broad range of application domains and theoretical frameworks from both historical and recent perspectives, this article is designed to provide an overview of the computational and theoretical foundations of multimodal machine learning. We start by defining three key principles of modality heterogeneity , connections , and interactions that have driven subsequent innovations, and propose a taxonomy of six core technical challenges: representation , alignment , reasoning , generation , transference , and quantification covering historical and recent trends. Recent technical achievements will be presented through the lens of this taxonomy, allowing researchers to understand the similarities and differences across new approaches. We end by motivating several open problems for future research as identified by our taxonomy.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4406412004",
+      "title": "A Review of CNN Applications in Smart Agriculture Using Multimodal Data",
+      "authors": [
+        "Mohammad El Sakka",
+        "Mihai Ivanovici",
+        "Lotfi Chaâri",
+        "Josiane Mothe"
+      ],
+      "year": 2025,
+      "venue": "Sensors",
+      "url": "https://www.mdpi.com/1424-8220/25/2/472/pdf?version=1737000953",
+      "doi": "10.3390/s25020472",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 150,
+      "abstract": "This review explores the applications of Convolutional Neural Networks (CNNs) in smart agriculture, highlighting recent advancements across various applications including weed detection, disease detection, crop classification, water management, and yield prediction. Based on a comprehensive analysis of more than 115 recent studies, coupled with a bibliometric study of the broader literature, this paper contextualizes the use of CNNs within Agriculture 5.0, where technological integration optimizes agricultural efficiency. Key approaches analyzed involve image classification, image segmentation, regression, and object detection methods that use diverse data types ranging from RGB and multispectral images to radar and thermal data. By processing UAV and satellite data with CNNs, real-time and large-scale crop monitoring can be achieved, supporting advanced farm management. A comparative analysis shows how CNNs perform with respect to other techniques that involve traditional machine learning and recent deep learning models in image processing, particularly when applied to high-dimensional or temporal data. Future directions point toward integrating IoT and cloud platforms for real-time data processing and leveraging large language models for regulatory insights. Potential research advancements emphasize improving increased data accessibility and hybrid modeling to meet the agricultural demands of climate variability and food security, positioning CNNs as pivotal tools in sustainable agricultural practices. A related repository that contains the reviewed articles along with their publication links is made available.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4394806371",
+      "title": "The TESCREAL bundle: Eugenics and the promise of utopia through artificial general intelligence",
+      "authors": [
+        "Timnit Gebru",
+        "Émile P. Torres"
+      ],
+      "year": 2024,
+      "venue": "First Monday",
+      "url": "https://firstmonday.org/ojs/index.php/fm/article/download/13636/11606",
+      "doi": "10.5210/fm.v29i4.13636",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 148,
+      "abstract": "The stated goal of many organizations in the field of artificial intelligence (AI) is to develop artificial general intelligence (AGI), an imagined system with more intelligence than anything we have ever seen. Without seriously questioning whether such a system can and should be built, researchers are working to create “safe AGI” that is “beneficial for all of humanity.” We argue that, unlike systems with specific applications which can be evaluated following standard engineering principles, undefined systems like “AGI” cannot be appropriately tested for safety. Why, then, is building AGI often framed as an unquestioned goal in the field of AI? In this paper, we argue that the normative framework that motivates much of this goal is rooted in the Anglo-American eugenics tradition of the twentieth century. As a result, many of the very same discriminatory attitudes that animated eugenicists in the past (e.g., racism, xenophobia, classism, ableism, and sexism) remain widespread within the movement to build AGI, resulting in systems that harm marginalized groups and centralize power, while using the language of “safety” and “benefiting humanity” to evade accountability. We conclude by urging researchers to work on defined tasks for which we can develop safety protocols, rather than attempting to build a presumably all-knowing system such as AGI.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W3015928967",
+      "title": "Multimodal mental health analysis in social media",
+      "authors": [
+        "Amir Hossein Yazdavar",
+        "Mohammad Saeid Mahdavinejad",
+        "Goonmeet Bajaj",
+        "William L. Romine",
+        "Amit Sheth",
+        "Amir Hassan Monadjemi",
+        "Krishnaprasad Thirunarayan",
+        "John M. Meddar",
+        "Annie Myers",
+        "Jyotishman Pathak",
+        "Pascal Hitzler"
+      ],
+      "year": 2020,
+      "venue": "PLoS ONE",
+      "url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0226248&type=printable",
+      "doi": "10.1371/journal.pone.0226248",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 131,
+      "abstract": "Depression is a major public health concern in the U.S. and globally. While successful early identification and treatment can lead to many positive health and behavioral outcomes, depression, remains undiagnosed, untreated or undertreated due to several reasons, including denial of the illness as well as cultural and social stigma. With the ubiquity of social media platforms, millions of people are now sharing their online persona by expressing their thoughts, moods, emotions, and even their daily struggles with mental health on social media. Unlike traditional observational cohort studies conducted through questionnaires and self-reported surveys, we explore the reliable detection of depressive symptoms from tweets obtained, unobtrusively. Particularly, we examine and exploit multimodal big (social) data to discern depressive behaviors using a wide variety of features including individual-level demographics. By developing a multimodal framework and employing statistical techniques to fuse heterogeneous sets of features obtained through the processing of visual, textual, and user interaction data, we significantly enhance the current state-of-the-art approaches for identifying depressed individuals on Twitter (improving the average F1-Score by 5 percent) as well as facilitate demographic inferences from social media. Besides providing insights into the relationship between demographics and mental health, our research assists in the design of a new breed of demographic-aware health interventions.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W3199015608",
+      "title": "Multimodal Classification: Current Landscape, Taxonomy and Future Directions",
+      "authors": [
+        "William C. Sleeman",
+        "Rishabh Kapoor",
+        "Preetam Ghosh"
+      ],
+      "year": 2022,
+      "venue": "ACM Computing Surveys",
+      "url": "https://dl.acm.org/doi/pdf/10.1145/3543848",
+      "doi": "10.1145/3543848",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 118,
+      "abstract": "Multimodal classification research has been gaining popularity with new datasets in domains such as satellite imagery, biometrics, and medicine. Prior research has shown the benefits of combining data from multiple sources compared to traditional unimodal data that has led to the development of many novel multimodal architectures. However, the lack of consistent terminologies and architectural descriptions makes it difficult to compare different solutions. We address these challenges by proposing a new taxonomy for describing multimodal classification models based on trends found in recent publications. Examples of how this taxonomy could be applied to existing models are presented as well as a checklist to aid in the clear and complete presentation of future models. Many of the most difficult aspects of unimodal classification have not yet been fully addressed for multimodal datasets, including big data, class imbalance, and instance-level difficulty. We also provide a discussion of these challenges and future directions of research.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "research"
+    },
+    {
+      "id": "openalex:W4402890475",
+      "title": "Foundation models in robotics: Applications, challenges, and the future",
+      "authors": [
+        "Roya Firoozi",
+        "Johnathan Tucker",
+        "Stephen Tian",
+        "Anirudha Majumdar",
+        "Jiankai Sun",
+        "Weiyu Liu",
+        "Yuke Zhu",
+        "Shuran Song",
+        "Ashish Kapoor",
+        "Karol Hausman",
+        "Brian Ichter",
+        "Danny Driess"
+      ],
+      "year": 2024,
+      "venue": "The International Journal of Robotics Research",
+      "organization": "NVIDIA",
+      "url": "https://journals.sagepub.com/history/e3eb5469-f176-4c99-8231-efe683fe6399/02783649241281508.17904978.pdf",
+      "doi": "10.1177/02783649241281508",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 173,
+      "abstract": "We survey applications of pretrained foundation models in robotics. Traditional deep learning models in robotics are trained on small datasets tailored for specific tasks, which limits their adaptability across diverse applications. In contrast, foundation models pretrained on internet-scale data appear to have superior generalization capabilities, and in some instances display an emergent ability to find zero-shot solutions to problems that are not present in the training data. Foundation models may hold the potential to enhance various components of the robot autonomy stack, from perception to decision-making and control. For example, large language models can generate code or provide common sense reasoning, while vision-language models enable open-vocabulary visual recognition. However, significant open research challenges remain, particularly around the scarcity of robot-relevant training data, safety guarantees and uncertainty quantification, and real-time execution. In this survey, we study recent papers that have used or built foundation models to solve robotics problems. We explore how foundation models contribute to improving robot capabilities in the domains of perception, decision-making, and control. We discuss the challenges hindering the adoption of foundation models in robot autonomy and provide opportunities and potential pathways for future advancements. The GitHub project corresponding to this paper can be found here: https://github.com/robotics-survey/Awesome-Robotics-Foundation-Models .",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "industry"
+    },
+    {
+      "id": "openalex:W4393177776",
+      "title": "Sora OpenAI's Prelude: Social Media Perspectives on Sora OpenAI and the Future of AI Video Generation",
+      "authors": [
+        "Reza Hadi Mogavi",
+        "D. Wang",
+        "Joseph Tu",
+        "Hilda Hadan",
+        "Sabrina Alicia Sgandurra",
+        "Pan Hui",
+        "Lennart E. Nacke"
+      ],
+      "year": 2024,
+      "venue": "arXiv (Cornell University)",
+      "url": "https://doi.org/10.48550/arxiv.2403.14665",
+      "doi": "10.48550/arxiv.2403.14665",
+      "type": "preprint",
+      "open_access": true,
+      "citation_count": 9,
+      "abstract": "The rapid advancement of Generative AI (Gen-AI) is transforming Human-Computer Interaction (HCI), with significant implications across various sectors. This study investigates the public's perception of Sora OpenAI, a pioneering Gen-AI video generation tool, via social media discussions on Reddit before its release. It centers on two main questions: the envisioned applications and the concerns related to Sora's integration. The analysis forecasts positive shifts in content creation, predicting that Sora will democratize video marketing and innovate game development by making video production more accessible and economical. Conversely, there are concerns about deepfakes and the potential for disinformation, underscoring the need for strategies to address disinformation and bias. This paper contributes to the Gen-AI discourse by fostering discussion on current and future capabilities, enriching the understanding of public expectations, and establishing a temporal benchmark for user anticipation. This research underscores the necessity for informed, ethical approaches to AI development and integration, ensuring that technological advancements align with societal values and user needs.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "industry"
+    },
+    {
+      "id": "openalex:W4409365815",
+      "title": "Driving in the Occupancy World: Vision-Centric 4D Occupancy Forecasting and Planning via World Models for Autonomous Driving",
+      "authors": [
+        "Yu Yang",
+        "Jianbiao Mei",
+        "Yukai Ma",
+        "Siliang Du",
+        "Wenqing Chen",
+        "Yijie Qian",
+        "Yuxiang Feng",
+        "Yong Liu"
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the AAAI Conference on Artificial Intelligence",
+      "organization": "Huawei",
+      "url": "https://ojs.aaai.org/index.php/AAAI/article/download/33010/35165",
+      "doi": "10.1609/aaai.v39i9.33010",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 9,
+      "abstract": "World models envision potential future states based on various ego actions. They embed extensive knowledge about the driving environment, facilitating safe and scalable autonomous driving. Most existing methods primarily focus on either data generation or the pretraining paradigms of world models. Unlike the aforementioned prior works, we propose Drive-OccWorld, which adapts a vision-centric 4D forecasting world model to end-to-end planning for autonomous driving. Specifically, we first introduce a semantic and motion-conditional normalization in the memory module, which accumulates semantic and dynamic information from historical BEV embeddings. These BEV features are then conveyed to the world decoder for future occupancy and flow forecasting, considering both geometry and spatiotemporal modeling. Additionally, we propose injecting flexible action conditions, such as velocity, steering angle, trajectory, and commands, into the world model to enable controllable generation and facilitate a broader range of downstream applications. Furthermore, we explore integrating the generative capabilities of the 4D world model with end-to-end planning, enabling continuous forecasting of future states and the selection of optimal trajectories using an occupancy-based cost function. Extensive experiments on the nuScenes dataset demonstrate that our method can generate plausible and controllable 4D occupancy, opening new avenues for driving world generation and end-to-end planning.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "industry"
+    },
+    {
+      "id": "openalex:W4392954640",
+      "title": "Generate Impressive Videos with Text Instructions: A Review of OpenAI Sora, Stable Diffusion, Lumiere and Comparable Models",
+      "authors": [
+        "Enis Karaarslan",
+        "Ömer Aydın"
+      ],
+      "year": 2024,
+      "venue": "",
+      "url": "https://www.techrxiv.org/doi/pdf/10.36227/techrxiv.170862194.43871446/v2",
+      "doi": "10.36227/techrxiv.170862194.43871446/v2",
+      "type": "preprint",
+      "open_access": true,
+      "citation_count": 6,
+      "abstract": "The generation of videos from textual input poses a significant computational challenge within computer science. Nonetheless, recent advancements in text-to-video artificial intelligence (AI) technologies have showcased notable progress within this domain. Foreseen advancements in realistic video generation and data-driven physics simulations are poised to further propel the field forward. The emergence of text-to-video AI holds transformative potential across a plethora of creative domains, including filmmaking, advertising, graphic design, and game development, as well as within sectors such as social media, influencer marketing, and educational technology. This research study seeks to comprehensively review generative AI methodologies in text-to-video synthesis, with an emphasis on large language models and AI architectures. Multiple methods such as literature review, technical evaluation and solution proposal were applied for this purpose. Prominent models such as OpenAI Sora, Stable Diffusion, and Lumiere are evaluated for their efficacy and architectural intricacies. However, the pursuit of Artificial General Intelligence (AGI) is accompanied by a myriad of challenges. These encompass the imperative to safeguard human rights, prevent potential misuse, and protect intellectual property rights. Ensuring the accuracy and integrity of the generated content is paramount. The computationally intensive nature of transformer models results in substantial electricity and water consumption, necessitating the formulation of strategies to mitigate environmental and computational costs to ensure long-term sustainability. This research endeavors to explore potential avenues for addressing these challenges and proposes solutions to advance environmental and computational efficiency within the context of text-to-video AI.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "industry"
+    },
+    {
+      "id": "openalex:W4404717804",
+      "title": "AVID: Adapting Video Diffusion Models to World Models",
+      "authors": [
+        "Marc Rigter",
+        "Tarun Sen Gupta",
+        "Agrin Hilmkil",
+        "Chao Ma"
+      ],
+      "year": 2024,
+      "venue": "Qeios",
+      "organization": "Microsoft Research",
+      "url": "https://www.qeios.com/read/H7BFDW/pdf",
+      "doi": "10.32388/h7bfdw",
+      "type": "preprint",
+      "open_access": true,
+      "citation_count": 0,
+      "abstract": "Large-scale generative models have achieved remarkable success in a number of domains. However, for sequential decision-making problems, such as robotics, action-labelled data is often scarce and therefore scaling-up foundation models for decision-making remains a challenge. A potential solution lies in leveraging widely-available unlabelled videos to train world models that simulate the consequences of actions. If the world model is accurate, it can be used to optimize decision-making in downstream tasks. Image-to-video diffusion models are already capable of generating highly realistic synthetic videos. However, these models are not action-conditioned, and the most powerful models are closed-source which means they cannot be finetuned. In this work, we propose to adapt pretrained video diffusion models to action-conditioned world models, without access to the parameters of the pretrained model. Our approach, AVID, trains an adapter on a small domain-specific dataset of action-labelled videos. AVID uses a learned mask to modify the intermediate outputs of the pretrained model and generate accurate action-conditioned videos. We evaluate AVID on video game and real-world robotics data, and show that it outperforms existing baselines for diffusion model adaptation.1 Our results demonstrate that if utilized correctly, pretrained video models have the potential to be powerful tools for embodied AI.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "industry"
+    },
+    {
+      "id": "openalex:W3178685848",
+      "title": "A Triangulated Accounting of Top Notch 2: Negotiating Ideologies in the Multimodal Discourse of an EFL Textbook in Korean University Classrooms",
+      "authors": [
+        "Christopher A. Smith"
+      ],
+      "year": 2020,
+      "venue": "",
+      "url": "http://repository.library.carleton.ca/downloads/1j92g8461",
+      "doi": "10.22215/etd/2020-14260",
+      "type": "thesis",
+      "open_access": true,
+      "citation_count": 22,
+      "abstract": "Textbooks are artifacts of a pedagogical culture, but in the context of English as a Foreign Language (EFL) education in Korean universities, that culture often forces instructors and students to use generic, global publications for reasons more political than pedagogical. Critical studies of EFL textbooks in global and Korean contexts reveal they contain certain social realities that often favor Anglo-centric hegemonies, while marginalizing their intended audiences. Regardless of those social injustices, Korean university programs continue to prescribe globally published EFL textbooks that often serve as the course curriculum. While some research underscores content and consumption in Korean contexts, none yield a comprehensive look at the multimodal discourse in a specific EFL textbook or correlate how that content is negotiated, consumed and valued by students and instructors in a comparable fashion.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "thesis"
+    },
+    {
+      "id": "openalex:W4313469377",
+      "title": "Towards temporal sentence grounding in videos",
+      "authors": [
+        "Hao Zhang"
+      ],
+      "year": 2022,
+      "venue": "",
+      "url": "https://dr.ntu.edu.sg/bitstream/10356/163788/2/PhD_Thesis___Zhang_Hao.pdf",
+      "doi": "10.32657/10356/163788",
+      "type": "thesis",
+      "open_access": true,
+      "citation_count": 7,
+      "abstract": "Temporal sentence grounding in videos (TSGV), a.k.a., natural language video localization (NLVL) or video moment retrieval (VMR), aims to retrieve a temporal moment (i.e., a fraction of a video) that semantically corresponds to a language query from an untrimmed video. Connecting computer vision and natural language, TSGV has drawn significant attention from researchers in both communities. Successful retrieval of temporal moments enables machines to understand and organize multimodal information in a systematic manner. Different from humans who can quickly identify temporal moments, which is semantically related to a given language query, using their inference-making ability and commonsense knowledge, machines do not have such intelligence. The main challenge is that machines require to understand the semantics of both video and language query, as well as the precise cross-modal reasoning between them. As video and language query are different modalities, the recognition and localization of temporal moments greatly depend on machine understanding of the input contents and interactions between them. In this thesis, we introduce several novel approaches to tackle the TSGV problem from a new perspective. First, we propose to formulate TSGV as a span-based question answering (QA) task by treating the input video as a text passage. Then we devise a video span localizing network (VSLNet), on top of a typical span-based QA framework, to address TSGV by considering the differences between TSGV and span-based QA. The proposed method demonstrates that adopting a span-based QA framework is a promising direction to solve TSGV, and superior performance is obtained on several benchmark datasets. Second, despite the promising performance achieved by VSLNet, we observe existing solutions, including VSLNet, only perform well on short videos, but fail to generalize on long videos. To address the issue of performance degradation on long videos, we extend VSLNet to VSLNet-L by applyin",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "thesis"
+    },
+    {
+      "id": "openalex:W3013449349",
+      "title": "Multimodal emotion recognition using deep learning techniques",
+      "authors": [
+        "Tien Dung Nguyen"
+      ],
+      "year": 2020,
+      "venue": "Queensland University of Technology",
+      "url": "https://eprints.qut.edu.au/180753/1/Tien%20Dung_Nguyen_Thesis.pdf",
+      "doi": "10.5204/thesis.eprints.180753",
+      "type": "thesis",
+      "open_access": true,
+      "citation_count": 6,
+      "abstract": "This thesis investigates the use of deep learning techniques to address the problem of machine understanding of human affective behaviour and improve the accuracy of both unimodal and multimodal human emotion recognition. The objective was to explore how best to configure deep learning networks to capture individually and jointly, the key features contributing to human emotions from three modalities (speech, face, and bodily movements) to accurately classify the expressed human emotion. The outcome of the research should be useful for several applications including the design of social robots.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "thesis"
+    },
+    {
+      "id": "openalex:W4321242134",
+      "title": "Multimodal data fusion of remote sensing and social media using machine learning for natural disaster detection and assessment",
+      "authors": [
+        "Rabiul Islam Jony"
+      ],
+      "year": 2023,
+      "venue": "Queensland University of Technology",
+      "url": "https://eprints.qut.edu.au/238058/1/Rabiul%2BIslam%2BJony%2BThesis%284%29.pdf",
+      "doi": "10.5204/thesis.eprints.238058",
+      "type": "thesis",
+      "open_access": true,
+      "citation_count": 6,
+      "abstract": "For more than a decade, social media has emerged as a potential platform to generate and spread information about a natural disasters. Alternatively, a common way of conducting research into natural disasters is via remote sensing. However, remote sensing data comes with few challenges, such as, unavailability due to long revisit time of the sensors, and obstruction due to cloud cover. This research develops a novel machine learning algorithm for the fusion of Social media images and text with Remote sensing multispectral satellite images to detect flooding. The fusion method is further extended to generate flood maps for assessment.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "thesis"
+    },
+    {
+      "id": "openalex:W4292589917",
+      "title": "Towards designing a flexible multimodal learning analytics system",
+      "authors": [
+        "Hamza Ouhaichi"
+      ],
+      "year": 2022,
+      "venue": "",
+      "url": "http://mau.diva-portal.org/smash/get/diva2:1658780/FULLTEXT02",
+      "doi": "10.24834/isbn.9789178772988",
+      "type": "thesis",
+      "open_access": true,
+      "citation_count": 5,
+      "abstract": "Dynamic data and continuously evolving sets of records are essential for a wide variety of today's data management applications. Such applications range from large, social, content-driven Internet applications, to highly focused data processing verticals like data intensive science, telecommunications and intelligence applications. However, the dynamic and multimodal nature of data makes it challenging to transform it into machine-readable and machineinterpretable forms. In this paper, we report on an action research study that we conducted in collaboration with a multinational company in the embedded systems domain. In our study, and in the context of a real-world industrial application of dynamic data management, we provide insights to data science community and research to guide discussions and future research into dynamic data management in embedded systems. Our study identifies the key challenges in the phases of data collection, data storage and data cleaning that can significantly impact the overall performance of the system.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "thesis"
+    },
+    {
+      "id": "openalex:W3094484211",
+      "title": "Multimodal Sensor Calibration with a Spherical Calibration Target",
+      "authors": [
+        "Julius Kümmerle"
+      ],
+      "year": 2020,
+      "venue": "Repository KITopen (Karlsruhe Institute of Technology)",
+      "url": "https://doi.org/10.5445/ir/1000124721",
+      "doi": "10.5445/ir/1000124721",
+      "type": "thesis",
+      "open_access": true,
+      "citation_count": 4,
+      "abstract": "Automatisierte Systeme werden mit einer zunehmenden Anzahl unterschied- licher Sensoren ausgestattet, um immer komplexere Aufgaben zu bewältigen. Präzise Sensorkalibrierung ist eine essentielle Voraussetzung, um die Informa- tionen der Sensoren zu fusionieren und wichtige Aufgaben wie Lokalisierung und Objekterkennung zuverlässig zu bewerkstelligen. In dieser Arbeit werden neue Methoden zur multimodalen Sensorkalibrierung vorgestellt. Es wird ein spherischer Kalibrierkörper entwickelt, der von einer Vielzahl an Sensoren, wie beispielsweise Kameras, Laserscannern und Radaren, detektiert werden kann. Der Kalibrierkörper hat mehrere günstige Eigenschaften, welche akkurate Detektionen ermöglichen und zu einer sim- plen Problemformulierung führen. Es werden drei Kalibriermethoden präsen- tiert. Die erste Methode minimiert euklidische Distanzen zwischen Beobach- tungen des Kugelzentrums, um die Sensorposen zu schätzen. In der nächst fortgeschritteneren Methode werden durch eine probabilistische Problemfor- mulierung zusätzlich Beobachtungsunsicherheiten miteinbezogen. In der drit- ten Methode werden, neben den Sensorposen, auch intrinsische Sensorparam- eter geschätzt. Die drei Methoden werden in Simulation und mittels Realdaten evaluiert. Es wird gezeigt, dass bereits die einfachste Methode sehr gute Ergebnisse liefert, mit einem Durchschnittsfehler von weniger als 3 mm in Position und 0.1deg in Orientierung für einen Sensoraufbau mit einer Kamera und einem Laserscanner. Außerdem wird in der Evaluation ersichtlich, dass die Berück- sichtigung von Beobachtungsunsicherheiten zu einer deutlichen Verbesserung der Kalibrierergebnisse führt. Schließlich wird experimentell gezeigt, dass die Schätzung der intrinsischen Kameraparameter von den komplementären Messungen der Tiefensensoren profitieren kann.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "thesis"
+    },
+    {
+      "id": "openalex:W3130054217",
+      "title": "Deep Multimodal Learning for Vision and Language Processing",
+      "authors": [
+        "Rémi Cadène"
+      ],
+      "year": 2020,
+      "venue": "",
+      "url": "https://tel.archives-ouvertes.fr/tel-03140942",
+      "doi": null,
+      "type": "thesis",
+      "open_access": true,
+      "citation_count": 2,
+      "abstract": "Digital technologies have become instrumental in transforming our society. Recent statistical methods have been successfully deployed to automate the processing of the growing amount of images, videos, and texts we produce daily. In particular, deep neural networks have been adopted by the computer vision and natural language processing communities for their ability to perform accurate image recognition and text understanding once trained on big sets of data. Advances in both communities built the groundwork for new research problems at the intersection of vision and language. Integrating language into visual recognition could have an important impact on human life through the creation of real-world applications such as next-generation search engines or AI assistants.In the first part of this thesis, we focus on systems for cross-modal text-image retrieval. We propose a learning strategy to efficiently align both modalities while structuring the retrieval space with semantic information. In the second part, we focus on systems able to answer questions about an image. We propose a multimodal architecture that iteratively fuses the visual and textual modalities using a factorized bilinear model while modeling pairwise relationships between each region of the image. In the last part, we address the issues related to biases in the modeling. We propose a learning strategy to reduce the language biases which are commonly present in visual question answering systems.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "thesis"
+    },
+    {
+      "id": "openalex:W4392679398",
+      "title": "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context",
+      "authors": [
+        "Gemini Robotics Team",
+        "Petko Georgiev",
+        "Ving Ian Lei",
+        "Ryan Burnell",
+        "Libin Bai",
+        "Anmol Gulati",
+        "Garrett Tanzer",
+        "Damien Vincent",
+        "Zhufeng Pan",
+        "Wang, Shibo",
+        "Mariooryad, Soroosh",
+        "Yifan Ding"
+      ],
+      "year": 2024,
+      "venue": "arXiv (Cornell University)",
+      "url": "https://doi.org/10.48550/arxiv.2403.05530",
+      "doi": "10.48550/arxiv.2403.05530",
+      "type": "preprint",
+      "open_access": true,
+      "citation_count": 291,
+      "abstract": "In this report, we introduce the Gemini 1.5 family of models, representing the next generation of highly compute-efficient multimodal models capable of recalling and reasoning over fine-grained information from millions of tokens of context, including multiple long documents and hours of video and audio. The family includes two new models: (1) an updated Gemini 1.5 Pro, which exceeds the February version on the great majority of capabilities and benchmarks; (2) Gemini 1.5 Flash, a more lightweight variant designed for efficiency with minimal regression in quality. Gemini 1.5 models achieve near-perfect recall on long-context retrieval tasks across modalities, improve the state-of-the-art in long-document QA, long-video QA and long-context ASR, and match or surpass Gemini 1.0 Ultra's state-of-the-art performance across a broad set of benchmarks. Studying the limits of Gemini 1.5's long-context ability, we find continued improvement in next-token prediction and near-perfect retrieval (&gt;99%) up to at least 10M tokens, a generational leap over existing models such as Claude 3.0 (200k) and GPT-4 Turbo (128k). Finally, we highlight real-world use cases, such as Gemini 1.5 collaborating with professionals on completing their tasks achieving 26 to 75% time savings across 10 different job categories, as well as surprising new capabilities of large language models at the frontier; when given a grammar manual for Kalamang, a language with fewer than 200 speakers worldwide, the model learns to translate English to Kalamang at a similar level to a person who learned from the same content.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "preprint"
+    },
+    {
+      "id": "openalex:W4392341509",
+      "title": "Sora: A Review on Background, Technology, Limitations, and Opportunities of Large Vision Models",
+      "authors": [
+        "Yixin Liu",
+        "Kai Zhang",
+        "Yuan Li",
+        "Zhiling Yan",
+        "Chujie Gao",
+        "Ruoxi Chen",
+        "Zhengqing Yuan",
+        "Yue Huang",
+        "Hanchi Sun",
+        "Jianfeng Gao",
+        "Lifang He",
+        "Lichao Sun"
+      ],
+      "year": 2024,
+      "venue": "arXiv (Cornell University)",
+      "url": "https://doi.org/10.48550/arxiv.2402.17177",
+      "doi": "10.48550/arxiv.2402.17177",
+      "type": "preprint",
+      "open_access": true,
+      "citation_count": 102,
+      "abstract": "Sora is a text-to-video generative AI model, released by OpenAI in February 2024. The model is trained to generate videos of realistic or imaginative scenes from text instructions and show potential in simulating the physical world. Based on public technical reports and reverse engineering, this paper presents a comprehensive review of the model's background, related technologies, applications, remaining challenges, and future directions of text-to-video AI models. We first trace Sora's development and investigate the underlying technologies used to build this \"world simulator\". Then, we describe in detail the applications and potential impact of Sora in multiple industries ranging from film-making and education to marketing. We discuss the main challenges and limitations that need to be addressed to widely deploy Sora, such as ensuring safe and unbiased video generation. Lastly, we discuss the future development of Sora and video generation models in general, and how advancements in the field could enable new ways of human-AI interaction, boosting productivity and creativity of video generation.",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "preprint"
+    },
+    {
+      "id": "openalex:W4386655647",
+      "title": "NExT-GPT: Any-to-Any Multimodal LLM",
+      "authors": [
+        "Shengqiong Wu",
+        "Fei, Hao",
+        "Leigang Qu",
+        "Wei Ji",
+        "Tat‐Seng Chua"
+      ],
+      "year": 2023,
+      "venue": "arXiv (Cornell University)",
+      "url": "https://doi.org/10.48550/arxiv.2309.05519",
+      "doi": "10.48550/arxiv.2309.05519",
+      "type": "preprint",
+      "open_access": true,
+      "citation_count": 95,
+      "abstract": "While recently Multimodal Large Language Models (MM-LLMs) have made exciting strides, they mostly fall prey to the limitation of only input-side multimodal understanding, without the ability to produce content in multiple modalities. As we humans always perceive the world and communicate with people through various modalities, developing any-to-any MM-LLMs capable of accepting and delivering content in any modality becomes essential to human-level AI. To fill the gap, we present an end-to-end general-purpose any-to-any MM-LLM system, NExT-GPT. We connect an LLM with multimodal adaptors and different diffusion decoders, enabling NExT-GPT to perceive inputs and generate outputs in arbitrary combinations of text, images, videos, and audio. By leveraging the existing well-trained highly-performing encoders and decoders, NExT-GPT is tuned with only a small amount of parameter (1%) of certain projection layers, which not only benefits low-cost training and also facilitates convenient expansion to more potential modalities. Moreover, we introduce a modality-switching instruction tuning (MosIT) and manually curate a high-quality dataset for MosIT, based on which NExT-GPT is empowered with complex cross-modal semantic understanding and content generation. Overall, our research showcases the promising possibility of building an AI agent capable of modeling universal modalities, paving the way for more human-like AI research in the community. Project page: https://next-gpt.github.io/",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "preprint"
+    },
+    {
+      "id": "openalex:W3163993681",
+      "title": "Physics-informed machine learning",
+      "authors": [
+        "George Em Karniadakis",
+        "Ioannis G. Kevrekidis",
+        "Lu Lu",
+        "Paris Perdikaris",
+        "Sifan Wang",
+        "Liu Yang"
+      ],
+      "year": 2021,
+      "venue": "Nature Reviews Physics",
+      "url": "https://www.osti.gov/servlets/purl/2282016",
+      "doi": "10.1038/s42254-021-00314-5",
+      "type": "journal",
+      "open_access": true,
+      "citation_count": 7018,
+      "abstract": "",
+      "source_apis": [
+        "openalex"
+      ],
+      "track": "key_reference"
+    }
+  ],
+  "errors": [],
+  "notes": [
+    "Normalized multi-track harvest for Pineapple 71717.",
+    "Tracks: key_reference, research, industry, thesis, preprint.",
+    "AI enrichment should confirm tracks and may add verified industry URLs."
+  ]
+}

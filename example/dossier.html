@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only — Research Dossier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;650;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+/* Skill71717 — Pineapple Research Materials
+   Professional academic dossier theme. Embed entire file into generated HTML. */
+
+:root {
+  --ink: #1a2332;
+  --ink-soft: #3d4a5c;
+  --paper: #f7f4ef;
+  --paper-card: #ffffff;
+  --rule: #d9d2c5;
+  --accent: #2f6f4e;
+  --accent-soft: #e6f0ea;
+  --gold: #c4a35a;
+  --gold-soft: #f3ead2;
+  --warn: #9a3412;
+  --chip: #eef2f6;
+  --shadow: 0 1px 2px rgba(26, 35, 50, 0.06), 0 8px 24px rgba(26, 35, 50, 0.06);
+  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  --font-body: "Source Sans 3", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  --radius: 10px;
+  --max: 1100px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 500px at 10% -10%, #eef6f1 0%, transparent 55%),
+    radial-gradient(900px 400px at 100% 0%, #f3ead2 0%, transparent 50%),
+    var(--paper);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--ink);
+}
+
+.shell {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+}
+
+.brand-mark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+
+.brand-sub {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.hero {
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.5rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin: 0 0 0.6rem;
+}
+
+.hero .lede {
+  margin: 0 0 1.1rem;
+  color: var(--ink-soft);
+  max-width: 62ch;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  background: var(--chip);
+  border: 1px solid var(--rule);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.chip strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin: 1.25rem 0 0;
+}
+
+.stat {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  padding: 0.85rem 0.95rem;
+}
+
+.stat .n {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat .l {
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.1rem 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.panel h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.panel p,
+.panel li {
+  color: var(--ink-soft);
+}
+
+.panel ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.panel li + li {
+  margin-top: 0.35rem;
+}
+
+.material {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-card);
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.85rem;
+  box-shadow: var(--shadow);
+}
+
+.material-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.85rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.material h3 {
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 650;
+  margin: 0;
+  letter-spacing: -0.02em;
+  flex: 1 1 16rem;
+  line-height: 1.3;
+}
+
+.material h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.material h3 a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.relevance {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.2rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: #5c4714;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.35rem 0 0.55rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--chip);
+  border: 1px solid var(--rule);
+  color: var(--ink-soft);
+}
+
+.badge.type-journal { background: #e8f0ff; border-color: #c9d8f5; color: #243f6b; }
+.badge.type-preprint { background: #fff3e0; border-color: #f0d2a8; color: #7a4a12; }
+.badge.type-dataset { background: #eaf7f0; border-color: #b9deca; color: #1f5a3a; }
+.badge.type-standard { background: #f1eaff; border-color: #d4c5f0; color: #4a2f78; }
+.badge.type-web { background: #f3f3f3; border-color: #d8d8d8; color: #444; }
+.badge.type-thesis { background: #fce8f0; border-color: #efc0d4; color: #7a2448; }
+.badge.track-key_reference { background: var(--gold-soft); border-color: #e0cfa0; color: #5c4714; }
+.badge.track-research { background: #e8f0ff; border-color: #c9d8f5; color: #243f6b; }
+.badge.track-industry { background: #eaf7f0; border-color: #b9deca; color: #1f5a3a; }
+.badge.track-thesis { background: #fce8f0; border-color: #efc0d4; color: #7a2448; }
+.badge.track-preprint { background: #fff3e0; border-color: #f0d2a8; color: #7a4a12; }
+.badge.oa { background: var(--accent-soft); border-color: #b7d4c3; color: var(--accent); }
+
+.guide {
+  margin-bottom: 1.5rem;
+}
+
+.guide h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.guide-table th,
+.guide-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.55rem 0.65rem;
+  border-top: 1px solid var(--rule);
+}
+
+.guide-table thead th {
+  border-top: 0;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.guide-table tbody th {
+  font-weight: 650;
+  width: 28%;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.guide-table td {
+  color: var(--ink-soft);
+}
+
+.material-section {
+  margin-bottom: 1.75rem;
+}
+
+.section-heading {
+  margin: 0 0 0.85rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.section-heading h2 {
+  font-family: var(--font-display);
+  font-size: 1.28rem;
+  margin: 0 0 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+.section-blurb {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.byline {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin: 0 0 0.45rem;
+}
+
+.desc {
+  margin: 0;
+  color: var(--ink);
+}
+
+.desc-secondary {
+  margin: 0.55rem 0 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.desc-secondary ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.side-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.side-list li {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  gap: 0.4rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.92rem;
+}
+
+.side-list li:last-child {
+  border-bottom: 0;
+}
+
+.side-list .n {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.bibtex {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  white-space: pre-wrap;
+  background: #f3f1ec;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 0.85rem;
+  max-height: 280px;
+  overflow: auto;
+  color: var(--ink);
+}
+
+/* Intake form */
+.intake-card {
+  max-width: 640px;
+  margin: 3rem auto;
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: var(--shadow);
+  padding: 1.75rem;
+}
+
+.intake-card h1 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  margin: 0 0 0.4rem;
+}
+
+.intake-card .lede {
+  color: var(--ink-soft);
+  margin: 0 0 1.25rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  font-size: 0.92rem;
+}
+
+.field .hint {
+  display: block;
+  font-weight: 400;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field select,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  background: #fff;
+  color: var(--ink);
+}
+
+.field textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 0.75rem;
+}
+
+@media (max-width: 520px) {
+  .checks {
+    grid-template-columns: 1fr;
+  }
+}
+
+.checks label {
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.btn {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1.2rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--rule);
+}
+
+.confirm {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.confirm h1 {
+  font-family: var(--font-display);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+  .shell {
+    max-width: none;
+    padding: 0;
+  }
+  .material,
+  .panel,
+  .hero {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-mark">Pineapple 71717</span>
+        <span class="brand-sub">Research Materials Dossier</span>
+      </div>
+    </div>
+
+    <header class="hero">
+      <h1>Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only</h1>
+      <div class="meta-row"><span class="chip"><strong>Field: Machine learning / robotics / computer vision</strong></span><span class="chip"><strong>Years: 2020–2026</strong></span><span class="chip">Generated <strong>2026-07-28</strong></span></div>
+      <div class="stats">
+        <div class="stat"><div class="n">50</div><div class="l">Materials</div></div>
+        <div class="stat"><div class="n">2020–2025</div><div class="l">Year span</div></div>
+        <div class="stat"><div class="n">100%</div><div class="l">Open access</div></div>
+        <div class="stat"><div class="n" style="font-size:1rem;padding-top:0.35rem">IEEE Access, arXiv (Cornell University), arXiv, Sensors</div><div class="l">Top venues</div></div>
+      </div>
+    </header>
+
+    
+<section class="guide panel" aria-label="What each section means">
+  <h2>What each section means</h2>
+  <table class="guide-table">
+    <thead>
+      <tr><th scope="col">Section</th><th scope="col">Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">Key references</th><td>Must-read, highly cited starters.</td></tr><tr><th scope="row">Research papers</th><td>Peer-reviewed journal or conference work.</td></tr><tr><th scope="row">Industry reports</th><td>Company / lab tech notes and blogs.</td></tr><tr><th scope="row">Theses</th><td>PhD or Master’s dissertations.</td></tr><tr><th scope="row">Preprints</th><td>Early drafts (e.g. arXiv), not yet peer-reviewed.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+
+    <div class="layout">
+      <main>
+        
+<section class="material-section" data-track="key_reference">
+  <div class="section-heading">
+    <h2>Key references</h2>
+    <p class="section-blurb">Must-read, highly cited starters.</p>
+  </div>
+  
+<article class="material" data-id="arxiv:2301.04104" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://arxiv.org/abs/2301.04104" target="_blank" rel="noopener noreferrer">Mastering Diverse Domains through World Models</a></h3>
+    <span class="relevance" title="Relevance score">96</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">1800 cites</span><span class="badge">arXiv</span></div>
+  <p class="byline">Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, Timothy Lillicrap</p>
+  
+  <p class="desc">DreamerV3 learns environment dynamics and improves behavior by imagining futures across many domains. Best academic starting point for the simulator-for-control side of this debate.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Canonical modern world-model RL agent: generation is for imagined planning, not media.</p><p><strong>Best for:</strong> Problem framing</p><p><strong>Limitations:</strong> Latent dynamics rather than Sora-scale RGB video.</p><p><strong>Key claims:</strong></p><ul><li>A single world-model agent can master diverse domains</li><li>Planning in latent imagination is practical at scale</li></ul></div>
+</article>
+
+
+<article class="material" data-id="arxiv:2402.15391" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://arxiv.org/abs/2402.15391" target="_blank" rel="noopener noreferrer">Genie: Generative Interactive Environments</a></h3>
+    <span class="relevance" title="Relevance score">95</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">700 cites</span><span class="badge">Google DeepMind</span><span class="badge">Google DeepMind</span></div>
+  <p class="byline">Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Tim Rocktäschel</p>
+  
+  <p class="desc">Genie learns action-controllable virtual worlds from unlabeled videos. Widely cited when distinguishing interactive world models from one-shot generative media.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Flagship interactive generative environment — simulator framing made explicit.</p><p><strong>Best for:</strong> Interactive simulator vs clip generator</p><p><strong>Limitations:</strong> Playable domains remain constrained versus photoreal foundation video.</p><p><strong>Key claims:</strong></p><ul><li>Latent actions can be learned without ground-truth controls</li><li>Generative models can yield interactive environments</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3003667836" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://ieeexplore.ieee.org/ielx7/6287639/8948470/08972429.pdf" target="_blank" rel="noopener noreferrer">Digital Twin: Values, Challenges and Enablers From a Modeling Perspective</a></h3>
+    <span class="relevance" title="Relevance score">95</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">1763 cites</span><span class="badge">IEEE Access</span></div>
+  <p class="byline">Adil Rasheed, Omer San, Trond Kvamsdal</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1109/access.2020.2970143" target="_blank" rel="noopener noreferrer">10.1109/access.2020.2970143</a></div>
+  <p class="desc">Digital twin can be defined as a virtual representation of a physical asset enabled through data and simulators for real-time prediction, optimization, monitoring, controlling, and improved decision making. Recent advances in computational pipelines, multiphysics solvers,…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Starting point / related work</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W2953303875" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://ieeexplore.ieee.org/ielx7/6287639/8948470/09046805.pdf" target="_blank" rel="noopener noreferrer">A Survey of Autonomous Driving: &lt;i&gt;Common Practices and Emerging Technologies&lt;/i&gt;</a></h3>
+    <span class="relevance" title="Relevance score">95</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">1744 cites</span><span class="badge">IEEE Access</span></div>
+  <p class="byline">Ekim Yurtsever, Jacob Lambert, Alexander Carballo, Kazuya Takeda</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1109/access.2020.2983149" target="_blank" rel="noopener noreferrer">10.1109/access.2020.2983149</a></div>
+  <p class="desc">Automated driving systems (ADSs) promise a safe, comfortable and efficient driving experience. However, fatalities involving vehicles equipped with ADSs are on the rise. The full potential of ADSs cannot be realized unless the robustness of state-of-the-art is improved further.…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Starting point / related work</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3140854437" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://journalofbigdata.springeropen.com/counter/pdf/10.1186/s40537-021-00444-8" target="_blank" rel="noopener noreferrer">Review of deep learning: concepts, CNN architectures, challenges, applications, future directions</a></h3>
+    <span class="relevance" title="Relevance score">94</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2021</span><span class="badge">7685 cites</span><span class="badge">Journal Of Big Data</span></div>
+  <p class="byline">Laith Alzubaidi, Jinglan Zhang, Amjad J. Humaidi, Ayad Q. Al-Dujaili, Ye Duan, Omran Al-Shamma, José Santamaría, Mohammed A. Fadhel, Muthana Al‐Amidie, Laith Farhan</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1186/s40537-021-00444-8" target="_blank" rel="noopener noreferrer">10.1186/s40537-021-00444-8</a></div>
+  <p class="desc">In the last few years, the deep learning (DL) computing paradigm has been deemed the Gold Standard in the machine learning (ML) community. Moreover, it has gradually become the most widely used computational approach in the field of ML, thus achieving outstanding results on…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Starting point / related work</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W2995022099" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://doi.org/10.1561/2200000083" target="_blank" rel="noopener noreferrer">Advances and Open Problems in Federated Learning</a></h3>
+    <span class="relevance" title="Relevance score">94</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">4942 cites</span><span class="badge">Foundations and Trends® in Machine Learning</span></div>
+  <p class="byline">Peter Kairouz, H. Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Kallista Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, Rafael G. L. D’Oliveira, Hubert Eichner</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1561/2200000083" target="_blank" rel="noopener noreferrer">10.1561/2200000083</a></div>
+  <p class="desc">Federated learning (FL) is a machine learning setting where many clients (e.g., mobile devices or whole organizations) collaboratively train a model under the orchestration of a central server (e.g., service provider), while keeping the training data decentralized. FL embodies…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Starting point / related work</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3168997536" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="http://hdl.handle.net/10072/405164" target="_blank" rel="noopener noreferrer">A Survey of Convolutional Neural Networks: Analysis, Applications, and Prospects</a></h3>
+    <span class="relevance" title="Relevance score">94</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2021</span><span class="badge">4932 cites</span><span class="badge">IEEE Transactions on Neural Networks and Learning Systems</span></div>
+  <p class="byline">Zewen Li, Fan Liu, Wenjie Yang, Shouheng Peng, Jun Zhou</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1109/tnnls.2021.3084827" target="_blank" rel="noopener noreferrer">10.1109/tnnls.2021.3084827</a></div>
+  <p class="desc">A convolutional neural network (CNN) is one of the most significant networks in the deep learning field. Since CNN made impressive achievements in many areas, including but not limited to computer vision and natural language processing, it attracted much attention from both…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Starting point / related work</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3153990350" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://link.springer.com/content/pdf/10.1007/s12525-021-00475-2.pdf" target="_blank" rel="noopener noreferrer">Machine learning and deep learning</a></h3>
+    <span class="relevance" title="Relevance score">94</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2021</span><span class="badge">2534 cites</span><span class="badge">Electronic Markets</span></div>
+  <p class="byline">Christian Janiesch, Patrick Zschech, Kai Heinrich</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1007/s12525-021-00475-2" target="_blank" rel="noopener noreferrer">10.1007/s12525-021-00475-2</a></div>
+  <p class="desc">Abstract Today, intelligent systems that offer artificial intelligence capabilities often rely on machine learning. Machine learning describes the capacity of systems to learn from problem-specific training data to automate the process of analytical model building and solve…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Starting point / related work</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4386142022" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://link.springer.com/content/pdf/10.1007/s12559-023-10179-8.pdf" target="_blank" rel="noopener noreferrer">Interpreting Black-Box Models: A Review on Explainable Artificial Intelligence</a></h3>
+    <span class="relevance" title="Relevance score">94</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">1831 cites</span><span class="badge">Cognitive Computation</span></div>
+  <p class="byline">Vikas Hassija, Vinay Chamola, Atmesh Mahapatra, Abhinandan Singal, Divyansh Goel, Kaizhu Huang, Simone Scardapane, Indro Spinelli, Mufti Mahmud, Amir Hussain</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1007/s12559-023-10179-8" target="_blank" rel="noopener noreferrer">10.1007/s12559-023-10179-8</a></div>
+  <p class="desc">Abstract Recent years have seen a tremendous growth in Artificial Intelligence (AI)-based methodological development in a broad range of domains. In this rapidly evolving field, large number of methods are being reported using machine learning (ML) and Deep Learning (DL) models.…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Starting point / related work</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4206484811" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://ieeexplore.ieee.org/ielx7/6287639/9668973/09667507.pdf" target="_blank" rel="noopener noreferrer">A Metaverse: Taxonomy, Components, Applications, and Open Challenges</a></h3>
+    <span class="relevance" title="Relevance score">94</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2022</span><span class="badge">1789 cites</span><span class="badge">IEEE Access</span></div>
+  <p class="byline">Sangmin Park, Young‐Gab Kim</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1109/access.2021.3140175" target="_blank" rel="noopener noreferrer">10.1109/access.2021.3140175</a></div>
+  <p class="desc">Unlike previous studies on the Metaverse based on Second Life, the current Metaverse is based on the social value of Generation Z that online and offline selves are not different. With the technological development of deep learning-based high-precision recognition models and…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Starting point / related work</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3163993681" data-track="key_reference">
+  <div class="material-head">
+    <h3><a href="https://www.osti.gov/servlets/purl/2282016" target="_blank" rel="noopener noreferrer">Physics-informed machine learning</a></h3>
+    <span class="relevance" title="Relevance score">94</span>
+  </div>
+  <div class="badges"><span class="badge track-key_reference">key reference</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2021</span><span class="badge">7018 cites</span><span class="badge">Nature Reviews Physics</span></div>
+  <p class="byline">George Em Karniadakis, Ioannis G. Kevrekidis, Lu Lu, Paris Perdikaris, Sifan Wang, Liu Yang</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1038/s42254-021-00314-5" target="_blank" rel="noopener noreferrer">10.1038/s42254-021-00314-5</a></div>
+  <p class="desc">Physics-informed machine learning — see the linked source for details.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Starting point / related work</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+</section>
+
+
+<section class="material-section" data-track="research">
+  <div class="section-heading">
+    <h2>Research papers</h2>
+    <p class="section-blurb">Peer-reviewed journal or conference work.</p>
+  </div>
+  
+<article class="material" data-id="arxiv:2302.02648" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://arxiv.org/abs/2302.02648" target="_blank" rel="noopener noreferrer">Learning Universal Policies via Text-Guided Video Generation</a></h3>
+    <span class="relevance" title="Relevance score">96</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">650 cites</span><span class="badge">ICLR</span></div>
+  <p class="byline">Yilun Du, Sherry Yang, Bo Dai, Hanjun Dai, Ofir Nachum, Joshua B. Tenenbaum, Dale Schuurmans, Pieter Abbeel</p>
+  
+  <p class="desc">UniPi treats decision making as generating a video plan from text, then reading actions from frames — a core bridge between generative video and planning.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Uses text-guided video generation as the planning representation.</p><p><strong>Best for:</strong> Methods: video-as-planner</p><p><strong>Limitations:</strong> Scale lags frontier media models; limited evaluation domains.</p><p><strong>Key claims:</strong></p><ul><li>Video models can propose multi-step plans from language</li><li>Action extraction closes the loop to control</li></ul></div>
+</article>
+
+
+<article class="material" data-id="arxiv:2405.12399" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://arxiv.org/abs/2405.12399" target="_blank" rel="noopener noreferrer">Diffusion for World Modeling: Visual Details Matter in Atari</a></h3>
+    <span class="relevance" title="Relevance score">88</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">280 cites</span><span class="badge">NeurIPS</span></div>
+  <p class="byline">Eloi Alonso, Adam Jelley, Vincent Micheli, Anssi Kanervisto, Amos Storkey, Tim Pearce, François Fleuret</p>
+  
+  <p class="desc">DIAMOND uses diffusion world modeling for Atari and argues visual detail in imagined rollouts matters for control.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Links diffusion visual fidelity to planning-relevant imagination.</p><p><strong>Best for:</strong> Fidelity vs planning utility</p><p><strong>Limitations:</strong> Atari-scale results may not extrapolate to real-world physics.</p><p><strong>Key claims:</strong></p><ul><li>Diffusion world models can be competitive for RL imagination</li><li>Discarding visual detail can hurt imagined-policy learning</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3154736008" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://link.springer.com/content/pdf/10.1007/s10055-021-00513-6.pdf" target="_blank" rel="noopener noreferrer">Cybersickness in current-generation virtual reality head-mounted displays: systematic review and outlook</a></h3>
+    <span class="relevance" title="Relevance score">75</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2021</span><span class="badge">347 cites</span><span class="badge">Virtual Reality</span></div>
+  <p class="byline">Polona Caserman, Augusto García-Agúndez, Alvar Gámez Zerban, Stefan Göbel</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1007/s10055-021-00513-6" target="_blank" rel="noopener noreferrer">10.1007/s10055-021-00513-6</a></div>
+  <p class="desc">Abstract Cybersickness (CS) is a term used to refer to symptoms, such as nausea, headache, and dizziness that users experience during or after virtual reality immersion. Initially discovered in flight simulators, commercial virtual reality (VR) head-mounted displays (HMD) of the…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4391610180" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2024.1331062/pdf" target="_blank" rel="noopener noreferrer">Generative artificial intelligence in drug discovery: basic framework, recent advances, challenges, and opportunities</a></h3>
+    <span class="relevance" title="Relevance score">75</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">168 cites</span><span class="badge">Frontiers in Pharmacology</span></div>
+  <p class="byline">Amit Gangwal, M. Azim Ansari, Iqrar Ahmad, Abul Kalam Azad, Vinoth Kumarasamy, Vetriselvan Subramaniyan, Ling Shing Wong</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.3389/fphar.2024.1331062" target="_blank" rel="noopener noreferrer">10.3389/fphar.2024.1331062</a></div>
+  <p class="desc">There are two main ways to discover or design small drug molecules. The first involves fine-tuning existing molecules or commercially successful drugs through quantitative structure-activity relationships and virtual screening. The second approach involves generating new…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4385431115" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://doi.org/10.15607/rss.2023.xix.066" target="_blank" rel="noopener noreferrer">ConceptFusion: Open-set multimodal 3D mapping</a></h3>
+    <span class="relevance" title="Relevance score">73</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">193 cites</span></div>
+  <p class="byline">Krishna Murthy Jatavallabhula, Alihusein Kuwajerwala, Qiao Gu, Mohd Omama, Ganesh Iyer, Soroush Saryazdi, Tao Chen, Alaa Maalouf, Shuang Li, Nikhil Keetha, Ayush Tewari, Joshua B. Tenenbaum</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.15607/rss.2023.xix.066" target="_blank" rel="noopener noreferrer">10.15607/rss.2023.xix.066</a></div>
+  <p class="desc">modalities such as natural language, images, and audio.We demonstrate that pixel-aligned open-set features can be fused into 3D maps via traditional SLAM and multi-view fusion approaches.This enables effective zero-shot spatial reasoning, not needing any additional training or…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4398238904" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://link.springer.com/content/pdf/10.1186/s40561-024-00310-z.pdf" target="_blank" rel="noopener noreferrer">Google Gemini as a next generation AI educational tool: a review of emerging educational technology</a></h3>
+    <span class="relevance" title="Relevance score">73</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">181 cites</span><span class="badge">Smart Learning Environments</span></div>
+  <p class="byline">Muhammad Imran, Norah Almusharraf</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1186/s40561-024-00310-z" target="_blank" rel="noopener noreferrer">10.1186/s40561-024-00310-z</a></div>
+  <p class="desc">Abstract This emerging technology report discusses Google Gemini as a multimodal generative AI tool and presents its revolutionary potential for future educational technology. It introduces Gemini and its features, including versatility in processing data from text, image,…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4402155831" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://www.jmir.org/2024/1/e59505/PDF" target="_blank" rel="noopener noreferrer">Multimodal Large Language Models in Health Care: Applications, Challenges, and Future Outlook</a></h3>
+    <span class="relevance" title="Relevance score">72</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">267 cites</span><span class="badge">Journal of Medical Internet Research</span></div>
+  <p class="byline">Rawan AlSaad, Alaa Abd‐Alrazaq, Sabri Boughorbel, Arfan Ahmed, Max-Antoine Renault, Rafat Damseh, Javaid I. Sheikh</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.2196/59505" target="_blank" rel="noopener noreferrer">10.2196/59505</a></div>
+  <p class="desc">In the complex and multidimensional field of medicine, multimodal data are prevalent and crucial for informed clinical decisions. Multimodal data span a broad spectrum of data types, including medical images (eg, MRI and CT scans), time-series data (eg, sensor data from wearable…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4324290234" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://ieeexplore.ieee.org/ielx7/6287639/6514899/10068493.pdf" target="_blank" rel="noopener noreferrer">Blockchain Meets Metaverse and Digital Asset Management: A Comprehensive Survey</a></h3>
+    <span class="relevance" title="Relevance score">72</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">241 cites</span><span class="badge">IEEE Access</span></div>
+  <p class="byline">Vu Tuan Truong, Long Bao Le, Dusit Niyato</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1109/access.2023.3257029" target="_blank" rel="noopener noreferrer">10.1109/access.2023.3257029</a></div>
+  <p class="desc">Envisioned to be the next-generation Internet, the metaverse has been attracting enormous attention from both the academia and industry. The metaverse can be viewed as a 3D immersive virtual world, where people use Augmented/Virtual Reality (AR/VR) devices to access and interact…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3083484791" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://doi.org/10.1016/j.vrih.2020.07.008" target="_blank" rel="noopener noreferrer">Multimodal teaching, learning and training in virtual reality: a review and case study</a></h3>
+    <span class="relevance" title="Relevance score">72</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">217 cites</span><span class="badge">Virtual Reality &amp; Intelligent Hardware</span></div>
+  <p class="byline">Stéphanie Philippe, Alexis D. Souchet, Petros Lameras, Panagiotis Petridis, Julien Caporal, Gildas Coldeboeuf, Hadrien Duzan</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1016/j.vrih.2020.07.008" target="_blank" rel="noopener noreferrer">10.1016/j.vrih.2020.07.008</a></div>
+  <p class="desc">It is becoming increasingly prevalent in digital learning research to encompass an array of different meanings, spaces, processes, and teaching strategies for discerning a global perspective on constructing the student learning experience. Multimodality is an emergent phenomenon…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3016364508" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://ieeexplore.ieee.org/ielx7/6287639/8948470/09069183.pdf" target="_blank" rel="noopener noreferrer">Advantages and Constraints of a Hybrid Model K-12 E-Learning Assistant Chatbot</a></h3>
+    <span class="relevance" title="Relevance score">71</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">199 cites</span><span class="badge">IEEE Access</span></div>
+  <p class="byline">Eric Hsiao‐Kuang Wu, Chun-Han Lin, Yu‐Yen Ou, Chen-Zhong Liu, Wei-Kai Wang, Chi-Yun Chao</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1109/access.2020.2988252" target="_blank" rel="noopener noreferrer">10.1109/access.2020.2988252</a></div>
+  <p class="desc">E-Learning has become more and more popular in recent years with the advance of new technologies. Using their mobile devices, people can expand their knowledge anytime and anywhere. E-Learning also makes it possible for people to manage their learning progression freely and…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3153454949" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://www.mdpi.com/1424-8220/21/8/2811/pdf?version=1618913949" target="_blank" rel="noopener noreferrer">An Efficient Anomaly Recognition Framework Using an Attention Residual LSTM in Surveillance Videos</a></h3>
+    <span class="relevance" title="Relevance score">71</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2021</span><span class="badge">185 cites</span><span class="badge">Sensors</span></div>
+  <p class="byline">Waseem Ullah, Amin Ullah, Tanveer Hussain, Zulfiqar Ahmad Khan, Sung Wook Baik</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.3390/s21082811" target="_blank" rel="noopener noreferrer">10.3390/s21082811</a></div>
+  <p class="desc">Video anomaly recognition in smart cities is an important computer vision task that plays a vital role in smart surveillance and public safety but is challenging due to its diverse, complex, and infrequent occurrence in real-time surveillance environments. Various deep learning…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4378746725" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://www.frontiersin.org/articles/10.3389/fnbot.2023.1084000/pdf" target="_blank" rel="noopener noreferrer">Recent advancements in multimodal human–robot interaction</a></h3>
+    <span class="relevance" title="Relevance score">71</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">165 cites</span><span class="badge">Frontiers in Neurorobotics</span></div>
+  <p class="byline">Hang Su, Wen Qi, Jiahao Chen, Chenguang Yang, Juan Sandoval, Med Amine Laribi</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.3389/fnbot.2023.1084000" target="_blank" rel="noopener noreferrer">10.3389/fnbot.2023.1084000</a></div>
+  <p class="desc">Robotics have advanced significantly over the years, and human-robot interaction (HRI) is now playing an important role in delivering the best user experience, cutting down on laborious tasks, and raising public acceptance of robots. New HRI approaches are necessary to promote…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4389266910" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/aisy.202300359" target="_blank" rel="noopener noreferrer">Multimodal Human–Robot Interaction for Human‐Centric Smart Manufacturing: A Survey</a></h3>
+    <span class="relevance" title="Relevance score">71</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">165 cites</span><span class="badge">Advanced Intelligent Systems</span></div>
+  <p class="byline">Tian Wang, Pai Zheng, Shufei Li, Lihui Wang</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1002/aisy.202300359" target="_blank" rel="noopener noreferrer">10.1002/aisy.202300359</a></div>
+  <p class="desc">Human–robot interaction (HRI) has escalated in notability in recent years, and multimodal communication and control strategies are necessitated to guarantee a secure, efficient, and intelligent HRI experience. In spite of the considerable focus on multimodal HRI, comprehensive…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4394606408" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://dl.acm.org/doi/pdf/10.1145/3656580" target="_blank" rel="noopener noreferrer">Foundations &amp;amp; Trends in Multimodal Machine Learning: Principles, Challenges, and Open Questions</a></h3>
+    <span class="relevance" title="Relevance score">71</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">161 cites</span><span class="badge">ACM Computing Surveys</span></div>
+  <p class="byline">Paul Pu Liang, Amir Zadeh, Louis‐Philippe Morency</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1145/3656580" target="_blank" rel="noopener noreferrer">10.1145/3656580</a></div>
+  <p class="desc">Multimodal machine learning is a vibrant multi-disciplinary research field that aims to design computer agents with intelligent capabilities such as understanding, reasoning, and learning through integrating multiple communicative modalities, including linguistic, acoustic,…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4406412004" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://www.mdpi.com/1424-8220/25/2/472/pdf?version=1737000953" target="_blank" rel="noopener noreferrer">A Review of CNN Applications in Smart Agriculture Using Multimodal Data</a></h3>
+    <span class="relevance" title="Relevance score">71</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2025</span><span class="badge">150 cites</span><span class="badge">Sensors</span></div>
+  <p class="byline">Mohammad El Sakka, Mihai Ivanovici, Lotfi Chaâri, Josiane Mothe</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.3390/s25020472" target="_blank" rel="noopener noreferrer">10.3390/s25020472</a></div>
+  <p class="desc">This review explores the applications of Convolutional Neural Networks (CNNs) in smart agriculture, highlighting recent advancements across various applications including weed detection, disease detection, crop classification, water management, and yield prediction. Based on a…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4394806371" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://firstmonday.org/ojs/index.php/fm/article/download/13636/11606" target="_blank" rel="noopener noreferrer">The TESCREAL bundle: Eugenics and the promise of utopia through artificial general intelligence</a></h3>
+    <span class="relevance" title="Relevance score">71</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">148 cites</span><span class="badge">First Monday</span></div>
+  <p class="byline">Timnit Gebru, Émile P. Torres</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.5210/fm.v29i4.13636" target="_blank" rel="noopener noreferrer">10.5210/fm.v29i4.13636</a></div>
+  <p class="desc">The stated goal of many organizations in the field of artificial intelligence (AI) is to develop artificial general intelligence (AGI), an imagined system with more intelligence than anything we have ever seen. Without seriously questioning whether such a system can and should…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3015928967" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0226248&amp;type=printable" target="_blank" rel="noopener noreferrer">Multimodal mental health analysis in social media</a></h3>
+    <span class="relevance" title="Relevance score">71</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">131 cites</span><span class="badge">PLoS ONE</span></div>
+  <p class="byline">Amir Hossein Yazdavar, Mohammad Saeid Mahdavinejad, Goonmeet Bajaj, William L. Romine, Amit Sheth, Amir Hassan Monadjemi, Krishnaprasad Thirunarayan, John M. Meddar, Annie Myers, Jyotishman Pathak, Pascal Hitzler</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1371/journal.pone.0226248" target="_blank" rel="noopener noreferrer">10.1371/journal.pone.0226248</a></div>
+  <p class="desc">Depression is a major public health concern in the U.S. and globally. While successful early identification and treatment can lead to many positive health and behavioral outcomes, depression, remains undiagnosed, untreated or undertreated due to several reasons, including denial…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3199015608" data-track="research">
+  <div class="material-head">
+    <h3><a href="https://dl.acm.org/doi/pdf/10.1145/3543848" target="_blank" rel="noopener noreferrer">Multimodal Classification: Current Landscape, Taxonomy and Future Directions</a></h3>
+    <span class="relevance" title="Relevance score">71</span>
+  </div>
+  <div class="badges"><span class="badge track-research">research</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2022</span><span class="badge">118 cites</span><span class="badge">ACM Computing Surveys</span></div>
+  <p class="byline">William C. Sleeman, Rishabh Kapoor, Preetam Ghosh</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1145/3543848" target="_blank" rel="noopener noreferrer">10.1145/3543848</a></div>
+  <p class="desc">Multimodal classification research has been gaining popularity with new datasets in domains such as satellite imagery, biometrics, and medicine. Prior research has shown the benefits of combining data from multiple sources compared to traditional unimodal data that has led to…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Methods or evaluation section</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+</section>
+
+
+<section class="material-section" data-track="industry">
+  <div class="section-heading">
+    <h2>Industry reports</h2>
+    <p class="section-blurb">Company / lab tech notes and blogs.</p>
+  </div>
+  
+<article class="material" data-id="web:openai-sora-world-simulators" data-track="industry">
+  <div class="material-head">
+    <h3><a href="https://openai.com/index/video-generation-models-as-world-simulators/" target="_blank" rel="noopener noreferrer">Video generation models as world simulators</a></h3>
+    <span class="relevance" title="Relevance score">94</span>
+  </div>
+  <div class="badges"><span class="badge track-industry">industry</span><span class="badge type-web">web</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">OpenAI Research Blog</span><span class="badge">OpenAI</span></div>
+  <p class="byline">OpenAI</p>
+  
+  <p class="desc">OpenAI&#x27;s public technical note arguing video generation models are progressing toward general-purpose world simulators — the industry claim this dossier interrogates.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Primary industry claim that Sora-class video models are world simulators.</p><p><strong>Best for:</strong> Industry claim to evaluate against</p><p><strong>Limitations:</strong> Not a peer-reviewed empirical study; treat as a position/tech note.</p><p><strong>Key claims:</strong></p><ul><li>Scaling video generation yields more coherent world dynamics</li><li>Simulators are framed as an aspirational capability of media models</li></ul></div>
+</article>
+
+
+<article class="material" data-id="arxiv:2309.17080" data-track="industry">
+  <div class="material-head">
+    <h3><a href="https://arxiv.org/abs/2309.17080" target="_blank" rel="noopener noreferrer">GAIA-1: A Generative World Model for Autonomous Driving</a></h3>
+    <span class="relevance" title="Relevance score">92</span>
+  </div>
+  <div class="badges"><span class="badge track-industry">industry</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">900 cites</span><span class="badge">Wayve Technical Report</span><span class="badge">Wayve</span></div>
+  <p class="byline">Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, Jamie Shotton, Gianluca Corrado</p>
+  
+  <p class="desc">Wayve&#x27;s GAIA-1 generates driving futures conditioned on video, text, and action — world-model video for scenario simulation, not entertainment.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Industry world model in autonomous driving where planning stakes are real.</p><p><strong>Best for:</strong> Industry case study (AV)</p><p><strong>Limitations:</strong> Proprietary driving-data regime.</p><p><strong>Key claims:</strong></p><ul><li>Action-conditioned video supports driving scenario synthesis</li><li>Multimodal conditioning enables controllable futures</li></ul></div>
+</article>
+
+
+<article class="material" data-id="arxiv:2501.03575" data-track="industry">
+  <div class="material-head">
+    <h3><a href="https://arxiv.org/abs/2501.03575" target="_blank" rel="noopener noreferrer">Cosmos World Foundation Model Platform for Physical AI</a></h3>
+    <span class="relevance" title="Relevance score">90</span>
+  </div>
+  <div class="badges"><span class="badge track-industry">industry</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2025</span><span class="badge">150 cites</span><span class="badge">NVIDIA Technical Report</span><span class="badge">NVIDIA</span></div>
+  <p class="byline">NVIDIA</p>
+  
+  <p class="desc">NVIDIA Cosmos frames world foundation models as infrastructure for embodied/Physical AI simulation workflows.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Industry platform pitching world foundation models for Physical AI.</p><p><strong>Best for:</strong> Industry / Physical-AI framing</p><p><strong>Limitations:</strong> Platform paper; read independent closed-loop benchmarks carefully.</p><p><strong>Key claims:</strong></p><ul><li>World foundation models as transferable simulation priors</li><li>Physical AI needs more than media-generation APIs</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4409365815" data-track="industry">
+  <div class="material-head">
+    <h3><a href="https://ojs.aaai.org/index.php/AAAI/article/download/33010/35165" target="_blank" rel="noopener noreferrer">Driving in the Occupancy World: Vision-Centric 4D Occupancy Forecasting and Planning via World Models for Autonomous Driving</a></h3>
+    <span class="relevance" title="Relevance score">85</span>
+  </div>
+  <div class="badges"><span class="badge track-industry">industry</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2025</span><span class="badge">9 cites</span><span class="badge">Proceedings of the AAAI Conference on Artificial Intelligence</span><span class="badge">Huawei</span></div>
+  <p class="byline">Yu Yang, Jianbiao Mei, Yukai Ma, Siliang Du, Wenqing Chen, Yijie Qian, Yuxiang Feng, Yong Liu</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1609/aaai.v39i9.33010" target="_blank" rel="noopener noreferrer">10.1609/aaai.v39i9.33010</a></div>
+  <p class="desc">World models envision potential future states based on various ego actions. They embed extensive knowledge about the driving environment, facilitating safe and scalable autonomous driving. Most existing methods primarily focus on either data generation or the pretraining…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Industry / applied framing</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4392954640" data-track="industry">
+  <div class="material-head">
+    <h3><a href="https://www.techrxiv.org/doi/pdf/10.36227/techrxiv.170862194.43871446/v2" target="_blank" rel="noopener noreferrer">Generate Impressive Videos with Text Instructions: A Review of OpenAI Sora, Stable Diffusion, Lumiere and Comparable Models</a></h3>
+    <span class="relevance" title="Relevance score">83</span>
+  </div>
+  <div class="badges"><span class="badge track-industry">industry</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">6 cites</span></div>
+  <p class="byline">Enis Karaarslan, Ömer Aydın</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.36227/techrxiv.170862194.43871446/v2" target="_blank" rel="noopener noreferrer">10.36227/techrxiv.170862194.43871446/v2</a></div>
+  <p class="desc">The generation of videos from textual input poses a significant computational challenge within computer science. Nonetheless, recent advancements in text-to-video artificial intelligence (AI) technologies have showcased notable progress within this domain. Foreseen advancements…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Industry / applied framing</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4393177776" data-track="industry">
+  <div class="material-head">
+    <h3><a href="https://doi.org/10.48550/arxiv.2403.14665" target="_blank" rel="noopener noreferrer">Sora OpenAI&#x27;s Prelude: Social Media Perspectives on Sora OpenAI and the Future of AI Video Generation</a></h3>
+    <span class="relevance" title="Relevance score">81</span>
+  </div>
+  <div class="badges"><span class="badge track-industry">industry</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">9 cites</span><span class="badge">arXiv (Cornell University)</span></div>
+  <p class="byline">Reza Hadi Mogavi, D. Wang, Joseph Tu, Hilda Hadan, Sabrina Alicia Sgandurra, Pan Hui, Lennart E. Nacke</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.48550/arxiv.2403.14665" target="_blank" rel="noopener noreferrer">10.48550/arxiv.2403.14665</a></div>
+  <p class="desc">The rapid advancement of Generative AI (Gen-AI) is transforming Human-Computer Interaction (HCI), with significant implications across various sectors. This study investigates the public&#x27;s perception of Sora OpenAI, a pioneering Gen-AI video generation tool, via social media…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Industry / applied framing</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4404717804" data-track="industry">
+  <div class="material-head">
+    <h3><a href="https://www.qeios.com/read/H7BFDW/pdf" target="_blank" rel="noopener noreferrer">AVID: Adapting Video Diffusion Models to World Models</a></h3>
+    <span class="relevance" title="Relevance score">81</span>
+  </div>
+  <div class="badges"><span class="badge track-industry">industry</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">0 cites</span><span class="badge">Qeios</span><span class="badge">Microsoft Research</span></div>
+  <p class="byline">Marc Rigter, Tarun Sen Gupta, Agrin Hilmkil, Chao Ma</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.32388/h7bfdw" target="_blank" rel="noopener noreferrer">10.32388/h7bfdw</a></div>
+  <p class="desc">Large-scale generative models have achieved remarkable success in a number of domains. However, for sequential decision-making problems, such as robotics, action-labelled data is often scarce and therefore scaling-up foundation models for decision-making remains a challenge. A…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Industry / applied framing</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4402890475" data-track="industry">
+  <div class="material-head">
+    <h3><a href="https://journals.sagepub.com/history/e3eb5469-f176-4c99-8231-efe683fe6399/02783649241281508.17904978.pdf" target="_blank" rel="noopener noreferrer">Foundation models in robotics: Applications, challenges, and the future</a></h3>
+    <span class="relevance" title="Relevance score">76</span>
+  </div>
+  <div class="badges"><span class="badge track-industry">industry</span><span class="badge type-journal">journal</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">173 cites</span><span class="badge">The International Journal of Robotics Research</span><span class="badge">NVIDIA</span></div>
+  <p class="byline">Roya Firoozi, Johnathan Tucker, Stephen Tian, Anirudha Majumdar, Jiankai Sun, Weiyu Liu, Yuke Zhu, Shuran Song, Ashish Kapoor, Karol Hausman, Brian Ichter, Danny Driess</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.1177/02783649241281508" target="_blank" rel="noopener noreferrer">10.1177/02783649241281508</a></div>
+  <p class="desc">We survey applications of pretrained foundation models in robotics. Traditional deep learning models in robotics are trained on small datasets tailored for specific tasks, which limits their adaptability across diverse applications. In contrast, foundation models pretrained on…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Industry / applied framing</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+</section>
+
+
+<section class="material-section" data-track="thesis">
+  <div class="section-heading">
+    <h2>Theses</h2>
+    <p class="section-blurb">PhD or Master’s dissertations.</p>
+  </div>
+  
+<article class="material" data-id="openalex:W4389473504" data-track="thesis">
+  <div class="material-head">
+    <h3><a href="https://doi.org/10.23860/diss-li-hepfeng-2023" target="_blank" rel="noopener noreferrer">Trust-Region Based Policy Optimization for Efficient Reinforcement Learning</a></h3>
+    <span class="relevance" title="Relevance score">68</span>
+  </div>
+  <div class="badges"><span class="badge track-thesis">thesis</span><span class="badge type-thesis">thesis</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">5 cites</span><span class="badge">PhD Dissertation, University of Rhode Island</span></div>
+  <p class="byline">Hepfeng Li</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.23860/diss-li-hepfeng-2023" target="_blank" rel="noopener noreferrer">10.23860/diss-li-hepfeng-2023</a></div>
+  <p class="desc">PhD thesis on trust-region policy optimization for sample-efficient reinforcement learning — useful dissertation-format background for control learning methods.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Thesis-track depth on efficient RL policy optimization adjacent to world-model control.</p><p><strong>Best for:</strong> Thesis-track / methods background</p><p><strong>Limitations:</strong> Not specifically about video generation as a simulator.</p><p><strong>Key claims:</strong></p><ul><li>Trust-region methods improve stability of policy updates</li><li>Sample efficiency remains central for practical control learning</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3094484211" data-track="thesis">
+  <div class="material-head">
+    <h3><a href="https://doi.org/10.5445/ir/1000124721" target="_blank" rel="noopener noreferrer">Multimodal Sensor Calibration with a Spherical Calibration Target</a></h3>
+    <span class="relevance" title="Relevance score">64</span>
+  </div>
+  <div class="badges"><span class="badge track-thesis">thesis</span><span class="badge type-thesis">thesis</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">4 cites</span><span class="badge">Repository KITopen (Karlsruhe Institute of Technology)</span></div>
+  <p class="byline">Julius Kümmerle</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.5445/ir/1000124721" target="_blank" rel="noopener noreferrer">10.5445/ir/1000124721</a></div>
+  <p class="desc">Automatisierte Systeme werden mit einer zunehmenden Anzahl unterschied- licher Sensoren ausgestattet, um immer komplexere Aufgaben zu bewältigen. Präzise Sensorkalibrierung ist eine essentielle Voraussetzung, um die Informa- tionen der Sensoren zu fusionieren und wichtige…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Deep background chapter</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3178685848" data-track="thesis">
+  <div class="material-head">
+    <h3><a href="http://repository.library.carleton.ca/downloads/1j92g8461" target="_blank" rel="noopener noreferrer">A Triangulated Accounting of Top Notch 2: Negotiating Ideologies in the Multimodal Discourse of an EFL Textbook in Korean University Classrooms</a></h3>
+    <span class="relevance" title="Relevance score">62</span>
+  </div>
+  <div class="badges"><span class="badge track-thesis">thesis</span><span class="badge type-thesis">thesis</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">22 cites</span></div>
+  <p class="byline">Christopher A. Smith</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.22215/etd/2020-14260" target="_blank" rel="noopener noreferrer">10.22215/etd/2020-14260</a></div>
+  <p class="desc">Textbooks are artifacts of a pedagogical culture, but in the context of English as a Foreign Language (EFL) education in Korean universities, that culture often forces instructors and students to use generic, global publications for reasons more political than pedagogical.…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Deep background chapter</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4313469377" data-track="thesis">
+  <div class="material-head">
+    <h3><a href="https://dr.ntu.edu.sg/bitstream/10356/163788/2/PhD_Thesis___Zhang_Hao.pdf" target="_blank" rel="noopener noreferrer">Towards temporal sentence grounding in videos</a></h3>
+    <span class="relevance" title="Relevance score">62</span>
+  </div>
+  <div class="badges"><span class="badge track-thesis">thesis</span><span class="badge type-thesis">thesis</span><span class="badge oa">Open access</span><span class="badge">2022</span><span class="badge">7 cites</span></div>
+  <p class="byline">Hao Zhang</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.32657/10356/163788" target="_blank" rel="noopener noreferrer">10.32657/10356/163788</a></div>
+  <p class="desc">Temporal sentence grounding in videos (TSGV), a.k.a., natural language video localization (NLVL) or video moment retrieval (VMR), aims to retrieve a temporal moment (i.e., a fraction of a video) that semantically corresponds to a language query from an untrimmed video.…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Deep background chapter</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3013449349" data-track="thesis">
+  <div class="material-head">
+    <h3><a href="https://eprints.qut.edu.au/180753/1/Tien%20Dung_Nguyen_Thesis.pdf" target="_blank" rel="noopener noreferrer">Multimodal emotion recognition using deep learning techniques</a></h3>
+    <span class="relevance" title="Relevance score">62</span>
+  </div>
+  <div class="badges"><span class="badge track-thesis">thesis</span><span class="badge type-thesis">thesis</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">6 cites</span><span class="badge">Queensland University of Technology</span></div>
+  <p class="byline">Tien Dung Nguyen</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.5204/thesis.eprints.180753" target="_blank" rel="noopener noreferrer">10.5204/thesis.eprints.180753</a></div>
+  <p class="desc">This thesis investigates the use of deep learning techniques to address the problem of machine understanding of human affective behaviour and improve the accuracy of both unimodal and multimodal human emotion recognition. The objective was to explore how best to configure deep…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Deep background chapter</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4321242134" data-track="thesis">
+  <div class="material-head">
+    <h3><a href="https://eprints.qut.edu.au/238058/1/Rabiul%2BIslam%2BJony%2BThesis%284%29.pdf" target="_blank" rel="noopener noreferrer">Multimodal data fusion of remote sensing and social media using machine learning for natural disaster detection and assessment</a></h3>
+    <span class="relevance" title="Relevance score">62</span>
+  </div>
+  <div class="badges"><span class="badge track-thesis">thesis</span><span class="badge type-thesis">thesis</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">6 cites</span><span class="badge">Queensland University of Technology</span></div>
+  <p class="byline">Rabiul Islam Jony</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.5204/thesis.eprints.238058" target="_blank" rel="noopener noreferrer">10.5204/thesis.eprints.238058</a></div>
+  <p class="desc">For more than a decade, social media has emerged as a potential platform to generate and spread information about a natural disasters. Alternatively, a common way of conducting research into natural disasters is via remote sensing. However, remote sensing data comes with few…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Deep background chapter</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4292589917" data-track="thesis">
+  <div class="material-head">
+    <h3><a href="http://mau.diva-portal.org/smash/get/diva2:1658780/FULLTEXT02" target="_blank" rel="noopener noreferrer">Towards designing a flexible multimodal learning analytics system</a></h3>
+    <span class="relevance" title="Relevance score">62</span>
+  </div>
+  <div class="badges"><span class="badge track-thesis">thesis</span><span class="badge type-thesis">thesis</span><span class="badge oa">Open access</span><span class="badge">2022</span><span class="badge">5 cites</span></div>
+  <p class="byline">Hamza Ouhaichi</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.24834/isbn.9789178772988" target="_blank" rel="noopener noreferrer">10.24834/isbn.9789178772988</a></div>
+  <p class="desc">Dynamic data and continuously evolving sets of records are essential for a wide variety of today&#x27;s data management applications. Such applications range from large, social, content-driven Internet applications, to highly focused data processing verticals like data intensive…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Deep background chapter</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W3130054217" data-track="thesis">
+  <div class="material-head">
+    <h3><a href="https://tel.archives-ouvertes.fr/tel-03140942" target="_blank" rel="noopener noreferrer">Deep Multimodal Learning for Vision and Language Processing</a></h3>
+    <span class="relevance" title="Relevance score">62</span>
+  </div>
+  <div class="badges"><span class="badge track-thesis">thesis</span><span class="badge type-thesis">thesis</span><span class="badge oa">Open access</span><span class="badge">2020</span><span class="badge">2 cites</span></div>
+  <p class="byline">Rémi Cadène</p>
+  
+  <p class="desc">Digital technologies have become instrumental in transforming our society. Recent statistical methods have been successfully deployed to automate the processing of the growing amount of images, videos, and texts we produce daily. In particular, deep neural networks have been…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Deep background chapter</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+</section>
+
+
+<section class="material-section" data-track="preprint">
+  <div class="section-heading">
+    <h2>Preprints</h2>
+    <p class="section-blurb">Early drafts (e.g. arXiv), not yet peer-reviewed.</p>
+  </div>
+  
+<article class="material" data-id="arxiv:2408.14837" data-track="preprint">
+  <div class="material-head">
+    <h3><a href="https://arxiv.org/abs/2408.14837" target="_blank" rel="noopener noreferrer">Diffusion Models Are Real-Time Game Engines</a></h3>
+    <span class="relevance" title="Relevance score">86</span>
+  </div>
+  <div class="badges"><span class="badge track-preprint">preprint</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">220 cites</span><span class="badge">arXiv</span></div>
+  <p class="byline">Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter</p>
+  
+  <p class="desc">GameNGen demonstrates real-time interactive simulation of DOOM with a diffusion model — evidence for the simulator thesis under interactivity constraints.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Stress test of generative dynamics as a real-time interactive engine.</p><p><strong>Best for:</strong> Interactivity evidence</p><p><strong>Limitations:</strong> Game physics is not real-world Physical AI.</p><p><strong>Key claims:</strong></p><ul><li>Neural simulators can run complex interactive environments in real time</li><li>Game engines are a proving ground for world-model fidelity</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4392341509" data-track="preprint">
+  <div class="material-head">
+    <h3><a href="https://doi.org/10.48550/arxiv.2402.17177" target="_blank" rel="noopener noreferrer">Sora: A Review on Background, Technology, Limitations, and Opportunities of Large Vision Models</a></h3>
+    <span class="relevance" title="Relevance score">77</span>
+  </div>
+  <div class="badges"><span class="badge track-preprint">preprint</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">102 cites</span><span class="badge">arXiv (Cornell University)</span></div>
+  <p class="byline">Yixin Liu, Kai Zhang, Yuan Li, Zhiling Yan, Chujie Gao, Ruoxi Chen, Zhengqing Yuan, Yue Huang, Hanchi Sun, Jianfeng Gao, Lifang He, Lichao Sun</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.48550/arxiv.2402.17177" target="_blank" rel="noopener noreferrer">10.48550/arxiv.2402.17177</a></div>
+  <p class="desc">Sora is a text-to-video generative AI model, released by OpenAI in February 2024. The model is trained to generate videos of realistic or imaginative scenes from text instructions and show potential in simulating the physical world. Based on public technical reports and reverse…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the preprint track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Recent developments</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="arxiv:2312.14125" data-track="preprint">
+  <div class="material-head">
+    <h3><a href="https://arxiv.org/abs/2312.14125" target="_blank" rel="noopener noreferrer">VideoPoet: A Large Language Model for Zero-Shot Video Generation</a></h3>
+    <span class="relevance" title="Relevance score">74</span>
+  </div>
+  <div class="badges"><span class="badge track-preprint">preprint</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">550 cites</span><span class="badge">arXiv</span></div>
+  <p class="byline">Dan Kondratyuk, Lijun Yu, Xiuye Gu, José Lezama, Jonathan Huang, Lu Jiang</p>
+  
+  <p class="desc">VideoPoet showcases strong zero-shot video generation. Use as the generative-media reference when asking what extra structure a world simulator needs.</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> High-quality video generation baseline for the media-model pole.</p><p><strong>Best for:</strong> Media-only contrast</p><p><strong>Limitations:</strong> Not designed or evaluated as a planner/world model.</p><p><strong>Key claims:</strong></p><ul><li>LLM-style architectures can generate coherent video zero-shot</li><li>Media quality is the primary optimization target</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4392679398" data-track="preprint">
+  <div class="material-head">
+    <h3><a href="https://doi.org/10.48550/arxiv.2403.05530" target="_blank" rel="noopener noreferrer">Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context</a></h3>
+    <span class="relevance" title="Relevance score">70</span>
+  </div>
+  <div class="badges"><span class="badge track-preprint">preprint</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2024</span><span class="badge">291 cites</span><span class="badge">arXiv (Cornell University)</span></div>
+  <p class="byline">Gemini Robotics Team, Petko Georgiev, Ving Ian Lei, Ryan Burnell, Libin Bai, Anmol Gulati, Garrett Tanzer, Damien Vincent, Zhufeng Pan, Wang, Shibo, Mariooryad, Soroosh, Yifan Ding</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.48550/arxiv.2403.05530" target="_blank" rel="noopener noreferrer">10.48550/arxiv.2403.05530</a></div>
+  <p class="desc">In this report, we introduce the Gemini 1.5 family of models, representing the next generation of highly compute-efficient multimodal models capable of recalling and reasoning over fine-grained information from millions of tokens of context, including multiple long documents and…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the preprint track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Recent developments</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+
+<article class="material" data-id="openalex:W4386655647" data-track="preprint">
+  <div class="material-head">
+    <h3><a href="https://doi.org/10.48550/arxiv.2309.05519" target="_blank" rel="noopener noreferrer">NExT-GPT: Any-to-Any Multimodal LLM</a></h3>
+    <span class="relevance" title="Relevance score">70</span>
+  </div>
+  <div class="badges"><span class="badge track-preprint">preprint</span><span class="badge type-preprint">preprint</span><span class="badge oa">Open access</span><span class="badge">2023</span><span class="badge">95 cites</span><span class="badge">arXiv (Cornell University)</span></div>
+  <p class="byline">Shengqiong Wu, Fei, Hao, Leigang Qu, Wei Ji, Tat‐Seng Chua</p>
+  <div class="byline">DOI: <a href="https://doi.org/10.48550/arxiv.2309.05519" target="_blank" rel="noopener noreferrer">10.48550/arxiv.2309.05519</a></div>
+  <p class="desc">While recently Multimodal Large Language Models (MM-LLMs) have made exciting strides, they mostly fall prey to the limitation of only input-side multimodal understanding, without the ability to produce content in multiple modalities. As we humans always perceive the world and…</p>
+  <div class="desc-secondary"><p><strong>Why it matters:</strong> Included in the preprint track for this 2020–2026 scan of multimodal world models and video-for-planning.</p><p><strong>Best for:</strong> Recent developments</p><p><strong>Limitations:</strong> Auto-enriched from harvest metadata; skim the source before relying on details.</p><p><strong>Key claims:</strong></p><ul><li>Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.</li><li>Should be verified against the primary PDF/page before citation.</li></ul></div>
+</article>
+
+</section>
+
+      </main>
+      <aside>
+        <section class="panel">
+          <h2>What's missing from this list</h2>
+          <ul><li>Independent tests that try to prove or disprove whether Sora-class models are true physics simulators are still scarce.</li><li>Few apples-to-apples comparisons of pretty video quality versus success when an agent actually plans with the model.</li><li>Robotics transfer from foundation video world models into the real world is thinner than the demo videos suggest.</li></ul>
+        </section>
+        <section class="panel">
+          <h2>Searches to try next</h2>
+          <ul><li>video world model action conditioning physics consistency benchmark</li><li>Sora world simulator critique counterfactual planning evaluation</li><li>sim-to-real robotics generative video world foundation model</li></ul>
+        </section>
+        <section class="panel">
+          <h2>BibTeX</h2>
+          <pre class="bibtex">@misc{hafner2023mastering,
+  title = {Mastering Diverse Domains through World Models},
+  author = {Danijar Hafner and Jurgis Pasukonis and Jimmy Ba and Timothy Lillicrap},
+  year = {2023},
+  journal = {arXiv},
+  url = {https://arxiv.org/abs/2301.04104},
+}
+
+@article{du2023learning,
+  title = {Learning Universal Policies via Text-Guided Video Generation},
+  author = {Yilun Du and Sherry Yang and Bo Dai and Hanjun Dai and Ofir Nachum and Joshua B. Tenenbaum and Dale Schuurmans and Pieter Abbeel},
+  year = {2023},
+  journal = {ICLR},
+  url = {https://arxiv.org/abs/2302.02648},
+}
+
+@misc{bruce2024genie,
+  title = {Genie: Generative Interactive Environments},
+  author = {Jake Bruce and Michael Dennis and Ashley Edwards and Jack Parker-Holder and Yuge Shi and Tim Rocktäschel},
+  year = {2024},
+  journal = {Google DeepMind},
+  url = {https://arxiv.org/abs/2402.15391},
+}
+
+@article{rasheed2020digital,
+  title = {Digital Twin: Values, Challenges and Enablers From a Modeling Perspective},
+  author = {Adil Rasheed and Omer San and Trond Kvamsdal},
+  year = {2020},
+  journal = {IEEE Access},
+  doi = {10.1109/access.2020.2970143},
+  url = {https://ieeexplore.ieee.org/ielx7/6287639/8948470/08972429.pdf},
+}
+
+@article{yurtsever2020a,
+  title = {A Survey of Autonomous Driving: &lt;i&gt;Common Practices and Emerging Technologies&lt;/i&gt;},
+  author = {Ekim Yurtsever and Jacob Lambert and Alexander Carballo and Kazuya Takeda},
+  year = {2020},
+  journal = {IEEE Access},
+  doi = {10.1109/access.2020.2983149},
+  url = {https://ieeexplore.ieee.org/ielx7/6287639/8948470/09046805.pdf},
+}
+
+@misc{openai2024video,
+  title = {Video generation models as world simulators},
+  author = {OpenAI},
+  year = {2024},
+  journal = {OpenAI Research Blog},
+  url = {https://openai.com/index/video-generation-models-as-world-simulators/},
+}
+
+@article{alzubaidi2021review,
+  title = {Review of deep learning: concepts, CNN architectures, challenges, applications, future directions},
+  author = {Laith Alzubaidi and Jinglan Zhang and Amjad J. Humaidi and Ayad Q. Al-Dujaili and Ye Duan and Omran Al-Shamma and José Santamaría and Mohammed A. Fadhel and Muthana Al‐Amidie and Laith Farhan},
+  year = {2021},
+  journal = {Journal Of Big Data},
+  doi = {10.1186/s40537-021-00444-8},
+  url = {https://journalofbigdata.springeropen.com/counter/pdf/10.1186/s40537-021-00444-8},
+}
+
+@article{kairouz2020advances,
+  title = {Advances and Open Problems in Federated Learning},
+  author = {Peter Kairouz and H. Brendan McMahan and Brendan Avent and Aurélien Bellet and Mehdi Bennis and Arjun Nitin Bhagoji and Kallista Bonawitz and Zachary Charles and Graham Cormode and Rachel Cummings and Rafael G. L. D’Oliveira and Hubert Eichner},
+  year = {2020},
+  journal = {Foundations and Trends® in Machine Learning},
+  doi = {10.1561/2200000083},
+  url = {https://doi.org/10.1561/2200000083},
+}
+
+@article{li2021a,
+  title = {A Survey of Convolutional Neural Networks: Analysis, Applications, and Prospects},
+  author = {Zewen Li and Fan Liu and Wenjie Yang and Shouheng Peng and Jun Zhou},
+  year = {2021},
+  journal = {IEEE Transactions on Neural Networks and Learning Systems},
+  doi = {10.1109/tnnls.2021.3084827},
+  url = {http://hdl.handle.net/10072/405164},
+}
+
+@article{janiesch2021machine,
+  title = {Machine learning and deep learning},
+  author = {Christian Janiesch and Patrick Zschech and Kai Heinrich},
+  year = {2021},
+  journal = {Electronic Markets},
+  doi = {10.1007/s12525-021-00475-2},
+  url = {https://link.springer.com/content/pdf/10.1007/s12525-021-00475-2.pdf},
+}
+
+@article{hassija2023interpreting,
+  title = {Interpreting Black-Box Models: A Review on Explainable Artificial Intelligence},
+  author = {Vikas Hassija and Vinay Chamola and Atmesh Mahapatra and Abhinandan Singal and Divyansh Goel and Kaizhu Huang and Simone Scardapane and Indro Spinelli and Mufti Mahmud and Amir Hussain},
+  year = {2023},
+  journal = {Cognitive Computation},
+  doi = {10.1007/s12559-023-10179-8},
+  url = {https://link.springer.com/content/pdf/10.1007/s12559-023-10179-8.pdf},
+}
+
+@article{park2022a,
+  title = {A Metaverse: Taxonomy, Components, Applications, and Open Challenges},
+  author = {Sangmin Park and Young‐Gab Kim},
+  year = {2022},
+  journal = {IEEE Access},
+  doi = {10.1109/access.2021.3140175},
+  url = {https://ieeexplore.ieee.org/ielx7/6287639/9668973/09667507.pdf},
+}
+
+@article{karniadakis2021physics,
+  title = {Physics-informed machine learning},
+  author = {George Em Karniadakis and Ioannis G. Kevrekidis and Lu Lu and Paris Perdikaris and Sifan Wang and Liu Yang},
+  year = {2021},
+  journal = {Nature Reviews Physics},
+  doi = {10.1038/s42254-021-00314-5},
+  url = {https://www.osti.gov/servlets/purl/2282016},
+}
+
+@misc{hu2023gaia,
+  title = {GAIA-1: A Generative World Model for Autonomous Driving},
+  author = {Anthony Hu and Lloyd Russell and Hudson Yeo and Zak Murez and George Fedoseev and Alex Kendall and Jamie Shotton and Gianluca Corrado},
+  year = {2023},
+  journal = {Wayve Technical Report},
+  url = {https://arxiv.org/abs/2309.17080},
+}
+
+@misc{nvidia2025cosmos,
+  title = {Cosmos World Foundation Model Platform for Physical AI},
+  author = {NVIDIA},
+  year = {2025},
+  journal = {NVIDIA Technical Report},
+  url = {https://arxiv.org/abs/2501.03575},
+}
+
+@article{alonso2024diffusion,
+  title = {Diffusion for World Modeling: Visual Details Matter in Atari},
+  author = {Eloi Alonso and Adam Jelley and Vincent Micheli and Anssi Kanervisto and Amos Storkey and Tim Pearce and François Fleuret},
+  year = {2024},
+  journal = {NeurIPS},
+  url = {https://arxiv.org/abs/2405.12399},
+}
+
+@misc{valevski2024diffusion,
+  title = {Diffusion Models Are Real-Time Game Engines},
+  author = {Dani Valevski and Yaniv Leviathan and Moab Arar and Shlomi Fruchter},
+  year = {2024},
+  journal = {arXiv},
+  url = {https://arxiv.org/abs/2408.14837},
+}
+
+@article{yang2025driving,
+  title = {Driving in the Occupancy World: Vision-Centric 4D Occupancy Forecasting and Planning via World Models for Autonomous Driving},
+  author = {Yu Yang and Jianbiao Mei and Yukai Ma and Siliang Du and Wenqing Chen and Yijie Qian and Yuxiang Feng and Yong Liu},
+  year = {2025},
+  journal = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v39i9.33010},
+  url = {https://ojs.aaai.org/index.php/AAAI/article/download/33010/35165},
+}
+
+@misc{karaarslan2024generate,
+  title = {Generate Impressive Videos with Text Instructions: A Review of OpenAI Sora, Stable Diffusion, Lumiere and Comparable Models},
+  author = {Enis Karaarslan and Ömer Aydın},
+  year = {2024},
+  doi = {10.36227/techrxiv.170862194.43871446/v2},
+  url = {https://www.techrxiv.org/doi/pdf/10.36227/techrxiv.170862194.43871446/v2},
+}
+
+@misc{mogavi2024sora,
+  title = {Sora OpenAI&#x27;s Prelude: Social Media Perspectives on Sora OpenAI and the Future of AI Video Generation},
+  author = {Reza Hadi Mogavi and D. Wang and Joseph Tu and Hilda Hadan and Sabrina Alicia Sgandurra and Pan Hui and Lennart E. Nacke},
+  year = {2024},
+  journal = {arXiv (Cornell University)},
+  doi = {10.48550/arxiv.2403.14665},
+  url = {https://doi.org/10.48550/arxiv.2403.14665},
+}
+
+@misc{rigter2024avid,
+  title = {AVID: Adapting Video Diffusion Models to World Models},
+  author = {Marc Rigter and Tarun Sen Gupta and Agrin Hilmkil and Chao Ma},
+  year = {2024},
+  journal = {Qeios},
+  doi = {10.32388/h7bfdw},
+  url = {https://www.qeios.com/read/H7BFDW/pdf},
+}
+
+@misc{liu2024sora,
+  title = {Sora: A Review on Background, Technology, Limitations, and Opportunities of Large Vision Models},
+  author = {Yixin Liu and Kai Zhang and Yuan Li and Zhiling Yan and Chujie Gao and Ruoxi Chen and Zhengqing Yuan and Yue Huang and Hanchi Sun and Jianfeng Gao and Lifang He and Lichao Sun},
+  year = {2024},
+  journal = {arXiv (Cornell University)},
+  doi = {10.48550/arxiv.2402.17177},
+  url = {https://doi.org/10.48550/arxiv.2402.17177},
+}
+
+@article{firoozi2024foundation,
+  title = {Foundation models in robotics: Applications, challenges, and the future},
+  author = {Roya Firoozi and Johnathan Tucker and Stephen Tian and Anirudha Majumdar and Jiankai Sun and Weiyu Liu and Yuke Zhu and Shuran Song and Ashish Kapoor and Karol Hausman and Brian Ichter and Danny Driess},
+  year = {2024},
+  journal = {The International Journal of Robotics Research},
+  doi = {10.1177/02783649241281508},
+  url = {https://journals.sagepub.com/history/e3eb5469-f176-4c99-8231-efe683fe6399/02783649241281508.17904978.pdf},
+}
+
+@article{caserman2021cybersickness,
+  title = {Cybersickness in current-generation virtual reality head-mounted displays: systematic review and outlook},
+  author = {Polona Caserman and Augusto García-Agúndez and Alvar Gámez Zerban and Stefan Göbel},
+  year = {2021},
+  journal = {Virtual Reality},
+  doi = {10.1007/s10055-021-00513-6},
+  url = {https://link.springer.com/content/pdf/10.1007/s10055-021-00513-6.pdf},
+}
+
+@article{gangwal2024generative,
+  title = {Generative artificial intelligence in drug discovery: basic framework, recent advances, challenges, and opportunities},
+  author = {Amit Gangwal and M. Azim Ansari and Iqrar Ahmad and Abul Kalam Azad and Vinoth Kumarasamy and Vetriselvan Subramaniyan and Ling Shing Wong},
+  year = {2024},
+  journal = {Frontiers in Pharmacology},
+  doi = {10.3389/fphar.2024.1331062},
+  url = {https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2024.1331062/pdf},
+}
+
+@misc{kondratyuk2023videopoet,
+  title = {VideoPoet: A Large Language Model for Zero-Shot Video Generation},
+  author = {Dan Kondratyuk and Lijun Yu and Xiuye Gu and José Lezama and Jonathan Huang and Lu Jiang},
+  year = {2023},
+  journal = {arXiv},
+  url = {https://arxiv.org/abs/2312.14125},
+}
+
+@article{jatavallabhula2023conceptfusion,
+  title = {ConceptFusion: Open-set multimodal 3D mapping},
+  author = {Krishna Murthy Jatavallabhula and Alihusein Kuwajerwala and Qiao Gu and Mohd Omama and Ganesh Iyer and Soroush Saryazdi and Tao Chen and Alaa Maalouf and Shuang Li and Nikhil Keetha and Ayush Tewari and Joshua B. Tenenbaum},
+  year = {2023},
+  doi = {10.15607/rss.2023.xix.066},
+  url = {https://doi.org/10.15607/rss.2023.xix.066},
+}
+
+@article{imran2024google,
+  title = {Google Gemini as a next generation AI educational tool: a review of emerging educational technology},
+  author = {Muhammad Imran and Norah Almusharraf},
+  year = {2024},
+  journal = {Smart Learning Environments},
+  doi = {10.1186/s40561-024-00310-z},
+  url = {https://link.springer.com/content/pdf/10.1186/s40561-024-00310-z.pdf},
+}
+
+@article{alsaad2024multimodal,
+  title = {Multimodal Large Language Models in Health Care: Applications, Challenges, and Future Outlook},
+  author = {Rawan AlSaad and Alaa Abd‐Alrazaq and Sabri Boughorbel and Arfan Ahmed and Max-Antoine Renault and Rafat Damseh and Javaid I. Sheikh},
+  year = {2024},
+  journal = {Journal of Medical Internet Research},
+  doi = {10.2196/59505},
+  url = {https://www.jmir.org/2024/1/e59505/PDF},
+}
+
+@article{truong2023blockchain,
+  title = {Blockchain Meets Metaverse and Digital Asset Management: A Comprehensive Survey},
+  author = {Vu Tuan Truong and Long Bao Le and Dusit Niyato},
+  year = {2023},
+  journal = {IEEE Access},
+  doi = {10.1109/access.2023.3257029},
+  url = {https://ieeexplore.ieee.org/ielx7/6287639/6514899/10068493.pdf},
+}
+
+@article{philippe2020multimodal,
+  title = {Multimodal teaching, learning and training in virtual reality: a review and case study},
+  author = {Stéphanie Philippe and Alexis D. Souchet and Petros Lameras and Panagiotis Petridis and Julien Caporal and Gildas Coldeboeuf and Hadrien Duzan},
+  year = {2020},
+  journal = {Virtual Reality &amp; Intelligent Hardware},
+  doi = {10.1016/j.vrih.2020.07.008},
+  url = {https://doi.org/10.1016/j.vrih.2020.07.008},
+}
+
+@article{wu2020advantages,
+  title = {Advantages and Constraints of a Hybrid Model K-12 E-Learning Assistant Chatbot},
+  author = {Eric Hsiao‐Kuang Wu and Chun-Han Lin and Yu‐Yen Ou and Chen-Zhong Liu and Wei-Kai Wang and Chi-Yun Chao},
+  year = {2020},
+  journal = {IEEE Access},
+  doi = {10.1109/access.2020.2988252},
+  url = {https://ieeexplore.ieee.org/ielx7/6287639/8948470/09069183.pdf},
+}
+
+@article{ullah2021an,
+  title = {An Efficient Anomaly Recognition Framework Using an Attention Residual LSTM in Surveillance Videos},
+  author = {Waseem Ullah and Amin Ullah and Tanveer Hussain and Zulfiqar Ahmad Khan and Sung Wook Baik},
+  year = {2021},
+  journal = {Sensors},
+  doi = {10.3390/s21082811},
+  url = {https://www.mdpi.com/1424-8220/21/8/2811/pdf?version=1618913949},
+}
+
+@article{su2023recent,
+  title = {Recent advancements in multimodal human–robot interaction},
+  author = {Hang Su and Wen Qi and Jiahao Chen and Chenguang Yang and Juan Sandoval and Med Amine Laribi},
+  year = {2023},
+  journal = {Frontiers in Neurorobotics},
+  doi = {10.3389/fnbot.2023.1084000},
+  url = {https://www.frontiersin.org/articles/10.3389/fnbot.2023.1084000/pdf},
+}
+
+@article{wang2023multimodal,
+  title = {Multimodal Human–Robot Interaction for Human‐Centric Smart Manufacturing: A Survey},
+  author = {Tian Wang and Pai Zheng and Shufei Li and Lihui Wang},
+  year = {2023},
+  journal = {Advanced Intelligent Systems},
+  doi = {10.1002/aisy.202300359},
+  url = {https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/aisy.202300359},
+}
+
+@article{liang2024foundations,
+  title = {Foundations &amp;amp; Trends in Multimodal Machine Learning: Principles, Challenges, and Open Questions},
+  author = {Paul Pu Liang and Amir Zadeh and Louis‐Philippe Morency},
+  year = {2024},
+  journal = {ACM Computing Surveys},
+  doi = {10.1145/3656580},
+  url = {https://dl.acm.org/doi/pdf/10.1145/3656580},
+}
+
+@article{sakka2025a,
+  title = {A Review of CNN Applications in Smart Agriculture Using Multimodal Data},
+  author = {Mohammad El Sakka and Mihai Ivanovici and Lotfi Chaâri and Josiane Mothe},
+  year = {2025},
+  journal = {Sensors},
+  doi = {10.3390/s25020472},
+  url = {https://www.mdpi.com/1424-8220/25/2/472/pdf?version=1737000953},
+}
+
+@article{gebru2024the,
+  title = {The TESCREAL bundle: Eugenics and the promise of utopia through artificial general intelligence},
+  author = {Timnit Gebru and Émile P. Torres},
+  year = {2024},
+  journal = {First Monday},
+  doi = {10.5210/fm.v29i4.13636},
+  url = {https://firstmonday.org/ojs/index.php/fm/article/download/13636/11606},
+}
+
+@article{yazdavar2020multimodal,
+  title = {Multimodal mental health analysis in social media},
+  author = {Amir Hossein Yazdavar and Mohammad Saeid Mahdavinejad and Goonmeet Bajaj and William L. Romine and Amit Sheth and Amir Hassan Monadjemi and Krishnaprasad Thirunarayan and John M. Meddar and Annie Myers and Jyotishman Pathak and Pascal Hitzler},
+  year = {2020},
+  journal = {PLoS ONE},
+  doi = {10.1371/journal.pone.0226248},
+  url = {https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0226248&amp;type=printable},
+}
+
+@article{sleeman2022multimodal,
+  title = {Multimodal Classification: Current Landscape, Taxonomy and Future Directions},
+  author = {William C. Sleeman and Rishabh Kapoor and Preetam Ghosh},
+  year = {2022},
+  journal = {ACM Computing Surveys},
+  doi = {10.1145/3543848},
+  url = {https://dl.acm.org/doi/pdf/10.1145/3543848},
+}
+
+@misc{team2024gemini,
+  title = {Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context},
+  author = {Gemini Robotics Team and Petko Georgiev and Ving Ian Lei and Ryan Burnell and Libin Bai and Anmol Gulati and Garrett Tanzer and Damien Vincent and Zhufeng Pan and Wang, Shibo and Mariooryad, Soroosh and Yifan Ding},
+  year = {2024},
+  journal = {arXiv (Cornell University)},
+  doi = {10.48550/arxiv.2403.05530},
+  url = {https://doi.org/10.48550/arxiv.2403.05530},
+}
+
+@misc{wu2023next,
+  title = {NExT-GPT: Any-to-Any Multimodal LLM},
+  author = {Shengqiong Wu and Fei, Hao and Leigang Qu and Wei Ji and Tat‐Seng Chua},
+  year = {2023},
+  journal = {arXiv (Cornell University)},
+  doi = {10.48550/arxiv.2309.05519},
+  url = {https://doi.org/10.48550/arxiv.2309.05519},
+}
+
+@misc{li2023trust,
+  title = {Trust-Region Based Policy Optimization for Efficient Reinforcement Learning},
+  author = {Hepfeng Li},
+  year = {2023},
+  journal = {PhD Dissertation, University of Rhode Island},
+  doi = {10.23860/diss-li-hepfeng-2023},
+  url = {https://doi.org/10.23860/diss-li-hepfeng-2023},
+}
+
+@misc{kümmerle2020multimodal,
+  title = {Multimodal Sensor Calibration with a Spherical Calibration Target},
+  author = {Julius Kümmerle},
+  year = {2020},
+  journal = {Repository KITopen (Karlsruhe Institute of Technology)},
+  doi = {10.5445/ir/1000124721},
+  url = {https://doi.org/10.5445/ir/1000124721},
+}
+
+@misc{smith2020a,
+  title = {A Triangulated Accounting of Top Notch 2: Negotiating Ideologies in the Multimodal Discourse of an EFL Textbook in Korean University Classrooms},
+  author = {Christopher A. Smith},
+  year = {2020},
+  doi = {10.22215/etd/2020-14260},
+  url = {http://repository.library.carleton.ca/downloads/1j92g8461},
+}
+
+@misc{zhang2022towards,
+  title = {Towards temporal sentence grounding in videos},
+  author = {Hao Zhang},
+  year = {2022},
+  doi = {10.32657/10356/163788},
+  url = {https://dr.ntu.edu.sg/bitstream/10356/163788/2/PhD_Thesis___Zhang_Hao.pdf},
+}
+
+@misc{nguyen2020multimodal,
+  title = {Multimodal emotion recognition using deep learning techniques},
+  author = {Tien Dung Nguyen},
+  year = {2020},
+  journal = {Queensland University of Technology},
+  doi = {10.5204/thesis.eprints.180753},
+  url = {https://eprints.qut.edu.au/180753/1/Tien%20Dung_Nguyen_Thesis.pdf},
+}
+
+@misc{jony2023multimodal,
+  title = {Multimodal data fusion of remote sensing and social media using machine learning for natural disaster detection and assessment},
+  author = {Rabiul Islam Jony},
+  year = {2023},
+  journal = {Queensland University of Technology},
+  doi = {10.5204/thesis.eprints.238058},
+  url = {https://eprints.qut.edu.au/238058/1/Rabiul%2BIslam%2BJony%2BThesis%284%29.pdf},
+}
+
+@misc{ouhaichi2022towards,
+  title = {Towards designing a flexible multimodal learning analytics system},
+  author = {Hamza Ouhaichi},
+  year = {2022},
+  doi = {10.24834/isbn.9789178772988},
+  url = {http://mau.diva-portal.org/smash/get/diva2:1658780/FULLTEXT02},
+}
+
+@misc{cadène2020deep,
+  title = {Deep Multimodal Learning for Vision and Language Processing},
+  author = {Rémi Cadène},
+  year = {2020},
+  url = {https://tel.archives-ouvertes.fr/tel-03140942},
+}</pre>
+        </section>
+      </aside>
+    </div>
+  </div>
+</body>
+</html>

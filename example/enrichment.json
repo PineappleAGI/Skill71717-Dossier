@@ -1,0 +1,664 @@
+{
+  "coverage_gaps": [
+    "Independent tests that try to prove or disprove whether Sora-class models are true physics simulators are still scarce.",
+    "Few apples-to-apples comparisons of pretty video quality versus success when an agent actually plans with the model.",
+    "Robotics transfer from foundation video world models into the real world is thinner than the demo videos suggest."
+  ],
+  "suggested_next_queries": [
+    "video world model action conditioning physics consistency benchmark",
+    "Sora world simulator critique counterfactual planning evaluation",
+    "sim-to-real robotics generative video world foundation model"
+  ],
+  "materials": [
+    {
+      "id": "arxiv:2301.04104",
+      "track": "key_reference",
+      "relevance_score": 96,
+      "relevance_rationale": "Canonical modern world-model RL agent: generation is for imagined planning, not media.",
+      "short_description": "DreamerV3 learns environment dynamics and improves behavior by imagining futures across many domains. Best academic starting point for the simulator-for-control side of this debate.",
+      "key_claims": [
+        "A single world-model agent can master diverse domains",
+        "Planning in latent imagination is practical at scale"
+      ],
+      "limitations": "Latent dynamics rather than Sora-scale RGB video.",
+      "best_for": "Problem framing"
+    },
+    {
+      "id": "arxiv:2402.15391",
+      "track": "key_reference",
+      "relevance_score": 95,
+      "relevance_rationale": "Flagship interactive generative environment — simulator framing made explicit.",
+      "short_description": "Genie learns action-controllable virtual worlds from unlabeled videos. Widely cited when distinguishing interactive world models from one-shot generative media.",
+      "key_claims": [
+        "Latent actions can be learned without ground-truth controls",
+        "Generative models can yield interactive environments"
+      ],
+      "limitations": "Playable domains remain constrained versus photoreal foundation video.",
+      "best_for": "Interactive simulator vs clip generator"
+    },
+    {
+      "id": "arxiv:2302.02648",
+      "track": "research",
+      "relevance_score": 96,
+      "relevance_rationale": "Uses text-guided video generation as the planning representation.",
+      "short_description": "UniPi treats decision making as generating a video plan from text, then reading actions from frames — a core bridge between generative video and planning.",
+      "key_claims": [
+        "Video models can propose multi-step plans from language",
+        "Action extraction closes the loop to control"
+      ],
+      "limitations": "Scale lags frontier media models; limited evaluation domains.",
+      "best_for": "Methods: video-as-planner"
+    },
+    {
+      "id": "arxiv:2405.12399",
+      "track": "research",
+      "relevance_score": 88,
+      "relevance_rationale": "Links diffusion visual fidelity to planning-relevant imagination.",
+      "short_description": "DIAMOND uses diffusion world modeling for Atari and argues visual detail in imagined rollouts matters for control.",
+      "key_claims": [
+        "Diffusion world models can be competitive for RL imagination",
+        "Discarding visual detail can hurt imagined-policy learning"
+      ],
+      "limitations": "Atari-scale results may not extrapolate to real-world physics.",
+      "best_for": "Fidelity vs planning utility"
+    },
+    {
+      "id": "arxiv:2309.17080",
+      "track": "industry",
+      "relevance_score": 92,
+      "relevance_rationale": "Industry world model in autonomous driving where planning stakes are real.",
+      "short_description": "Wayve's GAIA-1 generates driving futures conditioned on video, text, and action — world-model video for scenario simulation, not entertainment.",
+      "key_claims": [
+        "Action-conditioned video supports driving scenario synthesis",
+        "Multimodal conditioning enables controllable futures"
+      ],
+      "limitations": "Proprietary driving-data regime.",
+      "best_for": "Industry case study (AV)"
+    },
+    {
+      "id": "arxiv:2501.03575",
+      "track": "industry",
+      "relevance_score": 90,
+      "relevance_rationale": "Industry platform pitching world foundation models for Physical AI.",
+      "short_description": "NVIDIA Cosmos frames world foundation models as infrastructure for embodied/Physical AI simulation workflows.",
+      "key_claims": [
+        "World foundation models as transferable simulation priors",
+        "Physical AI needs more than media-generation APIs"
+      ],
+      "limitations": "Platform paper; read independent closed-loop benchmarks carefully.",
+      "best_for": "Industry / Physical-AI framing"
+    },
+    {
+      "id": "web:openai-sora-world-simulators",
+      "track": "industry",
+      "relevance_score": 94,
+      "relevance_rationale": "Primary industry claim that Sora-class video models are world simulators.",
+      "short_description": "OpenAI's public technical note arguing video generation models are progressing toward general-purpose world simulators — the industry claim this dossier interrogates.",
+      "key_claims": [
+        "Scaling video generation yields more coherent world dynamics",
+        "Simulators are framed as an aspirational capability of media models"
+      ],
+      "limitations": "Not a peer-reviewed empirical study; treat as a position/tech note.",
+      "best_for": "Industry claim to evaluate against"
+    },
+    {
+      "id": "arxiv:2408.14837",
+      "track": "preprint",
+      "relevance_score": 86,
+      "relevance_rationale": "Stress test of generative dynamics as a real-time interactive engine.",
+      "short_description": "GameNGen demonstrates real-time interactive simulation of DOOM with a diffusion model — evidence for the simulator thesis under interactivity constraints.",
+      "key_claims": [
+        "Neural simulators can run complex interactive environments in real time",
+        "Game engines are a proving ground for world-model fidelity"
+      ],
+      "limitations": "Game physics is not real-world Physical AI.",
+      "best_for": "Interactivity evidence"
+    },
+    {
+      "id": "arxiv:2312.14125",
+      "track": "preprint",
+      "relevance_score": 74,
+      "relevance_rationale": "High-quality video generation baseline for the media-model pole.",
+      "short_description": "VideoPoet showcases strong zero-shot video generation. Use as the generative-media reference when asking what extra structure a world simulator needs.",
+      "key_claims": [
+        "LLM-style architectures can generate coherent video zero-shot",
+        "Media quality is the primary optimization target"
+      ],
+      "limitations": "Not designed or evaluated as a planner/world model.",
+      "best_for": "Media-only contrast"
+    },
+    {
+      "id": "openalex:W4389473504",
+      "track": "thesis",
+      "relevance_score": 68,
+      "relevance_rationale": "Thesis-track depth on efficient RL policy optimization adjacent to world-model control.",
+      "short_description": "PhD thesis on trust-region policy optimization for sample-efficient reinforcement learning — useful dissertation-format background for control learning methods.",
+      "key_claims": [
+        "Trust-region methods improve stability of policy updates",
+        "Sample efficiency remains central for practical control learning"
+      ],
+      "limitations": "Not specifically about video generation as a simulator.",
+      "best_for": "Thesis-track / methods background"
+    },
+    {
+      "id": "openalex:W3140854437",
+      "track": "key_reference",
+      "relevance_score": 94,
+      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "In the last few years, the deep learning (DL) computing paradigm has been deemed the Gold Standard in the machine learning (ML) community. Moreover, it has gradually become the most widely used computational approach in the field of ML, thus achieving outstanding results on…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Starting point / related work"
+    },
+    {
+      "id": "openalex:W2995022099",
+      "track": "key_reference",
+      "relevance_score": 94,
+      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Federated learning (FL) is a machine learning setting where many clients (e.g., mobile devices or whole organizations) collaboratively train a model under the orchestration of a central server (e.g., service provider), while keeping the training data decentralized. FL embodies…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Starting point / related work"
+    },
+    {
+      "id": "openalex:W3168997536",
+      "track": "key_reference",
+      "relevance_score": 94,
+      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "A convolutional neural network (CNN) is one of the most significant networks in the deep learning field. Since CNN made impressive achievements in many areas, including but not limited to computer vision and natural language processing, it attracted much attention from both…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Starting point / related work"
+    },
+    {
+      "id": "openalex:W3153990350",
+      "track": "key_reference",
+      "relevance_score": 94,
+      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Abstract Today, intelligent systems that offer artificial intelligence capabilities often rely on machine learning. Machine learning describes the capacity of systems to learn from problem-specific training data to automate the process of analytical model building and solve…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Starting point / related work"
+    },
+    {
+      "id": "openalex:W4386142022",
+      "track": "key_reference",
+      "relevance_score": 94,
+      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Abstract Recent years have seen a tremendous growth in Artificial Intelligence (AI)-based methodological development in a broad range of domains. In this rapidly evolving field, large number of methods are being reported using machine learning (ML) and Deep Learning (DL) models.…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Starting point / related work"
+    },
+    {
+      "id": "openalex:W4206484811",
+      "track": "key_reference",
+      "relevance_score": 94,
+      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Unlike previous studies on the Metaverse based on Second Life, the current Metaverse is based on the social value of Generation Z that online and offline selves are not different. With the technological development of deep learning-based high-precision recognition models and…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Starting point / related work"
+    },
+    {
+      "id": "openalex:W3003667836",
+      "track": "key_reference",
+      "relevance_score": 95,
+      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Digital twin can be defined as a virtual representation of a physical asset enabled through data and simulators for real-time prediction, optimization, monitoring, controlling, and improved decision making. Recent advances in computational pipelines, multiphysics solvers,…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Starting point / related work"
+    },
+    {
+      "id": "openalex:W2953303875",
+      "track": "key_reference",
+      "relevance_score": 95,
+      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Automated driving systems (ADSs) promise a safe, comfortable and efficient driving experience. However, fatalities involving vehicles equipped with ADSs are on the rise. The full potential of ADSs cannot be realized unless the robustness of state-of-the-art is improved further.…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Starting point / related work"
+    },
+    {
+      "id": "openalex:W3154736008",
+      "track": "research",
+      "relevance_score": 75,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Abstract Cybersickness (CS) is a term used to refer to symptoms, such as nausea, headache, and dizziness that users experience during or after virtual reality immersion. Initially discovered in flight simulators, commercial virtual reality (VR) head-mounted displays (HMD) of the…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4402155831",
+      "track": "research",
+      "relevance_score": 72,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "In the complex and multidimensional field of medicine, multimodal data are prevalent and crucial for informed clinical decisions. Multimodal data span a broad spectrum of data types, including medical images (eg, MRI and CT scans), time-series data (eg, sensor data from wearable…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4324290234",
+      "track": "research",
+      "relevance_score": 72,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Envisioned to be the next-generation Internet, the metaverse has been attracting enormous attention from both the academia and industry. The metaverse can be viewed as a 3D immersive virtual world, where people use Augmented/Virtual Reality (AR/VR) devices to access and interact…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W3083484791",
+      "track": "research",
+      "relevance_score": 72,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "It is becoming increasingly prevalent in digital learning research to encompass an array of different meanings, spaces, processes, and teaching strategies for discerning a global perspective on constructing the student learning experience. Multimodality is an emergent phenomenon…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W3016364508",
+      "track": "research",
+      "relevance_score": 71,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "E-Learning has become more and more popular in recent years with the advance of new technologies. Using their mobile devices, people can expand their knowledge anytime and anywhere. E-Learning also makes it possible for people to manage their learning progression freely and…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4385431115",
+      "track": "research",
+      "relevance_score": 73,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "modalities such as natural language, images, and audio.We demonstrate that pixel-aligned open-set features can be fused into 3D maps via traditional SLAM and multi-view fusion approaches.This enables effective zero-shot spatial reasoning, not needing any additional training or…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W3153454949",
+      "track": "research",
+      "relevance_score": 71,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Video anomaly recognition in smart cities is an important computer vision task that plays a vital role in smart surveillance and public safety but is challenging due to its diverse, complex, and infrequent occurrence in real-time surveillance environments. Various deep learning…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4398238904",
+      "track": "research",
+      "relevance_score": 73,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Abstract This emerging technology report discusses Google Gemini as a multimodal generative AI tool and presents its revolutionary potential for future educational technology. It introduces Gemini and its features, including versatility in processing data from text, image,…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4391610180",
+      "track": "research",
+      "relevance_score": 75,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "There are two main ways to discover or design small drug molecules. The first involves fine-tuning existing molecules or commercially successful drugs through quantitative structure-activity relationships and virtual screening. The second approach involves generating new…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4378746725",
+      "track": "research",
+      "relevance_score": 71,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Robotics have advanced significantly over the years, and human-robot interaction (HRI) is now playing an important role in delivering the best user experience, cutting down on laborious tasks, and raising public acceptance of robots. New HRI approaches are necessary to promote…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4389266910",
+      "track": "research",
+      "relevance_score": 71,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Human–robot interaction (HRI) has escalated in notability in recent years, and multimodal communication and control strategies are necessitated to guarantee a secure, efficient, and intelligent HRI experience. In spite of the considerable focus on multimodal HRI, comprehensive…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4394606408",
+      "track": "research",
+      "relevance_score": 71,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Multimodal machine learning is a vibrant multi-disciplinary research field that aims to design computer agents with intelligent capabilities such as understanding, reasoning, and learning through integrating multiple communicative modalities, including linguistic, acoustic,…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4406412004",
+      "track": "research",
+      "relevance_score": 71,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "This review explores the applications of Convolutional Neural Networks (CNNs) in smart agriculture, highlighting recent advancements across various applications including weed detection, disease detection, crop classification, water management, and yield prediction. Based on a…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4394806371",
+      "track": "research",
+      "relevance_score": 71,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "The stated goal of many organizations in the field of artificial intelligence (AI) is to develop artificial general intelligence (AGI), an imagined system with more intelligence than anything we have ever seen. Without seriously questioning whether such a system can and should…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W3015928967",
+      "track": "research",
+      "relevance_score": 71,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Depression is a major public health concern in the U.S. and globally. While successful early identification and treatment can lead to many positive health and behavioral outcomes, depression, remains undiagnosed, untreated or undertreated due to several reasons, including denial…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W3199015608",
+      "track": "research",
+      "relevance_score": 71,
+      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Multimodal classification research has been gaining popularity with new datasets in domains such as satellite imagery, biometrics, and medicine. Prior research has shown the benefits of combining data from multiple sources compared to traditional unimodal data that has led to…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Methods or evaluation section"
+    },
+    {
+      "id": "openalex:W4402890475",
+      "track": "industry",
+      "relevance_score": 76,
+      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "We survey applications of pretrained foundation models in robotics. Traditional deep learning models in robotics are trained on small datasets tailored for specific tasks, which limits their adaptability across diverse applications. In contrast, foundation models pretrained on…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Industry / applied framing"
+    },
+    {
+      "id": "openalex:W4393177776",
+      "track": "industry",
+      "relevance_score": 81,
+      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "The rapid advancement of Generative AI (Gen-AI) is transforming Human-Computer Interaction (HCI), with significant implications across various sectors. This study investigates the public's perception of Sora OpenAI, a pioneering Gen-AI video generation tool, via social media…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Industry / applied framing"
+    },
+    {
+      "id": "openalex:W4409365815",
+      "track": "industry",
+      "relevance_score": 85,
+      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "World models envision potential future states based on various ego actions. They embed extensive knowledge about the driving environment, facilitating safe and scalable autonomous driving. Most existing methods primarily focus on either data generation or the pretraining…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Industry / applied framing"
+    },
+    {
+      "id": "openalex:W4392954640",
+      "track": "industry",
+      "relevance_score": 83,
+      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "The generation of videos from textual input poses a significant computational challenge within computer science. Nonetheless, recent advancements in text-to-video artificial intelligence (AI) technologies have showcased notable progress within this domain. Foreseen advancements…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Industry / applied framing"
+    },
+    {
+      "id": "openalex:W4404717804",
+      "track": "industry",
+      "relevance_score": 81,
+      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Large-scale generative models have achieved remarkable success in a number of domains. However, for sequential decision-making problems, such as robotics, action-labelled data is often scarce and therefore scaling-up foundation models for decision-making remains a challenge. A…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Industry / applied framing"
+    },
+    {
+      "id": "openalex:W3178685848",
+      "track": "thesis",
+      "relevance_score": 62,
+      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Textbooks are artifacts of a pedagogical culture, but in the context of English as a Foreign Language (EFL) education in Korean universities, that culture often forces instructors and students to use generic, global publications for reasons more political than pedagogical.…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Deep background chapter"
+    },
+    {
+      "id": "openalex:W4313469377",
+      "track": "thesis",
+      "relevance_score": 62,
+      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Temporal sentence grounding in videos (TSGV), a.k.a., natural language video localization (NLVL) or video moment retrieval (VMR), aims to retrieve a temporal moment (i.e., a fraction of a video) that semantically corresponds to a language query from an untrimmed video.…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Deep background chapter"
+    },
+    {
+      "id": "openalex:W3013449349",
+      "track": "thesis",
+      "relevance_score": 62,
+      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "This thesis investigates the use of deep learning techniques to address the problem of machine understanding of human affective behaviour and improve the accuracy of both unimodal and multimodal human emotion recognition. The objective was to explore how best to configure deep…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Deep background chapter"
+    },
+    {
+      "id": "openalex:W4321242134",
+      "track": "thesis",
+      "relevance_score": 62,
+      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "For more than a decade, social media has emerged as a potential platform to generate and spread information about a natural disasters. Alternatively, a common way of conducting research into natural disasters is via remote sensing. However, remote sensing data comes with few…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Deep background chapter"
+    },
+    {
+      "id": "openalex:W4292589917",
+      "track": "thesis",
+      "relevance_score": 62,
+      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Dynamic data and continuously evolving sets of records are essential for a wide variety of today's data management applications. Such applications range from large, social, content-driven Internet applications, to highly focused data processing verticals like data intensive…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Deep background chapter"
+    },
+    {
+      "id": "openalex:W3094484211",
+      "track": "thesis",
+      "relevance_score": 64,
+      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Automatisierte Systeme werden mit einer zunehmenden Anzahl unterschied- licher Sensoren ausgestattet, um immer komplexere Aufgaben zu bewältigen. Präzise Sensorkalibrierung ist eine essentielle Voraussetzung, um die Informa- tionen der Sensoren zu fusionieren und wichtige…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Deep background chapter"
+    },
+    {
+      "id": "openalex:W3130054217",
+      "track": "thesis",
+      "relevance_score": 62,
+      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Digital technologies have become instrumental in transforming our society. Recent statistical methods have been successfully deployed to automate the processing of the growing amount of images, videos, and texts we produce daily. In particular, deep neural networks have been…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Deep background chapter"
+    },
+    {
+      "id": "openalex:W4392679398",
+      "track": "preprint",
+      "relevance_score": 70,
+      "relevance_rationale": "Included in the preprint track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "In this report, we introduce the Gemini 1.5 family of models, representing the next generation of highly compute-efficient multimodal models capable of recalling and reasoning over fine-grained information from millions of tokens of context, including multiple long documents and…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Recent developments"
+    },
+    {
+      "id": "openalex:W4392341509",
+      "track": "preprint",
+      "relevance_score": 77,
+      "relevance_rationale": "Included in the preprint track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Sora is a text-to-video generative AI model, released by OpenAI in February 2024. The model is trained to generate videos of realistic or imaginative scenes from text instructions and show potential in simulating the physical world. Based on public technical reports and reverse…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Recent developments"
+    },
+    {
+      "id": "openalex:W4386655647",
+      "track": "preprint",
+      "relevance_score": 70,
+      "relevance_rationale": "Included in the preprint track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "While recently Multimodal Large Language Models (MM-LLMs) have made exciting strides, they mostly fall prey to the limitation of only input-side multimodal understanding, without the ability to produce content in multiple modalities. As we humans always perceive the world and…",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Recent developments"
+    },
+    {
+      "id": "openalex:W3163993681",
+      "track": "key_reference",
+      "relevance_score": 94,
+      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
+      "short_description": "Physics-informed machine learning — see the linked source for details.",
+      "key_claims": [
+        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
+        "Should be verified against the primary PDF/page before citation."
+      ],
+      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
+      "best_for": "Starting point / related work"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyw
+.Python
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Runtime outputs (local artifacts)
+.research-materials/
+!example/
+
+# Server pid / lock
+.intake-server.pid
+*.pid
