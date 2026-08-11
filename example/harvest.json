@@ -261,7 +261,7 @@
       }
     ],
     "submitted_at": "2026-07-28T00:00:00+00:00",
-    "skill": "pineapple-71717"
+    "skill": "skill-dossier"
   },
   "harvested_at": "2026-07-28T06:42:14Z",
   "count": 50,
@@ -1434,7 +1434,7 @@
   ],
   "errors": [],
   "notes": [
-    "Normalized multi-track harvest for Pineapple 71717.",
+    "Normalized multi-track harvest for Skill Dossier.",
     "Tracks: key_reference, research, industry, thesis, preprint.",
     "AI enrichment should confirm tracks and may add verified industry URLs."
   ]

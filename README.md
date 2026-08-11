@@ -1,4 +1,4 @@
-# Skill71717: Pineapple Research Materials
+# Skill Dossier
 
 A downloadable agent skill for **students and researchers**. You describe a research topic in a small local form; the skill harvests scholarly materials from public academic APIs, the assistant scores relevance and writes short descriptions, and you get **one self-contained HTML dossier** you can open in any browser.
 
@@ -18,30 +18,30 @@ Open a terminal and type:
 python3 --version
 ```
 
-If you see something like `Python 3.10.4` you're done. If you see `command not found`, install Python from <https://www.python.org/downloads/> and try again.
+If you see something like `Python 3.10.4` you are good. If you see `command not found`, install Python from <https://www.python.org/downloads/> and try again.
 
 **No other tools to install.** No `pip install`, no `npm install`. The skill uses only the Python standard library. Academic APIs are called over HTTPS with `urllib`.
 
-### Step 2 — Download the skill ZIP
+### Step 2 — Download the skill ZIPPED
 
-1. Open <https://github.com/KingHenryZ/Skill71717-Dossier> in your browser
-2. Click the green **Code** button → **Download ZIP**
+1. Open <https://github.com/KingHenryZ/Skill-Dossier> in your browser
+2. Click the green **Code** button → **Download ZIPPED**
 3. Unzip it somewhere you'll remember (e.g. your Desktop or `~/Documents/`)
-4. Open the unzipped `Skill71717-Dossier-main` folder
+4. Open the unzipped `Skill-Dossier-main` folder
 
 That folder is the skill.
 
 ### Step 3 — Open the skill folder in your editor
 
-**For Cursor users:** open Cursor → **File → Open Folder…** → pick the `Skill71717-Dossier-main` folder. The skill is auto-registered via `.cursor/rules/research-materials.mdc` — nothing else to do.
+**For Cursor:** open Cursor → **File → Open Folder…** → pick the `Skill-Dossier-main` folder. The skill is auto-registered via `.cursor/rules/research-materials.mdc` — nothing else to do.
 
-**For Claude Code users:** copy the folder into your skills directory:
+**For Claude:** copy the folder into your skills directory, then open it in Claude:
 
 ```bash
-cp -r Skill71717-Dossier-main ~/.claude/skills/pineapple-research-materials
+cp -r Skill-Dossier-main ~/.claude/skills/skill-dossier
 ```
 
-The skill is now available as `/pineapple-research-materials` inside Claude Code.
+**For Codex:** open the `Skill-Dossier-main` folder as your workspace (or add it to the project you are working in) so the assistant can read `SKILL.md` and the scripts.
 
 ---
 
@@ -51,39 +51,26 @@ The skill is now available as `/pineapple-research-materials` inside Claude Code
 
 There's a prebuilt dossier already inside `example/`. Run the skill on it first so you can see what the output looks like before starting a live search.
 
-**In Cursor**, open the chat sidebar and paste:
+**In Cursor, Claude, or Codex**, open chat and paste:
 
 ```text
-Run Pineapple 71717 on the example request
-```
-
-**In Claude Code**, type:
-
-```text
-/pineapple-research-materials
-Run it on the example request
+Run Skill Dossier on the example request
 ```
 
 Or open `example/dossier.html` in your browser — that's what a finished run looks like, without calling the live APIs.
 
 ### Then: run a live research scan
 
-**In Cursor:**
+Same idea in **Cursor, Claude, or Codex** — open chat and paste:
 
 ```text
-Run Pineapple 71717 research materials
+Run Skill Dossier
 ```
 
 or:
 
 ```text
 Find research materials on retrieval-augmented generation evaluation
-```
-
-**In Claude Code:**
-
-```text
-/pineapple-research-materials
 ```
 
 Then sit back. The assistant will:
@@ -128,4 +115,4 @@ Made by:
 - **Henry Zou** — [@HenryZou on LinkedIn](https://www.linkedin.com/in/cunhanzou/)
 - **Jenny Zheng** — [@JennyZheng on LinkedIn](https://www.linkedin.com/in/jenzheny/)
 
-> Pineapple 71717 helps researchers and students assemble a high-resolution reading context — scholarly berries fused into one dossier — so literature work can move at the speed of thought without losing academic rigor.
+> Skill Dossier helps researchers and students assemble a high-resolution reading context — scholarly berries fused into one dossier — so literature work can move at the speed of thought without losing academic rigor.

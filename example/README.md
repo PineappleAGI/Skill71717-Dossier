@@ -1,6 +1,6 @@
-# Example fixture — Skill71717
+# Example fixture — Skill Dossier
 
-Offline demo of Pineapple 71717 for the topic:
+Offline demo of Skill Dossier for the topic:
 
 > Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only
 
@@ -32,5 +32,5 @@ Or open [`dossier.html`](dossier.html) if it is already up to date.
 ## Ask the assistant
 
 ```text
-Run Pineapple 71717 on the example request
+Run Skill Dossier on the example request
 ```

@@ -1,9 +1,9 @@
 ---
-name: pineapple-research-materials
-description: Skill71717 — Pineapple Research Materials. Open a professional intake form, harvest scholarly and industry sources from academic APIs, enrich with relevance scoring, and generate a single HTML research dossier sectioned by key references, research papers, industry reports, theses, and preprints. Use when the user wants literature, papers, theses, industry reports, a lit-review starter pack, or says Pineapple 71717.
+name: skill-dossier
+description: Skill Dossier — open a professional intake form, harvest scholarly and industry sources from academic APIs, enrich with relevance scoring, and generate a single HTML research dossier sectioned by key references, research papers, industry reports, theses, and preprints. Use when the user wants literature, papers, theses, industry reports, a lit-review starter pack, or says Skill Dossier.
 ---
 
-# Skill71717: Pineapple Research Materials
+# Skill Dossier
 
 Generate a single interactive HTML **research dossier** from a topic: URLs, short descriptions, relevance scores, what’s missing, and searches to try next — for students and professional researchers.
 
@@ -41,8 +41,8 @@ Generate a single interactive HTML **research dossier** from a topic: URLs, shor
 
 | User intent | Mode |
 |---|---|
-| "Run Pineapple 71717 on the example" / "use example request" | **example** — skip intake; use `example/request.json` |
-| "Run Pineapple 71717" / "find research materials" / topic in chat without form | **live** — start intake server |
+| "Run Skill Dossier on the example" / "use example request" | **example** — skip intake; use `example/request.json` |
+| "Run Skill Dossier" / "find research materials" / topic in chat without form | **live** — start intake server |
 | User already provided a completed `request.json` path | **replay** — skip intake |
 | Harvest + enrichment exist; "regenerate dossier" | **regen** — skip harvest/enrich |
 
@@ -81,7 +81,7 @@ python SKILL_ROOT/scripts/intake-server.py --port 8765 --out RUNTIME_DIR
   "audience": "lit_review",
   "seed_queries": ["optional extra OpenAlex queries for recall"],
   "submitted_at": "ISO-8601",
-  "skill": "pineapple-71717"
+  "skill": "skill-dossier"
 }
 ```
 
@@ -223,7 +223,7 @@ Example mode may write to `example/dossier.html` or open the committed file.
 ## Example Mode (no live APIs)
 
 ```text
-Run Pineapple 71717 on the example request
+Run Skill Dossier on the example request
 ```
 
 1. Use `example/request.json`, `example/harvest.json`, `example/enrichment.json`
@@ -238,11 +238,11 @@ open example/dossier.html
 
 ## Tool Mapping
 
-| SKILL.md | Cursor | Claude Code |
-|---|---|---|
-| Read / Write | Read / Write | Read / Write |
-| Shell | Shell | Bash |
-| Web search | WebSearch / WebFetch | WebSearch |
+| SKILL.md | Cursor | Claude | Codex |
+|---|---|---|---|
+| Read / Write | Read / Write | Read / Write | Read / Write |
+| Shell | Shell | Bash | Shell |
+| Web search | WebSearch / WebFetch | WebSearch | Web search |
 
 ## Supporting Files
 

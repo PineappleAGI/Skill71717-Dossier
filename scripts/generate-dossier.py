@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate a self-contained research dossier HTML for Skill71717.
+Generate a self-contained research dossier HTML for Skill Dossier.
 
 Usage:
   python scripts/generate-dossier.py <harvest.json> <enrichment.json> <output.html> [--no-open]
@@ -323,8 +323,8 @@ def generate(harvest: dict, enrichment: dict) -> str:
   <div class="shell">
     <div class="topbar">
       <div class="brand">
-        <span class="brand-mark">Pineapple 71717</span>
-        <span class="brand-sub">Research Materials Dossier</span>
+        <span class="brand-mark">Skill Dossier</span>
+        <span class="brand-sub">Research Materials</span>
       </div>
     </div>
 

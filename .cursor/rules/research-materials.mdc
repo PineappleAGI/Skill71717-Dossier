@@ -1,12 +1,12 @@
 ---
-description: Generate a professional research-materials dossier from a topic. Use when the user wants literature, papers, preprints, scholarly URLs, a lit review starter pack, or Pineapple 71717.
+description: Generate a professional research-materials dossier from a topic. Use when the user wants literature, papers, preprints, scholarly URLs, a lit review starter pack, or Skill Dossier.
 globs:
 alwaysApply: false
 ---
 
-# Skill71717: Pineapple Research Materials — Cursor Integration
+# Skill Dossier — Cursor Integration
 
-This rule activates the `pineapple-research-materials` skill for Cursor. The full workflow is defined in `SKILL.md` at the project root.
+This rule activates the `skill-dossier` skill for Cursor. The full workflow is defined in `SKILL.md` at the project root.
 
 ## Quick Reference
 
@@ -39,10 +39,10 @@ When this rule is invoked, follow the phased workflow in `SKILL.md`:
 
 ## Example Invocation
 
-- "Run Pineapple 71717"
+- "Run Skill Dossier"
 - "Find research materials on …"
 - "Literature scan for my thesis on …"
-- "Run Pineapple 71717 on the example request"
+- "Run Skill Dossier on the example request"
 
 ## Built-in Example
 

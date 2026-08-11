@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Harvest scholarly materials for Skill71717 (Pineapple Research Materials).
+Harvest scholarly materials for Skill Dossier.
 
 Reads request.json, queries public academic APIs with urllib (stdlib only),
 assigns material tracks, writes harvest.json with normalized, deduped records.
@@ -28,7 +28,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
-USER_AGENT = "Pineapple71717-ResearchMaterials/1.0 (https://github.com/KingHenryZ; mailto:{email})"
+USER_AGENT = "SkillDossier/1.0 (https://github.com/KingHenryZ; mailto:{email})"
 
 INDUSTRY_HINTS = (
     "openai",
@@ -701,7 +701,7 @@ def main() -> int:
         "materials": materials,
         "errors": errors,
         "notes": [
-            "Normalized multi-track harvest for Pineapple 71717.",
+            "Normalized multi-track harvest for Skill Dossier.",
             "Tracks: key_reference, research, industry, thesis, preprint.",
             "AI enrichment should confirm tracks and may add verified industry URLs.",
         ],
