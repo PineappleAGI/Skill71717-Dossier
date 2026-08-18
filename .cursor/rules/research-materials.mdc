@@ -1,12 +1,12 @@
 ---
-description: Generate a professional research-materials dossier from a topic. Use when the user wants literature, papers, preprints, scholarly URLs, a lit review starter pack, or Skill Dossier.
+description: Generate a professional research-materials dossier from a topic. Use when the user wants literature, papers, preprints, scholarly URLs, a lit review starter pack, or Pineapple 71717.
 globs:
 alwaysApply: false
 ---
 
-# Skill Dossier — Cursor Integration
+# Skill71717: Pineapple Research Materials — Cursor Integration
 
-This rule activates the `skill-dossier` skill for Cursor. The full workflow is defined in `SKILL.md` at the project root.
+This rule activates the `pineapple-research-materials` skill for Cursor. The full workflow is defined in `SKILL.md` at the project root.
 
 ## Quick Reference
 
@@ -16,10 +16,11 @@ When this rule is invoked, follow the phased workflow in `SKILL.md`:
 2. **Phase 0:** Detect mode (live intake, example replay, or regenerate)
 3. **Phase 1:** Start `python scripts/intake-server.py` and open the form (unless example/request already provided)
 4. **Phase 2:** Poll for `.research-materials/request.json` (or use `example/request.json`)
-5. **Phase 3:** Run `python scripts/harvest-sources.py <request.json> <out_dir>` (multi-track)
-6. **Phase 4:** Read harvest + write `enrichment.json` (confirm tracks; no fabricated URLs)
-7. **Phase 5:** Run `python scripts/generate-dossier.py ... --no-open`, then open once — **never hand-edit HTML**
-8. **Phase 6:** Stop the intake server and summarize by track
+5. **Phase 3:** Run `python scripts/harvest-sources.py <request.json> <out_dir>`
+6. **Phase 4:** Run `python scripts/classify-claims.py <harvest.json> <out_dir>` (Claude API; uses `claims.json` cache)
+7. **Phase 5:** Write `enrichment.json` (inquiry lens + gaps; no fabricated URLs)
+8. **Phase 6:** Run `python scripts/generate-dossier.py ... --no-open`, then open once — **never hand-edit HTML**. Dossier has three views: Evidence Synthesis, Debate Arena, Belief Timeline.
+9. **Phase 7:** Stop the intake server and summarize by stance
 
 ## Tool Mapping
 
@@ -35,14 +36,16 @@ When this rule is invoked, follow the phased workflow in `SKILL.md`:
 - `visualization-base.css` — Mandatory CSS embedded by the generator
 - `scripts/intake-server.py` — Local topic form
 - `scripts/harvest-sources.py` — Academic API harvest
+- `scripts/classify-claims.py` — Claude API stance classification + cache
 - `scripts/generate-dossier.py` — HTML dossier builder
+- `data/seed-debates.json` — Debate Arena “commonly misunderstood” starter rooms
 
 ## Example Invocation
 
-- "Run Skill Dossier"
+- "Run Pineapple 71717"
 - "Find research materials on …"
 - "Literature scan for my thesis on …"
-- "Run Skill Dossier on the example request"
+- "Run Pineapple 71717 on the example request"
 
 ## Built-in Example
 

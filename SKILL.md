@@ -1,20 +1,20 @@
 ---
-name: skill-dossier
-description: Skill Dossier — open a professional intake form, harvest scholarly and industry sources from academic APIs, enrich with relevance scoring, and generate a single HTML research dossier sectioned by key references, research papers, industry reports, theses, and preprints. Use when the user wants literature, papers, theses, industry reports, a lit-review starter pack, or says Skill Dossier.
+name: pineapple-research-materials
+description: Skill71717 — Pineapple Research Materials. Harvest scholarly sources, classify each paper's stance toward a research question (supports / contradicts / test conditions / background), drop off-topic items, and generate a single HTML dossier. Use when the user wants literature, papers, a lit-review starter pack, or says Pineapple 71717.
 ---
 
-# Skill Dossier
+# Skill71717: Pineapple Research Materials
 
 Generate a single interactive HTML **research dossier** from a topic: URLs, short descriptions, relevance scores, what’s missing, and searches to try next — for students and professional researchers.
 
 ## Core Principles
 
 1. **Hybrid Intake** — A local HTML form captures topic + filters; submit writes `request.json`.
-2. **Scripted Harvest** — `harvest-sources.py` pulls OpenAlex / arXiv / CrossRef / Semantic Scholar (Python stdlib only) with **multi-track budgets**.
-3. **AI Enrichment** — The assistant scores relevance, writes descriptions, confirms tracks, and notes gaps.
+2. **Scripted Harvest** — `harvest-sources.py` pulls OpenAlex / arXiv / CrossRef / Semantic Scholar (Python stdlib only).
+3. **Claim classification** — `classify-claims.py` calls the Claude API once per uncached paper (title + abstract) and caches stance in `claims.json`.
 4. **Single HTML Output** — One self-contained dossier with embedded CSS; Google Fonts are the only external dependency.
-5. **Sectioned materials** — Key references, Research papers, Industry reports, Theses, Preprints (empty sections omitted).
-6. **Academic Integrity** — Surface DOI, venue, year, OA, citations; never bypass paywalls; remind users to verify primary sources.
+5. **Sectioned by epistemic role** — Evidence supporting, contradicting/limiting, test conditions, then collapsed background. Off-topic papers are dropped.
+6. **Academic Integrity** — Surface DOI, venue, year, OA; never bypass paywalls; remind users to verify primary sources.
 
 ## Non-Negotiable Rules
 
@@ -41,8 +41,8 @@ Generate a single interactive HTML **research dossier** from a topic: URLs, shor
 
 | User intent | Mode |
 |---|---|
-| "Run Skill Dossier on the example" / "use example request" | **example** — skip intake; use `example/request.json` |
-| "Run Skill Dossier" / "find research materials" / topic in chat without form | **live** — start intake server |
+| "Run Pineapple 71717 on the example" / "use example request" | **example** — skip intake; use `example/request.json` |
+| "Run Pineapple 71717" / "find research materials" / topic in chat without form | **live** — start intake server |
 | User already provided a completed `request.json` path | **replay** — skip intake |
 | Harvest + enrichment exist; "regenerate dossier" | **regen** — skip harvest/enrich |
 
@@ -81,7 +81,7 @@ python SKILL_ROOT/scripts/intake-server.py --port 8765 --out RUNTIME_DIR
   "audience": "lit_review",
   "seed_queries": ["optional extra OpenAlex queries for recall"],
   "submitted_at": "ISO-8601",
-  "skill": "skill-dossier"
+  "skill": "pineapple-71717"
 }
 ```
 
@@ -134,9 +134,23 @@ If harvest returns 0 materials, tell the user and offer to broaden years or reph
 
 ---
 
-## Phase 3 — AI Enrichment
+## Phase 3 — Claim classification
 
-Read `harvest.json` + `request.json`. Write `RUNTIME_DIR/enrichment.json`.
+```bash
+python SKILL_ROOT/scripts/classify-claims.py RUNTIME_DIR/harvest.json RUNTIME_DIR --enrichment RUNTIME_DIR/enrichment.json
+```
+
+Requires `ANTHROPIC_API_KEY` for papers not already in `claims.json`. Cached items are skipped. Empty or broken abstracts are marked skipped and dropped from the dossier.
+
+Writes `RUNTIME_DIR/claims.json` keyed by paper `id` (`stance`, `confidence`, `evidence_strength`, `one_line_claim`, `relevance`).
+
+Off-topic papers (`relevance == "off_topic"`) are not rendered. Low-relevance papers are shown dimmed.
+
+---
+
+## Phase 3b — Enrichment notes (gaps + inquiry lens)
+
+Read `harvest.json` + `request.json` + `claims.json`. Write `RUNTIME_DIR/enrichment.json`.
 
 ### `enrichment.json` schema
 
@@ -144,6 +158,12 @@ Read `harvest.json` + `request.json`. Write `RUNTIME_DIR/enrichment.json`.
 {
   "coverage_gaps": ["Plain-language note about what this list is missing"],
   "suggested_next_queries": ["Follow-up search strings a person can paste next"],
+  "inquiry_classification": {
+    "title": "Research Question Framework",
+    "core_inquiry": {"label": "Comparative / Benchmarking", "detail": "Why this lens"},
+    "epistemic_rigor": {"label": "Foundational or frontier", "detail": "Evidence mix"},
+    "scope_boundary": {"label": "What is in vs out", "detail": "Years, fields, exclusions"}
+  },
   "materials": [
     {
       "id": "must match harvest id",
@@ -164,8 +184,9 @@ Optional legacy fields (`research_question_restatement`, `theme_clusters`, `read
 
 ### Authoring rules
 
-- Score every harvested item; do not drop items silently (low scores are fine).
-- Confirm or correct each item’s `track` when harvest is unsure (especially industry vs research).
+- Write `inquiry_classification` (core inquiry intent, epistemic rigor, scope boundary) so the dossier can show the scan’s lens below the hero.
+- Coverage gaps and next queries remain required; per-paper stance comes from `claims.json`, not from invented key_claims.
+- Do not keep placeholder lines like “Contributes evidence or framing related to…” — re-run classification instead.
 - For **key_reference**: say why it is canonical (citations, survey status, defines the paradigm).
 - For **industry**: require real URL + organization; label tech report / blog / whitepaper in the description when clear.
 - For **thesis**: note university when available.
@@ -196,12 +217,16 @@ xdg-open RUNTIME_DIR/dossier-….html      # Linux
 
 Dossier UI contracts:
 
-- Hero shows **topic only** (no restatement lede)
-- No Researcher/Quick scan toggle
+- Persistent top switcher: **Evidence Synthesis** / **Debate Arena** / **Belief Timeline**
+- Synthesis: stance sections, searches live under Test conditions, Open questions sidebar
+- Debate lobby has two labeled sections:
+  1. **Related to your question** — contested sub-questions from the Mode 1 paper set (`group: related`, `source: harvest`)
+  2. **Commonly misunderstood** — curated everyday contested claims, **not** the user's topic (`group: common`, `source: seed` from `data/seed-debates.json`). Category sub-headers. At launch, 2–3 rooms ship with harvested for/against cards; the rest are `status: coming_soon` placeholder tiles.
+- Debate and Belief each keep a persistent “How this view works” note (argument mapping / Bayesian updating) with no close control.
+- Debate rooms: flippable for/against cards; score is strength-weighted, not card count
+- Belief: chronological meter over **Mode 1 papers only** (seed-room papers are excluded); prior 50% unless `claims.prior` is set
 - No audience chip; **Generated** is date-only (`YYYY-MM-DD`)
-- Materials are **sectioned** by track
-- Sidebar: **What's missing from this list**, **Searches to try next**, **BibTeX**
-- No footer disclaimer block
+- Confidence is a dot + thin bar, not a large score chip
 
 Example mode may write to `example/dossier.html` or open the committed file.
 
@@ -212,8 +237,8 @@ Example mode may write to `example/dossier.html` or open the committed file.
 1. `python SKILL_ROOT/scripts/intake-server.py --stop`
 2. Chat summary:
    - Topic
-   - Counts per track
-   - Top materials (title + year + track + relevance + URL)
+   - Counts per stance (supporting / contradicting / test conditions / background; off-topic dropped)
+   - Top in-scope materials (title + year + stance + URL)
    - 2–3 “what's missing” notes
    - Path to the dossier HTML
 3. Remind: verify primary sources before citing; dossier is triage, not a finished bibliography.
@@ -223,11 +248,17 @@ Example mode may write to `example/dossier.html` or open the committed file.
 ## Example Mode (no live APIs)
 
 ```text
-Run Skill Dossier on the example request
+Run Pineapple 71717 on the example request
 ```
 
-1. Use `example/request.json`, `example/harvest.json`, `example/enrichment.json`
-2. Regenerate (do not hand-edit HTML):
+1. Use `example/request.json`, `example/harvest.json`, `example/enrichment.json`, `example/claims.json`
+2. Classify only if claims are missing (`ANTHROPIC_API_KEY` required for uncached papers):
+
+```bash
+python scripts/classify-claims.py example/harvest.json example --enrichment example/enrichment.json
+```
+
+3. Regenerate (do not hand-edit HTML):
 
 ```bash
 python scripts/generate-dossier.py example/harvest.json example/enrichment.json example/dossier.html --no-open
@@ -238,16 +269,19 @@ open example/dossier.html
 
 ## Tool Mapping
 
-| SKILL.md | Cursor | Claude | Codex |
-|---|---|---|---|
-| Read / Write | Read / Write | Read / Write | Read / Write |
-| Shell | Shell | Bash | Shell |
-| Web search | WebSearch / WebFetch | WebSearch | Web search |
+| SKILL.md | Cursor | Claude Code |
+|---|---|---|
+| Read / Write | Read / Write | Read / Write |
+| Shell | Shell | Bash |
+| Web search | WebSearch / WebFetch | WebSearch |
 
 ## Supporting Files
 
 - `scripts/intake-server.py`
 - `scripts/harvest-sources.py`
+- `scripts/classify-claims.py`
 - `scripts/generate-dossier.py`
+- `scripts/dossier-ui.js` — mode switcher, debate rooms, belief timeline (embedded into HTML)
 - `visualization-base.css`
+- `data/seed-debates.json` — Mode 2 “commonly misunderstood” starter rooms + harvested proof-of-concept papers
 - `example/` — demo fixtures + prebuilt dossier

@@ -9,6 +9,21 @@
     "Sora world simulator critique counterfactual planning evaluation",
     "sim-to-real robotics generative video world foundation model"
   ],
+  "inquiry_classification": {
+    "title": "Research Question Framework",
+    "core_inquiry": {
+      "label": "Comparative / Benchmarking",
+      "detail": "Primary lens: Sora-class video as a world simulator for planning versus generative media that only produces clips. Secondary: applied feasibility (sim-to-real) and stress-tests of lab claims."
+    },
+    "epistemic_rigor": {
+      "label": "Mixed foundational + frontier",
+      "detail": "High-citation world-model baselines (DreamerV3, UniPi, Genie) sit beside lab notes and preprints (Sora, GAIA-1, Cosmos, GameNGen)."
+    },
+    "scope_boundary": {
+      "label": "Video-for-planning, 2020–2026",
+      "detail": "Machine learning, robotics, and computer vision. In: action-conditioned video, latent imagination, interactive generative environments. Out: generic world-model surveys with no video/planning tension."
+    }
+  },
   "materials": [
     {
       "id": "arxiv:2301.04104",

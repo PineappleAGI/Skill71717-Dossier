@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Evidence Arena</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: #faf8f3; }
+  .arena { font-family: -apple-system, 'Segoe UI', sans-serif; color: #1c1c1a; max-width: 780px; margin: 0 auto; }
+  .arena h1, .arena h2, .arena h3 { font-weight: 600; margin: 0; }
+  .explainer { background: #f4f1ea; border: 1px solid #e3ded0; border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; font-size: 13px; line-height: 1.55; color: #4a473e; }
+  .explainer b { color: #1c1c1a; }
+  .section-label { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: #8a8674; margin: 22px 0 10px; font-weight: 600; }
+  .lobby-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .room-tile { background: #fdfcf8; border: 1.5px solid #e3ded0; border-radius: 12px; padding: 14px; cursor: pointer; transition: border-color .15s, transform .1s; display: flex; flex-direction: column; justify-content: space-between; min-height: 128px; }
+  .room-tile:hover { border-color: #c7794f; transform: translateY(-2px); }
+  .room-cat { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: #b0836a; font-weight: 600; margin-bottom: 6px; }
+  .room-q { font-size: 13.5px; font-weight: 600; line-height: 1.35; color: #1c1c1a; }
+  .room-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .room-count { font-size: 11px; color: #8a8674; }
+  .heat { width: 34px; height: 5px; border-radius: 3px; background: #e3ded0; overflow: hidden; }
+  .heat-fill { height: 100%; background: #c7794f; }
+  .room-tile.soon { opacity: .55; cursor: default; }
+  .room-tile.soon:hover { border-color: #e3ded0; transform: none; }
+  .soon-badge { font-size: 10px; color: #b0836a; margin-top: 8px; }
+
+  .room-view { display: none; }
+  .room-view.active { display: block; }
+  .back-btn { background: none; border: none; font-size: 13px; color: #8a6a4e; cursor: pointer; padding: 0; margin-bottom: 14px; }
+  .room-title { font-size: 19px; font-weight: 600; margin-bottom: 4px; }
+  .room-tension { font-size: 13px; color: #6b6858; margin-bottom: 18px; line-height: 1.5; }
+  .score-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+  .score-for { background: #6b8a5a; }
+  .score-against { background: #b25c4a; }
+  .score-labels { display: flex; justify-content: space-between; font-size: 11px; color: #8a8674; margin-bottom: 20px; }
+  .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .col-head { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .col-head.for { color: #5a7a4a; }
+  .col-head.against { color: #a24c3a; }
+  .card { background: #fdfcf8; border: 1px solid #e3ded0; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; }
+  .card:hover { border-color: #c7794f; }
+  .card-claim { font-size: 12.5px; line-height: 1.45; color: #1c1c1a; margin-bottom: 8px; }
+  .card-meta { display: flex; justify-content: space-between; align-items: center; }
+  .strength-badge { font-size: 10px; padding: 2px 7px; border-radius: 9px; font-weight: 600; }
+  .strength-strong { background: #e2ebd9; color: #4a6a3a; }
+  .strength-moderate { background: #f2ead9; color: #8a6a3a; }
+  .strength-weak { background: #f2e2dc; color: #a24c3a; }
+  .card-source { font-size: 10.5px; color: #b0ab99; }
+  .card-back { display: none; font-size: 11.5px; color: #6b6858; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e3ded0; line-height: 1.5; }
+  .card.flipped .card-back { display: block; }
+  .shared-note { font-size: 11px; color: #b0836a; background: #f8f0e6; border-radius: 6px; padding: 6px 10px; margin-bottom: 14px; }
+  .submit-row { display: flex; gap: 8px; margin: 14px 0 4px; }
+  .submit-row select, .submit-row input { font-size: 12.5px; padding: 6px 8px; border: 1px solid #e3ded0; border-radius: 6px; background: #fdfcf8; }
+  .submit-row input { flex: 1; }
+  .submit-row button { font-size: 12.5px; padding: 6px 12px; border: none; border-radius: 6px; background: #c7794f; color: #fff; cursor: pointer; }
+  .submit-row button:disabled { opacity: .5; cursor: default; }
+  .submit-error { font-size: 11px; color: #a24c3a; margin-top: 4px; display: none; }
+  .vote-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+  .vote-btn { font-size: 11px; border: 1px solid #e3ded0; background: #fdfcf8; border-radius: 5px; padding: 2px 8px; cursor: pointer; }
+  .vote-btn:hover { border-color: #c7794f; }
+  .vote-count { font-size: 11px; color: #8a8674; }
+  .community-tag { font-size: 9.5px; color: #b0836a; font-weight: 600; text-transform: uppercase; margin-left: 6px; }
+  .loading-note { font-size: 11.5px; color: #8a8674; padding: 6px 0; }
+  .card-url { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+  .card-url-text { font-size: 10.5px; color: #8a8674; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; user-select: all; }
+  .copy-btn { font-size: 10px; border: 1px solid #e3ded0; background: #fdfcf8; border-radius: 5px; padding: 1px 6px; cursor: pointer; color: #8a6a4e; flex-shrink: 0; }
+  .copy-btn:hover { border-color: #c7794f; }
+</style>
+</head>
+<body>
+
+<div class="arena">
+  <div class="explainer" id="explainer">
+    This uses <b>argument mapping / dialectical reasoning</b> — instead of converging on one answer, it lays out the strongest case for and against a claim, side by side. Some questions are genuinely contested, and seeing both cases clearly is more useful than a forced single verdict.
+  </div>
+
+  <div id="lobby">
+    <div class="section-label">Related to your question</div>
+    <div class="lobby-grid" id="related-grid"></div>
+
+    <div class="section-label">Vexed Questions</div>
+    <div class="lobby-grid" id="misunderstood-grid"></div>
+  </div>
+
+  <div class="room-view" id="room-view">
+    <button class="back-btn" onclick="closeRoom()">&larr; Back to rooms</button>
+    <div class="room-title" id="room-title"></div>
+    <div class="room-tension" id="room-tension"></div>
+    <div class="shared-note">Votes and cards submitted here are shared — anyone else who opens this room can see and add to them.</div>
+    <div class="score-bar" id="score-bar"></div>
+    <div class="score-labels" id="score-labels"></div>
+    <div class="columns">
+      <div>
+        <div class="col-head for">Evidence for</div>
+        <div id="for-cards"></div>
+      </div>
+      <div>
+        <div class="col-head against">Evidence against</div>
+        <div id="against-cards"></div>
+      </div>
+    </div>
+    <div class="section-label" style="margin-top:22px;">Add your own card</div>
+    <div class="submit-row">
+      <select id="submit-side"><option value="for">For</option><option value="against">Against</option></select>
+      <input id="submit-text" placeholder="What the paper found (in your own words)" maxlength="180" />
+    </div>
+    <div class="submit-row">
+      <input id="submit-url" placeholder="Link to the paper (e.g. an arxiv or DOI URL)" style="flex:1;" />
+      <button id="submit-btn" onclick="submitCard()">Add</button>
+    </div>
+    <div class="submit-error" id="submit-error">Add a claim and a link to the paper it comes from.</div>
+  </div>
+</div>
+
+<script>
+const strengthWeight = { strong: 3, moderate: 2, weak: 1 };
+
+const rooms = [
+  {
+    id: 'related-1', category: 'Related · video world models', live: true,
+    q: 'Do world models need real-world video, or can synthetic data alone work?',
+    tension: 'Some argue photoreal footage is essential for grounding physical dynamics; others show synthetic/game environments already produce transferable control policies.',
+    forCards: [
+      { claim: 'DreamerV3 masters diverse simulated domains purely from learned latent dynamics, with no photoreal video required.', strength: 'strong', source: 'Hafner et al., 2023', url: 'https://arxiv.org/abs/2301.04104', detail: 'Trained and evaluated across many benchmark domains using imagined rollouts in latent space rather than pixel-level video.' },
+      { claim: 'GameNGen runs a fully playable, real-time DOOM simulation from a diffusion model trained on synthetic gameplay, not real-world footage.', strength: 'moderate', source: 'Valevski et al., 2024', url: 'https://arxiv.org/abs/2408.14837', detail: 'Demonstrates interactive fidelity is achievable without any real-world video in the training loop.' }
+    ],
+    againstCards: [
+      { claim: 'GAIA-1 relies on large-scale real driving video to generate physically plausible, action-conditioned future scenarios.', strength: 'strong', source: 'Hu et al., Wayve, 2023', url: 'https://arxiv.org/abs/2309.17080', detail: 'Real-world driving footage is treated as necessary to capture the long tail of physical dynamics synthetic data misses.' },
+      { claim: 'OpenAI positions Sora\'s world-simulation ability as emerging specifically from scaling on large, diverse real video data.', strength: 'weak', source: 'OpenAI research note, 2024', url: 'https://openai.com/index/video-generation-models-as-world-simulators/', detail: 'Company position paper, not independently benchmarked against a synthetic-only baseline.' }
+    ]
+  },
+  {
+    id: 'related-2', category: 'Related · video world models', live: true,
+    q: 'Is visual fidelity necessary for a model to be useful for planning, or does it just need to get physics right?',
+    tension: 'High-fidelity video looks more convincing, but some evidence suggests coarse latent dynamics are sufficient for control while dropped detail can hurt imagined-policy learning.',
+    forCards: [
+      { claim: 'DIAMOND shows visual detail in imagined Atari rollouts materially affects downstream control performance.', strength: 'moderate', source: 'Alonso et al., NeurIPS 2024', url: 'https://arxiv.org/abs/2405.12399', detail: 'Argues discarding fine visual detail can hurt imagined-policy learning even in relatively simple game domains.' }
+    ],
+    againstCards: [
+      { claim: 'DreamerV3 achieves strong control performance across domains using compact latent representations rather than high-fidelity pixel video.', strength: 'strong', source: 'Hafner et al., 2023', url: 'https://arxiv.org/abs/2301.04104', detail: 'Suggests the useful signal for planning is dynamics, not photorealism.' },
+      { claim: 'UniPi extracts usable multi-step action plans from generated video without requiring frontier-level visual fidelity.', strength: 'moderate', source: 'Du et al., NeurIPS 2023', url: 'https://arxiv.org/abs/2302.00111', detail: 'Plans are read from generated frames at moderate resolution/fidelity, not Sora-scale output.' }
+    ]
+  },
+  {
+    id: 'related-3', category: 'Related · video world models', live: false,
+    q: 'Does sim-to-real transfer actually work for video-trained world models, or does it break down outside the lab?',
+    tension: 'Demo videos suggest strong transfer; independent, apples-to-apples closed-loop tests remain scarce.',
+    forCards: [], againstCards: []
+  },
+  {
+    id: 'm-food-1', category: 'Food & health', live: true,
+    q: 'Are ultra-processed foods addictive?',
+    tension: 'Some research shows these foods trigger brain reward pathways similarly to addictive substances; the exact mechanism and clinical criteria remain debated.',
+    forCards: [
+      { claim: 'Highly processed foods with fast-absorbing refined carbs and fat activate reward circuitry in patterns resembling substance-cue responses.', strength: 'moderate', source: 'Gearhardt et al., reward neuroscience review', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13104711/', detail: 'Neuroimaging studies find overlapping activation patterns, though causal mechanisms are still being worked out.' },
+      { claim: 'Self-report scales like the Yale Food Addiction Scale find a meaningful subset of people meet substance-use-disorder-style criteria for specific processed foods.', strength: 'moderate', source: 'Pursey et al., YFAS prevalence review', url: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4210934/', detail: 'Criteria mirror DSM substance-use-disorder symptoms: loss of control, craving, continued use despite harm. Meta-analysis found ~20% weighted mean prevalence.' }
+    ],
+    againstCards: [
+      { claim: 'Critics argue "food addiction" conflates normal hedonic eating with a formal addiction diagnosis, since no single addictive compound has been isolated the way nicotine or alcohol has.', strength: 'moderate', source: 'Ziauddeen & Fletcher, "Food addiction: a valid concept?"', url: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6224546/', detail: 'The behavioral-addiction framing is contested precisely because food, unlike drugs, is necessary for survival.' }
+    ]
+  },
+  {
+    id: 'm-food-2', category: 'Food & health', live: true,
+    q: 'Is intermittent fasting safe long-term?',
+    tension: 'Strong short-term weight-loss evidence is well established; longer-term cardiovascular safety data is thinner and some recent findings raise concern.',
+    forCards: [
+      { claim: 'Multiple randomized trials show intermittent fasting produces short- to medium-term weight loss comparable to continuous calorie restriction.', strength: 'strong', source: 'Zhang et al., meta-analysis, Nutrients 2022', url: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9099935/', detail: 'Consistent across several trial designs (16:8, alternate-day, 5:2).' }
+    ],
+    againstCards: [
+      { claim: 'A widely reported epidemiological analysis linked a narrow eating window (under 8 hours) to higher cardiovascular mortality risk in observational data.', strength: 'weak', source: 'Zhong et al., AHA Scientific Sessions 2024 (abstract)', url: 'https://www.ahajournals.org/doi/10.1161/circ.149.suppl_1.P192', detail: 'Association, not causation — self-reported eating windows and residual confounding are real limitations flagged by other researchers.' }
+    ]
+  },
+  {
+    id: 'm-food-3', category: 'Food & health', live: false,
+    q: 'Should we edit human genes to prevent disease?',
+    tension: 'CRISPR can correct known genetic disease drivers, but germline/embryo editing raises consent and eugenics-adjacent ethical concerns.',
+    forCards: [], againstCards: []
+  },
+  {
+    id: 'm-food-4', category: 'Food & health', live: false,
+    q: 'Do microplastics in the body cause disease?',
+    tension: 'Microplastics are now routinely found in human organs; toxic exposure thresholds and causal health effects are not yet well established.',
+    forCards: [], againstCards: []
+  },
+  {
+    id: 'm-climate-1', category: 'Earth & climate', live: true,
+    q: 'Should we block sunlight to cool the Earth?',
+    tension: 'Solar geoengineering could rapidly offset warming, but modeling suggests real risk of disrupting regional weather patterns and creating new geopolitical conflict.',
+    forCards: [
+      { claim: 'Climate models suggest stratospheric aerosol injection could lower global average temperature within a few years, far faster than emissions cuts alone.', strength: 'moderate', source: 'ScienceDirect Topics, stratospheric aerosol injection overview', url: 'https://www.sciencedirect.com/topics/earth-and-planetary-sciences/stratospheric-aerosol-injection', detail: 'Modeled, not field-tested at scale — real-world atmospheric response carries real uncertainty.' }
+    ],
+    againstCards: [
+      { claim: 'Multiple climate models project regional precipitation disruption (notably monsoon patterns) under sustained aerosol injection scenarios.', strength: 'moderate', source: 'Response of Indian summer monsoon to solar geoengineering, Sci. Reports', url: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8105343/', detail: 'Risk is asymmetric across regions, raising equity and governance concerns beyond the physics.' },
+      { claim: 'Termination shock — a rapid resumption of warming if aerosol injection abruptly stopped — is flagged as a major systemic risk in modeling studies.', strength: 'moderate', source: 'Parker & Irvine, "The Risk of Termination Shock", Earth\'s Future 2018', url: 'https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2017EF000735', detail: 'Creates a long-term dependency problem once started.' }
+    ]
+  },
+  {
+    id: 'm-climate-2', category: 'Earth & climate', live: false,
+    q: 'Can nuclear energy fully replace fossil fuels?',
+    tension: 'Provides constant low-carbon power, but waste storage and high upfront construction costs divide experts on feasibility at scale.',
+    forCards: [], againstCards: []
+  },
+  {
+    id: 'm-climate-3', category: 'Earth & climate', live: false,
+    q: 'Is organic farming actually better for the planet?',
+    tension: 'Uses fewer synthetic chemicals per acre, but typically requires more land per unit of food, which can increase deforestation pressure.',
+    forCards: [], againstCards: []
+  },
+  {
+    id: 'm-tech-1', category: 'Technology & future', live: false,
+    q: 'Will AI surpass human intelligence soon?',
+    tension: 'Some industry leaders predict this within the decade; many researchers argue general reasoning at human level remains far off.',
+    forCards: [], againstCards: []
+  },
+  {
+    id: 'm-tech-2', category: 'Technology & future', live: false,
+    q: 'Should aging be treated as a disease?',
+    tension: 'Longevity researchers are testing drugs to slow biological aging; critics argue aging is a natural process, not a pathology to cure.',
+    forCards: [], againstCards: []
+  },
+  {
+    id: 'm-tech-3', category: 'Technology & future', live: false,
+    q: 'Is there a safe limit for cell phone radiation?',
+    tension: 'Regulators consider current exposure limits safe; some researchers argue long-term heavy-use effects need more study.',
+    forCards: [], againstCards: []
+  }
+];
+
+function heatPct(r) {
+  const f = r.forCards.reduce((s,c)=>s+strengthWeight[c.strength],0);
+  const a = r.againstCards.reduce((s,c)=>s+strengthWeight[c.strength],0);
+  const total = f + a;
+  if (total === 0) return 50;
+  const forPct = (f/total)*100;
+  return 100 - Math.abs(forPct - 50) * 2;
+}
+
+function renderGrid(containerId, roomList) {
+  const grid = document.getElementById(containerId);
+  grid.innerHTML = roomList.map(r => {
+    if (!r.live) {
+      return `<div class="room-tile soon">
+        <div>
+          <div class="room-cat">${r.category}</div>
+          <div class="room-q">${r.q}</div>
+        </div>
+        <div class="soon-badge">Coming soon</div>
+      </div>`;
+    }
+    const count = r.forCards.length + r.againstCards.length;
+    const heat = heatPct(r);
+    return `<div class="room-tile" onclick="openRoom('${r.id}')">
+      <div>
+        <div class="room-cat">${r.category}</div>
+        <div class="room-q">${r.q}</div>
+      </div>
+      <div class="room-meta">
+        <div class="room-count">${count} cards</div>
+        <div class="heat"><div class="heat-fill" style="width:${heat}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+renderGrid('related-grid', rooms.filter(r => r.category.startsWith('Related')));
+renderGrid('misunderstood-grid', rooms.filter(r => !r.category.startsWith('Related')));
+
+function cardHtml(c, side, key, votes) {
+  const communityBit = key ? `<span class="community-tag">community</span>` : '';
+  const voteBit = key ? `<div class="vote-row"><button class="vote-btn" onclick="voteCard(event,'${key}',1)">+1</button><span class="vote-count">${votes||0} votes</span></div>` : '';
+  const sourceLabel = c.url
+    ? `<a href="${c.url}" target="_blank" rel="noopener noreferrer" onclick="return openPaper(event, this.href)" class="card-source" style="text-decoration:underline;">${c.source||'view paper'} &#8599;</a>`
+    : `<span class="card-source">${c.source||'no link provided'}</span>`;
+  const urlLine = c.url
+    ? `<div class="card-url" onclick="event.stopPropagation()">
+        <span class="card-url-text" title="${c.url}">${c.url}</span>
+        <button class="copy-btn" onclick="copyLink(event,'${c.url.replace(/'/g,"\\'")}')">Copy link</button>
+      </div>`
+    : '';
+  return `<div class="card" onclick="this.classList.toggle('flipped')">
+    <div class="card-claim">${c.claim}${communityBit}</div>
+    <div class="card-meta">
+      <span class="strength-badge strength-${c.strength||'moderate'}">${c.strength||'unrated'}</span>
+      ${sourceLabel}
+    </div>
+    ${urlLine}
+    <div class="card-back">${c.detail||''}</div>
+    ${voteBit}
+  </div>`;
+}
+
+function openPaper(evt, url) {
+  if (evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+  }
+  if (!url) return false;
+  var opened = null;
+  try {
+    opened = window.open(url, '_blank', 'noopener');
+  } catch (err) {
+    opened = null;
+  }
+  if (opened) return false;
+  // Claude's public artifact iframe blocks popups (no allow-popups).
+  // Navigate this frame so the paper still loads.
+  window.location.href = url;
+  return false;
+}
+
+function copyLink(evt, url) {
+  evt.stopPropagation();
+  const btn = evt.target;
+  const original = btn.textContent;
+  function ok() {
+    btn.textContent = 'Copied';
+    setTimeout(() => { btn.textContent = original; }, 1200);
+  }
+  function fallback() {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      const copied = document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (copied) { ok(); return; }
+    } catch (err) {}
+    btn.textContent = 'Select & copy manually';
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(ok).catch(fallback);
+  } else {
+    fallback();
+  }
+}
+
+let currentRoomId = null;
+let communityCache = [];
+
+async function openRoom(id) {
+  currentRoomId = id;
+  const r = rooms.find(x => x.id === id);
+  document.getElementById('lobby').style.display = 'none';
+  document.getElementById('room-view').classList.add('active');
+  document.getElementById('room-title').textContent = r.q;
+  document.getElementById('room-tension').textContent = r.tension;
+  document.getElementById('for-cards').innerHTML = '<div class="loading-note">Loading shared cards…</div>';
+  document.getElementById('against-cards').innerHTML = '';
+  document.getElementById('submit-error').style.display = 'none';
+  document.getElementById('submit-text').value = '';
+
+  communityCache = await loadCommunity(id);
+  renderRoom(r);
+}
+
+function renderRoom(r) {
+  const forCommunity = communityCache.filter(c => c.side === 'for');
+  const againstCommunity = communityCache.filter(c => c.side === 'against');
+
+  document.getElementById('for-cards').innerHTML =
+    (r.forCards.map(c => cardHtml(c,'for')).join('') +
+     forCommunity.map(c => cardHtml({claim:c.text, url:c.url, source:'view paper'}, 'for', c.id, c.votes)).join(''))
+    || '<div style="font-size:12px;color:#b0ab99;">No cards yet — be the first to add one.</div>';
+
+  document.getElementById('against-cards').innerHTML =
+    (r.againstCards.map(c => cardHtml(c,'against')).join('') +
+     againstCommunity.map(c => cardHtml({claim:c.text, url:c.url, source:'view paper'}, 'against', c.id, c.votes)).join(''))
+    || '<div style="font-size:12px;color:#b0ab99;">No cards yet — be the first to add one.</div>';
+
+  const seedF = r.forCards.reduce((s,c)=>s+strengthWeight[c.strength],0);
+  const seedA = r.againstCards.reduce((s,c)=>s+strengthWeight[c.strength],0);
+  const commF = forCommunity.reduce((s,c)=>s+1+(c.votes||0)*0.3, 0);
+  const commA = againstCommunity.reduce((s,c)=>s+1+(c.votes||0)*0.3, 0);
+  const f = seedF + commF, a = seedA + commA;
+  const total = f + a || 1;
+  const forPct = Math.round((f/total)*100);
+  document.getElementById('score-bar').innerHTML = `<div class="score-for" style="width:${forPct}%"></div><div class="score-against" style="width:${100-forPct}%"></div>`;
+  document.getElementById('score-labels').innerHTML = `<span>For — weighted ${forPct}%</span><span>Against — weighted ${100-forPct}%</span>`;
+}
+
+async function loadCommunity(roomId) {
+  try {
+    const result = await window.storage.get('community:' + roomId, true);
+    return result ? JSON.parse(result.value) : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+async function saveCommunity(roomId, list) {
+  try {
+    await window.storage.set('community:' + roomId, JSON.stringify(list), true);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function isLikelyUrl(v) {
+  try { const u = new URL(v); return u.protocol === 'http:' || u.protocol === 'https:'; }
+  catch { return false; }
+}
+
+async function submitCard() {
+  const text = document.getElementById('submit-text').value.trim();
+  const url = document.getElementById('submit-url').value.trim();
+  const errEl = document.getElementById('submit-error');
+  if (!text || !isLikelyUrl(url)) {
+    errEl.textContent = 'Add a claim and a valid link (starting with http:// or https://) to the paper it comes from.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  const side = document.getElementById('submit-side').value;
+  const newCard = { id: 'c-' + Date.now() + '-' + Math.floor(Math.random()*1000), side, text, url, votes: 0 };
+  communityCache.push(newCard);
+  const ok = await saveCommunity(currentRoomId, communityCache);
+  btn.disabled = false;
+  if (ok) {
+    document.getElementById('submit-text').value = '';
+    document.getElementById('submit-url').value = '';
+    renderRoom(rooms.find(x => x.id === currentRoomId));
+  } else {
+    communityCache.pop();
+    errEl.textContent = 'Could not save — try again.';
+    errEl.style.display = 'block';
+  }
+}
+
+async function voteCard(evt, cardId, delta) {
+  evt.stopPropagation();
+  const card = communityCache.find(c => c.id === cardId);
+  if (!card) return;
+  card.votes = (card.votes || 0) + delta;
+  const ok = await saveCommunity(currentRoomId, communityCache);
+  if (!ok) card.votes -= delta;
+  renderRoom(rooms.find(x => x.id === currentRoomId));
+}
+
+function closeRoom() {
+  document.getElementById('lobby').style.display = 'block';
+  document.getElementById('room-view').classList.remove('active');
+  currentRoomId = null;
+}
+</script>
+
+</body>
+</html>
