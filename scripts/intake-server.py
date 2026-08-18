@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Local intake form for Skill Dossier.
+Local intake form for Skill71717 (Pineapple Research Materials).
 
 Serves a professional topic form. On submit, writes request.json to the
 output directory so the agent can continue the harvest pipeline.
@@ -42,7 +42,7 @@ def _form_html() -> str:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Skill Dossier — Research Intake</title>
+  <title>Pineapple 71717 — Research Intake</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -51,7 +51,7 @@ def _form_html() -> str:
 <body>
   <div class="intake-card">
     <div class="brand" style="margin-bottom:0.75rem">
-      <span class="brand-mark">Skill Dossier</span>
+      <span class="brand-mark">Pineapple 71717</span>
       <span class="brand-sub">Research Materials</span>
     </div>
     <h1>What are you researching?</h1>
@@ -117,7 +117,7 @@ def _confirm_html() -> str:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Submitted — Skill Dossier</title>
+  <title>Submitted — Pineapple 71717</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -126,7 +126,7 @@ def _confirm_html() -> str:
 <body>
   <div class="intake-card confirm">
     <div class="brand" style="justify-content:center;margin-bottom:0.75rem">
-      <span class="brand-mark">Skill Dossier</span>
+      <span class="brand-mark">Pineapple 71717</span>
     </div>
     <h1>Request submitted</h1>
     <p class="lede">Your topic was saved to <code>request.json</code>. Return to Cursor or Claude — the assistant will harvest sources and open the dossier when ready. You can close this tab.</p>
@@ -183,7 +183,7 @@ def _parse_form(body: bytes) -> dict:
         "max_results": mx,
         "audience": one("audience", "lit_review"),
         "submitted_at": datetime.now(timezone.utc).isoformat(),
-        "skill": "skill-dossier",
+        "skill": "pineapple-71717",
     }
 
 
@@ -252,7 +252,7 @@ def _stop_existing() -> bool:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Skill Dossier research intake server")
+    parser = argparse.ArgumentParser(description="Pineapple 71717 research intake server")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--no-open", action="store_true")

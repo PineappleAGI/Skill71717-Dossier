@@ -1,0 +1,504 @@
+{
+  "research_question": "Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only",
+  "stance_definitions": {
+    "supports": "evidence backing the idea that video generation models function as genuine world simulators for planning",
+    "contradicts": "evidence that video generation models are media-generation only, or that simulator claims don't hold up under testing"
+  },
+  "model": "offline-example-cache",
+  "classified_at": "2026-08-18T04:45:28Z",
+  "stats": {
+    "harvested": 50,
+    "classified_now": 0,
+    "reused_cache": 49,
+    "skipped_broken_abstract": 1
+  },
+  "items": {
+    "arxiv:2301.04104": {
+      "stance": "supports",
+      "confidence": 88,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "canonical world-model RL agent; latent imagination, not RGB video",
+      "one_line_claim": "DreamerV3 learns environment dynamics and improves behavior by imagining future trajectories, treating generation as a planner rather than a media engine.",
+      "relevance": "high"
+    },
+    "arxiv:2402.15391": {
+      "stance": "supports",
+      "confidence": 90,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "flagship interactive generative environment from unlabeled video",
+      "one_line_claim": "Genie learns action-controllable virtual worlds from unlabeled Internet videos, making generative models into interactive simulators rather than one-shot clips.",
+      "relevance": "high"
+    },
+    "arxiv:2302.02648": {
+      "stance": "supports",
+      "confidence": 96,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "peer-reviewed method that closes video generation into control",
+      "one_line_claim": "UniPi casts sequential decision making as text-conditioned video generation, then infers actions from the generated frames.",
+      "relevance": "high"
+    },
+    "arxiv:2405.12399": {
+      "stance": "test_condition",
+      "confidence": 84,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "Atari-scale diffusion world model; tests visual fidelity as a planning variable",
+      "one_line_claim": "DIAMOND argues that high-fidelity visual detail in imagined rollouts is what makes a diffusion world model useful for planning, not clip quality alone.",
+      "relevance": "high"
+    },
+    "arxiv:2309.17080": {
+      "stance": "supports",
+      "confidence": 91,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "industry tech report; action-conditioned driving video, proprietary data",
+      "one_line_claim": "GAIA-1 generates realistic driving futures from video, text, and action so the video model can serve as a scenario simulator for autonomous driving.",
+      "relevance": "high"
+    },
+    "arxiv:2501.03575": {
+      "stance": "supports",
+      "confidence": 82,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "lab platform paper; Physical AI claim without independent physics tests",
+      "one_line_claim": "NVIDIA Cosmos presents world foundation models meant to support embodied simulation workflows, not entertainment video.",
+      "relevance": "high"
+    },
+    "web:openai-sora-world-simulators": {
+      "stance": "supports",
+      "confidence": 94,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "position note; no independent evaluation of simulator claims",
+      "one_line_claim": "OpenAI argues that video generation models such as Sora are progressing toward general-purpose world simulators rather than remaining clip generators.",
+      "relevance": "high"
+    },
+    "arxiv:2408.14837": {
+      "stance": "supports",
+      "confidence": 86,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "interactive DOOM demo; limited domain, not real-world physics",
+      "one_line_claim": "GameNGen shows a diffusion model can simulate DOOM in real time, treating generative dynamics as an interactive engine rather than a rendered clip.",
+      "relevance": "high"
+    },
+    "arxiv:2312.14125": {
+      "stance": "contradicts",
+      "confidence": 80,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "strong zero-shot video model with no action/planning loop",
+      "one_line_claim": "VideoPoet is a language-model recipe for zero-shot video generation, i.e. media synthesis without a planner or action-conditioned world.",
+      "relevance": "high"
+    },
+    "openalex:W4389473504": {
+      "stance": "neutral",
+      "confidence": 62,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "dissertation on trust-region RL; adjacent control methods only",
+      "one_line_claim": "The thesis develops trust-region policy optimization for sample-efficient reinforcement learning and does not test video models as simulators.",
+      "relevance": "low"
+    },
+    "openalex:W3140854437": {
+      "stance": "neutral",
+      "confidence": 15,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "generic deep-learning survey; no world-model or video-planning content",
+      "one_line_claim": "This survey reviews CNN architectures and deep-learning practice in general and does not address video world models or planning.",
+      "relevance": "off_topic"
+    },
+    "openalex:W2995022099": {
+      "stance": "neutral",
+      "confidence": 10,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "federated-learning survey; unrelated to video simulators",
+      "one_line_claim": "The paper surveys federated learning with decentralized clients and a central server, not generative video or world models.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3168997536": {
+      "stance": "neutral",
+      "confidence": 12,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "CNN survey; citation count is not topical relevance",
+      "one_line_claim": "This is a general survey of convolutional networks in vision and NLP, not a study of video models as simulators.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3153990350": {
+      "stance": "neutral",
+      "confidence": 10,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "introductory ML/DL overview",
+      "one_line_claim": "The article explains machine learning and deep learning as general automation methods and does not engage the simulator-versus-media question.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4386142022": {
+      "stance": "neutral",
+      "confidence": 12,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "XAI review; no video-world-model evaluation",
+      "one_line_claim": "This review covers methods for interpreting black-box ML models and does not test whether video generators simulate physics or plans.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4206484811": {
+      "stance": "neutral",
+      "confidence": 18,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "metaverse taxonomy; not action-conditioned video planning",
+      "one_line_claim": "The paper taxonomizes metaverse components and Generation-Z social VR, not video generation used as a world simulator.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3003667836": {
+      "stance": "neutral",
+      "confidence": 58,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "modeling survey of digital twins; conceptual cousin of simulators, no video generators",
+      "one_line_claim": "A digital twin is defined as a data-enabled virtual copy of a physical asset used for prediction and control, which is simulator infrastructure rather than generative video.",
+      "relevance": "medium"
+    },
+    "openalex:W2953303875": {
+      "stance": "neutral",
+      "confidence": 22,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "autonomous-driving survey; no generative world-model video",
+      "one_line_claim": "This ADS survey covers common practices and robustness gaps in automated driving and does not evaluate video generators as driving simulators.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3154736008": {
+      "stance": "neutral",
+      "confidence": 14,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "VR cybersickness review",
+      "one_line_claim": "The review catalogs nausea and related symptoms in current VR headsets and is not about video models as planning simulators.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4402155831": {
+      "stance": "neutral",
+      "confidence": 16,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "clinical multimodal LLMs; different 'multimodal' problem",
+      "one_line_claim": "The paper discusses multimodal clinical data (MRI, wearables) for health-care LLMs, not video world models for planning.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4324290234": {
+      "stance": "neutral",
+      "confidence": 14,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "blockchain-and-metaverse survey",
+      "one_line_claim": "This survey maps blockchain to metaverse digital-asset management and does not test generative video as a physics or planning simulator.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3083484791": {
+      "stance": "neutral",
+      "confidence": 12,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "VR teaching review",
+      "one_line_claim": "The article reviews multimodal teaching in virtual reality classrooms, not video-generation models used for agent planning.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3016364508": {
+      "stance": "neutral",
+      "confidence": 8,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "K-12 e-learning chatbot study",
+      "one_line_claim": "This paper evaluates a hybrid K-12 e-learning assistant chatbot and is unrelated to world models or Sora-class video.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4385431115": {
+      "stance": "neutral",
+      "confidence": 40,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "open-set 3D mapping; spatial reasoning without video world models",
+      "one_line_claim": "ConceptFusion fuses language, image, and audio features into 3D SLAM maps for zero-shot spatial reasoning, not for video-based rollouts.",
+      "relevance": "low"
+    },
+    "openalex:W3153454949": {
+      "stance": "neutral",
+      "confidence": 14,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "surveillance video anomaly detection",
+      "one_line_claim": "The framework recognizes anomalies in smart-city surveillance video and does not treat generators as world simulators.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4398238904": {
+      "stance": "neutral",
+      "confidence": 18,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "Gemini-as-education-tool review",
+      "one_line_claim": "This emerging-technology report describes Google Gemini as a multimodal educational tool, not as a video world simulator.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4391610180": {
+      "stance": "neutral",
+      "confidence": 10,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "generative AI for drug discovery",
+      "one_line_claim": "The review covers generative models for small-molecule design and does not address video simulators or planning.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4378746725": {
+      "stance": "neutral",
+      "confidence": 20,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "multimodal HRI survey; no video world models",
+      "one_line_claim": "The paper surveys multimodal human–robot interaction techniques for usability and acceptance, not generative video as a planner.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4389266910": {
+      "stance": "neutral",
+      "confidence": 20,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "HRI for smart manufacturing survey",
+      "one_line_claim": "This survey covers multimodal communication and control for human–robot manufacturing and does not evaluate Sora-class simulators.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4394606408": {
+      "stance": "neutral",
+      "confidence": 55,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "foundations survey of multimodal ML; methods background only",
+      "one_line_claim": "The authors survey principles and open questions in multimodal machine learning across language, audio, and vision, without testing video models as simulators.",
+      "relevance": "medium"
+    },
+    "openalex:W4406412004": {
+      "stance": "neutral",
+      "confidence": 8,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "CNN applications in agriculture",
+      "one_line_claim": "This review applies CNNs to weed, disease, and yield tasks in smart agriculture and is off the simulator-versus-media question.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4394806371": {
+      "stance": "neutral",
+      "confidence": 16,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "AGI/TESCREAL critique; not an empirical video-simulator test",
+      "one_line_claim": "The essay critiques AGI-utopia narratives bundled as TESCREAL and does not evaluate video generation models as world simulators.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3015928967": {
+      "stance": "neutral",
+      "confidence": 8,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "social-media depression detection",
+      "one_line_claim": "The study analyzes multimodal social-media signals for depression detection, unrelated to world models or video planning.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3199015608": {
+      "stance": "neutral",
+      "confidence": 14,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "multimodal classification taxonomy",
+      "one_line_claim": "The paper taxonomizes multimodal classification datasets (satellite, biometrics, medicine) and does not discuss video world simulators.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4402890475": {
+      "stance": "neutral",
+      "confidence": 68,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "robotics foundation-model survey; flags decision-data scarcity",
+      "one_line_claim": "The survey argues that robotics foundation models are limited by scarce action-labelled data, so scaling generators into decision-making remains an open transfer problem.",
+      "relevance": "medium"
+    },
+    "openalex:W4393177776": {
+      "stance": "contradicts",
+      "confidence": 64,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "social-media perception study; not a physics or planning eval",
+      "one_line_claim": "Public discussion treats Sora as a generative video tool for HCI, not as a tested world simulator for planning.",
+      "relevance": "medium"
+    },
+    "openalex:W4409365815": {
+      "stance": "supports",
+      "confidence": 83,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "driving world model for occupancy forecasting and planning",
+      "one_line_claim": "The authors use a vision-centric world model to forecast 4D occupancy and plan driving, i.e. generation in the service of control rather than media.",
+      "relevance": "high"
+    },
+    "openalex:W4392954640": {
+      "stance": "contradicts",
+      "confidence": 74,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "text-to-video systems review (Sora, Lumiere, diffusion)",
+      "one_line_claim": "This review frames Sora, Stable Diffusion, and Lumiere as text-to-video generators — a media-synthesis problem — not as planners or physics engines.",
+      "relevance": "high"
+    },
+    "openalex:W4404717804": {
+      "stance": "supports",
+      "confidence": 92,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "method paper adapting video diffusion into world models for decisions",
+      "one_line_claim": "AVID adapts pretrained video diffusion models into world models so they can be used for sequential decision-making despite scarce action labels.",
+      "relevance": "high"
+    },
+    "openalex:W3178685848": {
+      "stance": "neutral",
+      "confidence": 6,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "EFL textbook discourse analysis",
+      "one_line_claim": "The dissertation analyzes ideologies in a Korean university EFL textbook and has no bearing on video world models.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4313469377": {
+      "stance": "neutral",
+      "confidence": 28,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "temporal sentence grounding in video; retrieval not simulation",
+      "one_line_claim": "The thesis studies retrieving a video moment from a language query, which is localization rather than generating a world for planning.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3013449349": {
+      "stance": "neutral",
+      "confidence": 10,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "multimodal emotion-recognition thesis",
+      "one_line_claim": "The thesis explores deep models for human emotion recognition and does not address video generators as simulators.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4321242134": {
+      "stance": "neutral",
+      "confidence": 8,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "disaster detection via remote sensing and social media",
+      "one_line_claim": "This dissertation fuses remote sensing and social media for natural-disaster assessment, unrelated to Sora-class world models.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4292589917": {
+      "stance": "neutral",
+      "confidence": 8,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "multimodal learning-analytics system design",
+      "one_line_claim": "The thesis designs a flexible multimodal learning-analytics system and does not evaluate video models as planners.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3094484211": {
+      "stance": "neutral",
+      "confidence": 10,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "spherical-target multimodal sensor calibration",
+      "one_line_claim": "The thesis develops calibration of heterogeneous sensors with a spherical target, not generative video simulation.",
+      "relevance": "off_topic"
+    },
+    "openalex:W3130054217": {
+      "stance": "neutral",
+      "confidence": 22,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "generic vision-and-language deep learning thesis",
+      "one_line_claim": "The thesis applies deep networks to images, videos, and text as media understanding, not as action-conditioned world simulators.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4392679398": {
+      "stance": "neutral",
+      "confidence": 24,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "Gemini 1.5 long-context multimodal report",
+      "one_line_claim": "Gemini 1.5 is presented as a long-context multimodal language model over documents and media, not a video world model for planning.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4392341509": {
+      "stance": "test_condition",
+      "confidence": 78,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "Sora survey of public reports; catalogs limitations rather than a new test",
+      "one_line_claim": "This Sora review says the model can generate realistic scenes and may simulate the physical world, while stressing that public reports and reverse engineering have not yet proven that claim.",
+      "relevance": "high"
+    },
+    "openalex:W4386655647": {
+      "stance": "contradicts",
+      "confidence": 60,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "any-to-any multimodal LLM; generation without a dynamics/planning loop",
+      "one_line_claim": "NExT-GPT aims to generate content in many modalities from many inputs, which is media transformation rather than a controllable world simulator.",
+      "relevance": "low"
+    },
+    "openalex:W3163993681": {
+      "skipped": true,
+      "skip_reason": "empty_or_broken_abstract",
+      "relevance": "off_topic"
+    }
+  },
+  "prior": 0.5,
+  "rooms": [
+    {
+      "id": "sim-vs-media",
+      "group": "related",
+      "source": "harvest",
+      "category": "Machine learning",
+      "status": "ready",
+      "title": "Simulators or just clips?",
+      "question": "Do Sora-class video models work as world simulators for planning, or only as generative media?",
+      "blurb": "Labs pitch video models as world simulators; critics say they still just generate plausible clips.",
+      "for_ids": [
+        "arxiv:2301.04104",
+        "arxiv:2402.15391",
+        "arxiv:2302.02648",
+        "arxiv:2309.17080",
+        "arxiv:2501.03575",
+        "web:openai-sora-world-simulators",
+        "arxiv:2408.14837",
+        "openalex:W4409365815",
+        "openalex:W4404717804"
+      ],
+      "against_ids": [
+        "arxiv:2312.14125",
+        "openalex:W4393177776",
+        "openalex:W4392954640",
+        "openalex:W4386655647"
+      ]
+    },
+    {
+      "id": "can-video-plan",
+      "group": "related",
+      "source": "harvest",
+      "category": "Machine learning",
+      "status": "ready",
+      "title": "Can a video model plan?",
+      "question": "Is generating a video enough to produce a usable plan, or is that still just media?",
+      "blurb": "Some papers treat generated video as a plan; others say planning needs structure the clip never had.",
+      "for_ids": ["arxiv:2302.02648", "openalex:W4404717804", "arxiv:2301.04104"],
+      "against_ids": ["arxiv:2312.14125", "openalex:W4392954640"]
+    },
+    {
+      "id": "lab-claims",
+      "group": "related",
+      "source": "harvest",
+      "category": "Machine learning",
+      "status": "ready",
+      "title": "Do the lab demos count?",
+      "question": "Should Sora/Cosmos-style lab notes be treated as evidence that video models simulate the world?",
+      "blurb": "Company tech notes claim simulator status; peer-reviewed work often treats those claims as unproven.",
+      "for_ids": ["web:openai-sora-world-simulators", "arxiv:2501.03575", "arxiv:2309.17080"],
+      "against_ids": ["openalex:W4392341509", "openalex:W4393177776", "openalex:W4392954640"]
+    },
+    {
+      "id": "interactive-worlds",
+      "group": "related",
+      "source": "harvest",
+      "category": "Machine learning",
+      "status": "ready",
+      "title": "Playable world or one-shot clip?",
+      "question": "Does interactivity (actions in, next frame out) make a generator a simulator?",
+      "blurb": "Action-conditioned next-frame models look like simulators; one-shot generators still aren't worlds you can query.",
+      "for_ids": ["arxiv:2402.15391", "arxiv:2408.14837"],
+      "against_ids": ["arxiv:2312.14125", "openalex:W4386655647"]
+    },
+    {
+      "id": "pixels-or-physics",
+      "group": "related",
+      "source": "harvest",
+      "category": "Machine learning",
+      "status": "ready",
+      "title": "Pretty pixels or usable physics?",
+      "question": "Does visual fidelity in generated video actually help planning, or just look convincing?",
+      "blurb": "Photorealism looks like understanding; planning may only need coarse dynamics.",
+      "for_ids": ["arxiv:2405.12399", "arxiv:2408.14837"],
+      "against_ids": ["openalex:W4392341509", "openalex:W4392954640"]
+    },
+    {
+      "id": "robots-and-roads",
+      "group": "related",
+      "source": "harvest",
+      "category": "Machine learning",
+      "status": "ready",
+      "title": "Will it transfer to cars and robots?",
+      "question": "Do action-conditioned video world models help real driving or robotics, or stay in demo-land?",
+      "blurb": "Driving and robot demos suggest transfer; the leap from video to real control is still contested.",
+      "for_ids": ["arxiv:2309.17080", "openalex:W4409365815", "arxiv:2501.03575"],
+      "against_ids": ["openalex:W4402890475"]
+    }
+  ]
+}

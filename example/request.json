@@ -12,6 +12,10 @@
   ],
   "max_results": 50,
   "audience": "lit_review",
+  "stance_definitions": {
+    "supports": "evidence backing the idea that video generation models function as genuine world simulators for planning",
+    "contradicts": "evidence that video generation models are media-generation only, or that simulator claims don't hold up under testing"
+  },
   "seed_queries": [
     "DreamerV3 mastering diverse domains world models",
     "Learning Universal Policies via Text-Guided Video Generation UniPi",
@@ -184,5 +188,5 @@
     }
   ],
   "submitted_at": "2026-07-28T00:00:00+00:00",
-  "skill": "skill-dossier"
+  "skill": "pineapple-71717"
 }

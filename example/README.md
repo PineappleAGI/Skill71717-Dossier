@@ -1,6 +1,6 @@
-# Example fixture — Skill Dossier
+# Example fixture — Skill71717
 
-Offline demo of Skill Dossier for the topic:
+Offline demo of Pineapple 71717 for the topic:
 
 > Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only
 
@@ -27,10 +27,13 @@ Or open [`dossier.html`](dossier.html) if it is already up to date.
 | `request.json` | Sample topic + material tracks |
 | `harvest.json` | Mixed tracks: key references, research, industry, thesis, preprints |
 | `enrichment.json` | Relevance scores and descriptions |
+| `claims.json` | Cached stance classifications (supporting / contradicting / test / background) plus related debate rooms |
 | `dossier.html` | Generated HTML dossier |
+
+Seed “commonly misunderstood” rooms live in `../data/seed-debates.json` (product-wide, not this topic). Three of those rooms ship with harvested for/against cards; the rest are coming-soon tiles.
 
 ## Ask the assistant
 
 ```text
-Run Skill Dossier on the example request
+Run Pineapple 71717 on the example request
 ```
