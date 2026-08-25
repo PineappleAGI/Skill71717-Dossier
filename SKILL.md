@@ -217,16 +217,16 @@ xdg-open RUNTIME_DIR/dossier-….html      # Linux
 
 Dossier UI contracts:
 
-- Persistent top switcher: **Evidence Synthesis** / **Debate Arena** / **Belief Timeline**
-- Synthesis: stance sections, searches live under Test conditions, Open questions sidebar
+- Persistent top switcher: **Evidence Synthesis** / **Debate Arena**
+- Synthesis: persistent “Systematic review methodology” note; stance sections; searches under Test conditions; Open questions sidebar
 - Debate lobby has two labeled sections:
   1. **Related to your question** — contested sub-questions from the Mode 1 paper set (`group: related`, `source: harvest`)
   2. **Commonly misunderstood** — curated everyday contested claims, **not** the user's topic (`group: common`, `source: seed` from `data/seed-debates.json`). Category sub-headers. At launch, 2–3 rooms ship with harvested for/against cards; the rest are `status: coming_soon` placeholder tiles.
-- Debate and Belief each keep a persistent “How this view works” note (argument mapping / Bayesian updating) with no close control.
+- Debate keeps a persistent “How this view works” note (argument mapping) with no close control.
 - Debate rooms: flippable for/against cards; score is strength-weighted, not card count
-- Belief: chronological meter over **Mode 1 papers only** (seed-room papers are excluded); prior 50% unless `claims.prior` is set
 - No audience chip; **Generated** is date-only (`YYYY-MM-DD`)
 - Confidence is a dot + thin bar, not a large score chip
+- Live debate and Belief Timeline are not in this version; the prior snapshot is `example/older-version/`
 
 Example mode may write to `example/dossier.html` or open the committed file.
 
@@ -281,7 +281,7 @@ open example/dossier.html
 - `scripts/harvest-sources.py`
 - `scripts/classify-claims.py`
 - `scripts/generate-dossier.py`
-- `scripts/dossier-ui.js` — mode switcher, debate rooms, belief timeline (embedded into HTML)
+- `scripts/dossier-ui.js` — mode switcher and debate rooms (embedded into HTML)
 - `visualization-base.css`
 - `data/seed-debates.json` — Mode 2 “commonly misunderstood” starter rooms + harvested proof-of-concept papers
 - `example/` — demo fixtures + prebuilt dossier

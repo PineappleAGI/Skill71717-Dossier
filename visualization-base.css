@@ -96,59 +96,6 @@ a:hover {
   color: #fff;
 }
 
-.mode-cluster {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.tab-live-dot {
-  display: inline-block;
-  width: 0.45rem;
-  height: 0.45rem;
-  margin-left: 0.4rem;
-  border-radius: 50%;
-  background: #e53935;
-  box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7);
-  animation: live-dot-red 1.4s ease-out infinite;
-  vertical-align: middle;
-}
-
-.mode-tab.is-active .tab-live-dot {
-  background: #ff6b6b;
-  box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
-}
-
-.mode-live-now {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.42rem 0.8rem 0.42rem 0.65rem;
-  border-radius: 999px;
-  border: 1px solid #b42318;
-  background: #c62828;
-  color: #fff !important;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.45), var(--shadow);
-  animation: live-glow 1.8s ease-out infinite;
-}
-
-.mode-live-now:hover {
-  color: #fff !important;
-  background: #b42318;
-}
-
-@keyframes live-dot-red {
-  0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.65); }
-  70% { box-shadow: 0 0 0 0.4rem rgba(229, 57, 53, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
-}
-
 .mode-panel[hidden] {
   display: none !important;
 }
@@ -976,6 +923,10 @@ details.material-section[open] > summary.section-heading::after {
   color: var(--ink-soft);
   box-shadow: var(--shadow);
 }
+.mode-explainer[data-explainer="synthesis"] {
+  border-color: #c5d9cc;
+  background: var(--accent-soft);
+}
 .explainer-title {
   margin: 0;
   font-weight: 700;
@@ -1004,47 +955,6 @@ details.material-section[open] > summary.section-heading::after {
   margin: 0;
   letter-spacing: -0.03em;
   color: var(--ink);
-}
-.join-live-debate {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 1.05rem 0.55rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid #b42318;
-  background: #c62828;
-  color: #fff !important;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.45), var(--shadow);
-  animation: live-glow 1.8s ease-out infinite;
-}
-.join-live-debate:hover {
-  color: #fff !important;
-  background: #b42318;
-  filter: none;
-}
-.live-dot {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
-  animation: live-dot 1.4s ease-out infinite;
-  flex: 0 0 auto;
-}
-@keyframes live-dot {
-  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.65); }
-  70% { box-shadow: 0 0 0 0.45rem rgba(255, 255, 255, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-}
-@keyframes live-glow {
-  0% { box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.4), var(--shadow); }
-  70% { box-shadow: 0 0 0 0.55rem rgba(198, 40, 40, 0), var(--shadow); }
-  100% { box-shadow: 0 0 0 0 rgba(198, 40, 40, 0), var(--shadow); }
 }
 .lobby-lede {
   margin: 0 0 0.85rem;
@@ -1370,60 +1280,11 @@ a.arena-cite {
 }
 .arena-user-slot code { color: var(--accent); }
 
-/* Mode 3 — Belief timeline (same Mode 1 palette) */
-.belief-stage h2 {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 3vw, 2.15rem);
-  margin: 0.2rem 0 0.5rem;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-}
-
-.belief-kicker {
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.belief-lede { color: var(--ink-soft); max-width: 62ch; }
-
-.belief-readout {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  margin: 1rem 0 0.75rem;
-  color: var(--ink);
-}
-
-#belief-canvas {
-  width: 100%;
-  height: 280px;
-  display: block;
-  background: var(--paper-card);
-  border: 1px solid var(--rule);
-  border-radius: calc(var(--radius) + 4px);
-  box-shadow: var(--shadow);
-  cursor: default;
-}
-
-.belief-actions { margin: 0.85rem 0 1rem; }
-
-.belief-why { color: var(--accent); font-size: 0.88rem; }
-.belief-meta { font-size: 0.88rem; color: var(--ink-soft); margin: 0.35rem 0 0; }
-.belief-open { margin: 0.45rem 0 0; font-weight: 600; }
-.belief-claim a { font-weight: 650; }
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .arena-card-inner { transition: none; }
-  .join-live-debate,
-  .mode-live-now,
-  .live-dot,
-  .tab-live-dot { animation: none; }
   .qg-summary::after { transition: none; }
 }
 

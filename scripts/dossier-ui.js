@@ -1,4 +1,4 @@
-/* Skill71717 — dossier mode switcher, debate rooms, belief timeline.
+/* Skill71717 — dossier mode switcher and debate rooms.
    Embedded into generated HTML. Consumes #dossier-data JSON. */
 (function () {
   "use strict";
@@ -35,9 +35,6 @@
     try {
       history.replaceState(null, "", "#" + mode);
     } catch (e) {}
-    if (mode === "belief") {
-      window.dispatchEvent(new Event("dossier:belief-show"));
-    }
   }
   window.dossierSetMode = setMode;
 
@@ -48,7 +45,7 @@
       });
     });
     var hash = (location.hash || "").replace("#", "");
-    if (hash === "debate" || hash === "belief" || hash === "synthesis") {
+    if (hash === "debate" || hash === "synthesis") {
       setMode(hash);
     } else {
       setMode("synthesis");
@@ -280,250 +277,10 @@
     });
   }
 
-  /* ——— Belief timeline ——— */
-  function signedDelta(p) {
-    var w = paperWeight(p);
-    if (p.stance === "supports") return w;
-    if (p.stance === "contradicts") return -w;
-    return 0;
-  }
-
-  function logistic(x) {
-    return 1 / (1 + Math.exp(-x));
-  }
-
-  function beliefAfter(papers, prior, throughIndex) {
-    var logodds = Math.log(prior / (1 - prior));
-    papers.forEach(function (p, i) {
-      if (i > throughIndex) return;
-      logodds += signedDelta(p) * 0.35;
-    });
-    return logistic(logodds);
-  }
-
-  function bindBelief(data) {
-    var canvas = $("#belief-canvas");
-    var readout = $("#belief-readout");
-    var claimBox = $("#belief-claim");
-    var replay = $("#belief-replay");
-    if (!canvas || !canvas.getContext) return;
-
-    var papers = (data.papers || [])
-      .filter(function (p) {
-        if (p.scope === "seed" || p.source === "seed") return false;
-        return p.stance === "supports" || p.stance === "contradicts";
-      })
-      .slice()
-      .sort(function (a, b) {
-        return (a.year || 0) - (b.year || 0);
-      });
-    var prior = typeof data.prior === "number" ? data.prior : 0.5;
-    var hover = -1;
-    var selected = -1;
-    var playUntil = papers.length - 1;
-    var anim = null;
-
-    function hitIndex(ev) {
-      var rect = canvas.getBoundingClientRect();
-      var x = ev.clientX - rect.left;
-      var y = ev.clientY - rect.top;
-      var hit = -1;
-      ptsCache.forEach(function (pt) {
-        if (pt.i > playUntil) return;
-        var dx = pt.x - x;
-        var dy = pt.y - y;
-        if (dx * dx + dy * dy < 140) hit = pt.i;
-      });
-      return hit;
-    }
-
-    function showClaim(i) {
-      if (!claimBox) return;
-      if (i < 0 || !papers[i]) {
-        claimBox.innerHTML =
-          "<p>Hover or click a node to see how that paper moved the meter.</p>";
-        return;
-      }
-      var p = papers[i];
-      var dir = signedDelta(p) > 0 ? "nudged belief up" : "nudged belief down";
-      var href = p.url || (p.doi ? "https://doi.org/" + p.doi : "");
-      var title = escapeHtml(p.title || "Untitled");
-      var titleHtml = href
-        ? '<a href="' +
-          escapeHtml(href) +
-          '" target="_blank" rel="noopener noreferrer">' +
-          title +
-          "</a>"
-        : title;
-      var authors = (p.authors || []).join(", ");
-      var meta = [];
-      if (authors) meta.push(escapeHtml(authors));
-      if (p.year) meta.push(escapeHtml(String(p.year)));
-      if (p.venue) meta.push(escapeHtml(p.venue));
-      var openHtml = href
-        ? '<p class="belief-open"><a href="' +
-          escapeHtml(href) +
-          '" target="_blank" rel="noopener noreferrer">Open paper →</a></p>'
-        : "";
-      claimBox.innerHTML =
-        "<strong>" +
-        titleHtml +
-        "</strong>" +
-        (meta.length ? '<p class="belief-meta">' + meta.join(" · ") + "</p>" : "") +
-        "<p>" +
-        escapeHtml(p.one_line_claim || "") +
-        "</p>" +
-        openHtml +
-        '<p class="belief-why">' +
-        dir +
-        " · " +
-        escapeHtml(p.evidence_strength || "") +
-        " evidence · confidence " +
-        escapeHtml(String(p.confidence || "—")) +
-        "</p>";
-    }
-
-    function draw(until) {
-      var ctx = canvas.getContext("2d");
-      var dpr = window.devicePixelRatio || 1;
-      var cssW = canvas.clientWidth || 720;
-      var cssH = 280;
-      canvas.width = Math.floor(cssW * dpr);
-      canvas.height = Math.floor(cssH * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, cssW, cssH);
-
-      var pad = { l: 36, r: 24, t: 28, b: 48 };
-      var w = cssW - pad.l - pad.r;
-      var h = cssH - pad.t - pad.b;
-      var n = Math.max(papers.length - 1, 1);
-
-      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--ink-soft") || "#3d4a5c";
-      ctx.font = "12px 'Source Sans 3', sans-serif";
-      ctx.fillText("media-only", pad.l, 16);
-      ctx.textAlign = "right";
-      ctx.fillText("simulator", cssW - pad.r, 16);
-      ctx.textAlign = "left";
-
-      ctx.strokeStyle = "rgba(26,35,50,0.12)";
-      ctx.beginPath();
-      ctx.moveTo(pad.l, pad.t + h * 0.5);
-      ctx.lineTo(pad.l + w, pad.t + h * 0.5);
-      ctx.stroke();
-
-      var pts = [];
-      papers.forEach(function (p, i) {
-        var b = beliefAfter(papers, prior, Math.min(i, until));
-        var x = pad.l + (i / n) * w;
-        var y = pad.t + (1 - b) * h;
-        pts.push({ x: x, y: y, b: b, p: p, i: i });
-      });
-
-      ctx.lineWidth = 2.5;
-      ctx.strokeStyle = "#2f6f4e";
-      ctx.beginPath();
-      pts.forEach(function (pt, i) {
-        if (i > until) return;
-        if (i === 0) ctx.moveTo(pt.x, pt.y);
-        else ctx.lineTo(pt.x, pt.y);
-      });
-      ctx.stroke();
-
-      pts.forEach(function (pt) {
-        if (pt.i > until) return;
-        var active = pt.i === hover || pt.i === selected;
-        ctx.beginPath();
-        ctx.fillStyle = pt.p.stance === "supports" ? "#2f6f4e" : "#9a3412";
-        ctx.arc(pt.x, pt.y, active ? 8 : 5.5, 0, Math.PI * 2);
-        ctx.fill();
-        if (active) {
-          ctx.strokeStyle = "#fff";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-      });
-
-      var last = Math.max(0, Math.min(until, papers.length - 1));
-      var bel = papers.length ? beliefAfter(papers, prior, last) : prior;
-      if (readout) {
-        readout.textContent =
-          Math.round(bel * 100) + "% toward “simulators for planning”  ·  prior " + Math.round(prior * 100) + "%";
-      }
-      return pts;
-    }
-
-    var ptsCache = draw(playUntil);
-
-    canvas.addEventListener("mousemove", function (ev) {
-      var hit = hitIndex(ev);
-      canvas.style.cursor = hit >= 0 ? "pointer" : "default";
-      if (hit !== hover) {
-        hover = hit;
-        ptsCache = draw(playUntil);
-        showClaim(hover >= 0 ? hover : selected);
-      }
-    });
-
-    canvas.addEventListener("mouseleave", function () {
-      hover = -1;
-      canvas.style.cursor = "default";
-      ptsCache = draw(playUntil);
-      showClaim(selected);
-    });
-
-    canvas.addEventListener("click", function (ev) {
-      var hit = hitIndex(ev);
-      if (hit < 0) return;
-      selected = hit;
-      hover = hit;
-      ptsCache = draw(playUntil);
-      showClaim(selected);
-    });
-
-    function play() {
-      if (anim) cancelAnimationFrame(anim);
-      playUntil = -1;
-      function step() {
-        playUntil += 1;
-        ptsCache = draw(playUntil);
-        if (playUntil < papers.length - 1) {
-          anim = requestAnimationFrame(function () {
-            setTimeout(step, 420);
-          });
-        }
-      }
-      step();
-    }
-
-    if (replay) replay.addEventListener("click", play);
-    window.addEventListener("dossier:belief-show", function () {
-      ptsCache = draw(playUntil);
-    });
-    window.addEventListener("resize", function () {
-      ptsCache = draw(playUntil);
-    });
-  }
-
-  function bindJoinLive() {
-    $all("a.join-live-debate, a.mode-live-now").forEach(function (a) {
-      a.addEventListener("click", function (ev) {
-        var url = a.href;
-        var win = window.open(url, "_blank");
-        if (win) {
-          ev.preventDefault();
-          try {
-            win.focus();
-          } catch (err) {}
-        }
-      });
-    });
-  }
-
   function boot() {
     var node = $("#dossier-data");
     if (!node) {
       bindSwitcher();
-      bindJoinLive();
       return;
     }
     var data = {};
@@ -533,9 +290,7 @@
       data = {};
     }
     bindSwitcher();
-    bindJoinLive();
     bindDebate(data);
-    bindBelief(data);
   }
 
   if (document.readyState === "loading") {
