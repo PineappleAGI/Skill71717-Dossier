@@ -19,7 +19,7 @@ When this rule is invoked, follow the phased workflow in `SKILL.md`:
 5. **Phase 3:** Run `python scripts/harvest-sources.py <request.json> <out_dir>`
 6. **Phase 4:** Run `python scripts/classify-claims.py <harvest.json> <out_dir>` (Claude API; uses `claims.json` cache)
 7. **Phase 5:** Write `enrichment.json` (inquiry lens + gaps; no fabricated URLs)
-8. **Phase 6:** Run `python scripts/generate-dossier.py ... --no-open`, then open once — **never hand-edit HTML**. Dossier has three views: Evidence Synthesis, Debate Arena, Belief Timeline.
+8. **Phase 6:** Run `python scripts/generate-dossier.py ... --no-open`, then open once — **never hand-edit HTML**. Dossier has two views: Evidence Synthesis and Debate Arena. Live debate and Belief Timeline live in `example/older-version/`.
 9. **Phase 7:** Stop the intake server and summarize by stance
 
 ## Tool Mapping

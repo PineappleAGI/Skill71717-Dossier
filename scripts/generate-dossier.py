@@ -24,7 +24,6 @@ from pathlib import Path
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 CSS_PATH = SKILL_ROOT / "visualization-base.css"
 SEED_DEBATES_PATH = SKILL_ROOT / "data" / "seed-debates.json"
-EVIDENCE_ARENA_PATH = SKILL_ROOT / "data" / "evidence-arena.html"
 
 RELATED_BLURBS = {
     "sim-vs-media": "Labs pitch video models as world simulators; critics say they still just generate plausible clips.",
@@ -659,14 +658,12 @@ def _lobby_section(
     rooms: list[dict],
     lookup: dict[str, dict],
     group_by_category: bool,
-    extra: str = "",
 ) -> str:
     if not rooms:
         return ""
     head = f"""
   <div class="lobby-head">
     <h3 class="lobby-h">{_esc(title)}</h3>
-    {extra}
   </div>
   <p class="lobby-lede">{lede}</p>"""
     if not group_by_category:
@@ -730,40 +727,9 @@ def _lobby_html(rooms: list[dict], lookup: dict[str, dict]) -> str:
       common,
       lookup,
       True,
-      extra=(
-          '<a class="join-live-debate" href="evidence-arena.html" '
-          'target="_blank" rel="noopener">'
-          '<span class="live-dot" aria-hidden="true"></span>'
-          "JOIN LIVE DEBATE HERE</a>"
-      ),
   )}
 </div>
 <div id="debate-room" class="debate-room" hidden></div>
-"""
-
-
-def _belief_html() -> str:
-    explainer = _explainer_html(
-        "belief",
-        "How this view works",
-        "This view uses <strong>Bayesian evidence weighting</strong>. It starts from a neutral belief (50/50) "
-        "and updates that belief up or down as each piece of evidence is added. Stronger evidence produces a "
-        "bigger shift than weaker evidence. The meter shows <em>how belief should shift given this evidence</em> — "
-        "not a claim about objective truth.",
-    )
-    return f"""
-<div class="belief-stage">
-  <p class="belief-kicker">Belief timeline</p>
-  <h2>Watch the claim move</h2>
-  {explainer}
-  <p class="belief-lede">Each for/against paper from your research question nudges the meter, weighted by evidence strength and confidence. Replay to see the sequence from oldest to newest.</p>
-  <p class="belief-readout" id="belief-readout">—</p>
-  <canvas id="belief-canvas" width="720" height="280" aria-label="Belief meter over time"></canvas>
-  <div class="belief-actions">
-    <button type="button" class="btn btn-primary" id="belief-replay">Replay from oldest</button>
-  </div>
-  <div class="belief-claim panel" id="belief-claim"><p>Hover or click a node to see how that paper moved the meter.</p></div>
-</div>
 """
 
 
@@ -810,6 +776,14 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
 
     classification_html = _render_classification(enrichment)
     question_guide_html = _question_guide_html()
+    synthesis_explainer = _explainer_html(
+        "synthesis",
+        "Systematic review methodology",
+        "This view follows a <strong>systematic review</strong> process: frame a research question, "
+        "search the literature, screen sources in or out, classify each paper by its epistemic role "
+        "(supporting, contradicting, test conditions, or background), and record what the scan still misses. "
+        "The aim is a map of the evidence, not a single narrative.",
+    )
 
     gaps_html = (
         "<ul>" + "".join(f"<li>{_esc(g)}</li>" for g in gaps) + "</ul>" if gaps else "<p>None noted.</p>"
@@ -857,7 +831,6 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     )
     lookup = _claim_lookup(claims_by_id, seed.get("papers") or [])
     lobby_html = _lobby_html(rooms, lookup)
-    belief_html = _belief_html()
     papers = [_paper_payload(m, _claim_entry(claims_by_id, m.get("id"))) for m in shown]
     seen_paper_ids = {p.get("id") for p in papers}
     for sp in seed.get("papers") or []:
@@ -899,9 +872,6 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     document.querySelectorAll(".mode-panel").forEach(function (panel) {{
       panel.hidden = panel.getAttribute("data-mode") !== mode;
     }});
-    if (mode === "belief") {{
-      try {{ window.dispatchEvent(new Event("dossier:belief-show")); }} catch (e) {{}}
-    }}
   }};
   </script>
 </head>
@@ -912,17 +882,10 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
         <span class="brand-mark">Pineapple 71717</span>
         <span class="brand-sub">Research Materials Dossier</span>
       </div>
-      <div class="mode-cluster">
       <nav class="mode-switcher" role="tablist" aria-label="Dossier modes">
         <button type="button" class="mode-tab is-active" role="tab" aria-selected="true" data-mode="synthesis" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('synthesis')">Evidence Synthesis</button>
-        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="debate" aria-label="Debate Arena, live debate in progress" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('debate')">Debate Arena<span class="tab-live-dot" aria-hidden="true"></span></button>
-        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="belief" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('belief')">Belief Timeline</button>
+        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="debate" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('debate')">Debate Arena</button>
       </nav>
-      <a class="mode-live-now" href="evidence-arena.html" target="_blank" rel="noopener" aria-label="Open live debate">
-        <span class="live-dot" aria-hidden="true"></span>
-        Live debate
-      </a>
-      </div>
     </div>
 
     <header class="hero">
@@ -937,6 +900,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     </header>
 
     <div class="mode-panel" data-mode="synthesis">
+    {synthesis_explainer}
     {question_guide_html}
     {classification_html}
 
@@ -962,10 +926,6 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
 
     <div class="mode-panel" data-mode="debate" hidden>
       {lobby_html}
-    </div>
-
-    <div class="mode-panel" data-mode="belief" hidden>
-      {belief_html}
     </div>
   </div>
   <script type="application/json" id="dossier-data">{payload_json}</script>
@@ -1017,10 +977,6 @@ def main() -> int:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(html_doc, encoding="utf-8")
     print(f"wrote {output_path.resolve()}")
-    if EVIDENCE_ARENA_PATH.is_file():
-        arena_path = output_path.parent / "evidence-arena.html"
-        arena_path.write_text(EVIDENCE_ARENA_PATH.read_text(encoding="utf-8"), encoding="utf-8")
-        print(f"wrote {arena_path.resolve()}")
     if not no_open:
         _open_html(output_path)
     return 0

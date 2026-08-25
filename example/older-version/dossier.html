@@ -106,6 +106,59 @@ a:hover {
   color: #fff;
 }
 
+.mode-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tab-live-dot {
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-left: 0.4rem;
+  border-radius: 50%;
+  background: #e53935;
+  box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7);
+  animation: live-dot-red 1.4s ease-out infinite;
+  vertical-align: middle;
+}
+
+.mode-tab.is-active .tab-live-dot {
+  background: #ff6b6b;
+  box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+}
+
+.mode-live-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.8rem 0.42rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid #b42318;
+  background: #c62828;
+  color: #fff !important;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.45), var(--shadow);
+  animation: live-glow 1.8s ease-out infinite;
+}
+
+.mode-live-now:hover {
+  color: #fff !important;
+  background: #b42318;
+}
+
+@keyframes live-dot-red {
+  0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.65); }
+  70% { box-shadow: 0 0 0 0.4rem rgba(229, 57, 53, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+}
+
 .mode-panel[hidden] {
   display: none !important;
 }
@@ -933,10 +986,6 @@ details.material-section[open] > summary.section-heading::after {
   color: var(--ink-soft);
   box-shadow: var(--shadow);
 }
-.mode-explainer[data-explainer="synthesis"] {
-  border-color: #c5d9cc;
-  background: var(--accent-soft);
-}
 .explainer-title {
   margin: 0;
   font-weight: 700;
@@ -965,6 +1014,47 @@ details.material-section[open] > summary.section-heading::after {
   margin: 0;
   letter-spacing: -0.03em;
   color: var(--ink);
+}
+.join-live-debate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.05rem 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid #b42318;
+  background: #c62828;
+  color: #fff !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.45), var(--shadow);
+  animation: live-glow 1.8s ease-out infinite;
+}
+.join-live-debate:hover {
+  color: #fff !important;
+  background: #b42318;
+  filter: none;
+}
+.live-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  animation: live-dot 1.4s ease-out infinite;
+  flex: 0 0 auto;
+}
+@keyframes live-dot {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.65); }
+  70% { box-shadow: 0 0 0 0.45rem rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+@keyframes live-glow {
+  0% { box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.4), var(--shadow); }
+  70% { box-shadow: 0 0 0 0.55rem rgba(198, 40, 40, 0), var(--shadow); }
+  100% { box-shadow: 0 0 0 0 rgba(198, 40, 40, 0), var(--shadow); }
 }
 .lobby-lede {
   margin: 0 0 0.85rem;
@@ -1290,11 +1380,60 @@ a.arena-cite {
 }
 .arena-user-slot code { color: var(--accent); }
 
+/* Mode 3 — Belief timeline (same Mode 1 palette) */
+.belief-stage h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+  margin: 0.2rem 0 0.5rem;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.belief-kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.belief-lede { color: var(--ink-soft); max-width: 62ch; }
+
+.belief-readout {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  margin: 1rem 0 0.75rem;
+  color: var(--ink);
+}
+
+#belief-canvas {
+  width: 100%;
+  height: 280px;
+  display: block;
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: var(--shadow);
+  cursor: default;
+}
+
+.belief-actions { margin: 0.85rem 0 1rem; }
+
+.belief-why { color: var(--accent); font-size: 0.88rem; }
+.belief-meta { font-size: 0.88rem; color: var(--ink-soft); margin: 0.35rem 0 0; }
+.belief-open { margin: 0.45rem 0 0; font-weight: 600; }
+.belief-claim a { font-weight: 650; }
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .arena-card-inner { transition: none; }
+  .join-live-debate,
+  .mode-live-now,
+  .live-dot,
+  .tab-live-dot { animation: none; }
   .qg-summary::after { transition: none; }
 }
 
@@ -1331,6 +1470,9 @@ a.arena-cite {
     document.querySelectorAll(".mode-panel").forEach(function (panel) {
       panel.hidden = panel.getAttribute("data-mode") !== mode;
     });
+    if (mode === "belief") {
+      try { window.dispatchEvent(new Event("dossier:belief-show")); } catch (e) {}
+    }
   };
   </script>
 </head>
@@ -1341,15 +1483,22 @@ a.arena-cite {
         <span class="brand-mark">Pineapple 71717</span>
         <span class="brand-sub">Research Materials Dossier</span>
       </div>
+      <div class="mode-cluster">
       <nav class="mode-switcher" role="tablist" aria-label="Dossier modes">
         <button type="button" class="mode-tab is-active" role="tab" aria-selected="true" data-mode="synthesis" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('synthesis')">Evidence Synthesis</button>
-        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="debate" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('debate')">Debate Arena</button>
+        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="debate" aria-label="Debate Arena, live debate in progress" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('debate')">Debate Arena<span class="tab-live-dot" aria-hidden="true"></span></button>
+        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="belief" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('belief')">Belief Timeline</button>
       </nav>
+      <a class="mode-live-now" href="evidence-arena.html" target="_blank" rel="noopener" aria-label="Open live debate">
+        <span class="live-dot" aria-hidden="true"></span>
+        Live debate
+      </a>
+      </div>
     </div>
 
     <header class="hero">
       <h1>Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only</h1>
-      <div class="meta-row"><span class="chip"><strong>Field: Machine learning / robotics / computer vision</strong></span><span class="chip"><strong>Years: 2020–2026</strong></span><span class="chip">Generated <strong>2026-08-25</strong></span></div>
+      <div class="meta-row"><span class="chip"><strong>Field: Machine learning / robotics / computer vision</strong></span><span class="chip"><strong>Years: 2020–2026</strong></span><span class="chip">Generated <strong>2026-08-18</strong></span></div>
       <div class="stats">
         <div class="stat"><div class="n">20</div><div class="l">In scope</div></div>
         <div class="stat"><div class="n">30</div><div class="l">Off-topic dropped</div></div>
@@ -1359,12 +1508,6 @@ a.arena-cite {
     </header>
 
     <div class="mode-panel" data-mode="synthesis">
-    
-<aside class="mode-explainer mode-explainer-static" data-explainer="synthesis">
-  <p class="explainer-title">Systematic review methodology</p>
-  <p>This view follows a <strong>systematic review</strong> process: frame a research question, search the literature, screen sources in or out, classify each paper by its epistemic role (supporting, contradicting, test conditions, or background), and record what the scan still misses. The aim is a map of the evidence, not a single narrative.</p>
-</aside>
-
     
 <div class="qg-wrap">
   <details class="qg-details">
@@ -1943,6 +2086,7 @@ a.arena-cite {
   
   <div class="lobby-head">
     <h3 class="lobby-h">Related to your question</h3>
+    
   </div>
   <p class="lobby-lede">Contested sub-questions inside the same field as the research question in Evidence Synthesis. Same paper set, split into rooms.</p>
   <div class="room-grid">
@@ -2018,6 +2162,7 @@ a.arena-cite {
   
   <div class="lobby-head">
     <h3 class="lobby-h">Vexed Questions</h3>
+    <a class="join-live-debate" href="evidence-arena.html" target="_blank" rel="noopener"><span class="live-dot" aria-hidden="true"></span>JOIN LIVE DEBATE HERE</a>
   </div>
   <p class="lobby-lede">Curated everyday claims people take strong stances on, even when the evidence is unsettled. These are <strong>not</strong> about your research question; they are starter examples of contested public beliefs.</p>
   
@@ -2148,10 +2293,32 @@ a.arena-cite {
 <div id="debate-room" class="debate-room" hidden></div>
 
     </div>
+
+    <div class="mode-panel" data-mode="belief" hidden>
+      
+<div class="belief-stage">
+  <p class="belief-kicker">Belief timeline</p>
+  <h2>Watch the claim move</h2>
+  
+<aside class="mode-explainer mode-explainer-static" data-explainer="belief">
+  <p class="explainer-title">How this view works</p>
+  <p>This view uses <strong>Bayesian evidence weighting</strong>. It starts from a neutral belief (50/50) and updates that belief up or down as each piece of evidence is added. Stronger evidence produces a bigger shift than weaker evidence. The meter shows <em>how belief should shift given this evidence</em> — not a claim about objective truth.</p>
+</aside>
+
+  <p class="belief-lede">Each for/against paper from your research question nudges the meter, weighted by evidence strength and confidence. Replay to see the sequence from oldest to newest.</p>
+  <p class="belief-readout" id="belief-readout">—</p>
+  <canvas id="belief-canvas" width="720" height="280" aria-label="Belief meter over time"></canvas>
+  <div class="belief-actions">
+    <button type="button" class="btn btn-primary" id="belief-replay">Replay from oldest</button>
+  </div>
+  <div class="belief-claim panel" id="belief-claim"><p>Hover or click a node to see how that paper moved the meter.</p></div>
+</div>
+
+    </div>
   </div>
   <script type="application/json" id="dossier-data">{"topic": "Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only", "prior": 0.5, "papers": [{"id": "arxiv:2301.04104", "source": "harvest", "scope": "main", "title": "Mastering Diverse Domains through World Models", "authors": ["Danijar Hafner", "Jurgis Pasukonis", "Jimmy Ba", "Timothy Lillicrap"], "year": 2023, "venue": "arXiv", "url": "https://arxiv.org/abs/2301.04104", "doi": "", "citation_count": 1800, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "canonical world-model RL agent; latent imagination, not RGB video", "confidence": 88, "one_line_claim": "DreamerV3 learns environment dynamics and improves behavior by imagining future trajectories, treating generation as a planner rather than a media engine."}, {"id": "arxiv:2402.15391", "source": "harvest", "scope": "main", "title": "Genie: Generative Interactive Environments", "authors": ["Jake Bruce", "Michael Dennis", "Ashley Edwards", "Jack Parker-Holder", "Yuge Shi", "Tim Rocktäschel"], "year": 2024, "venue": "Google DeepMind", "url": "https://arxiv.org/abs/2402.15391", "doi": "", "citation_count": 700, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "flagship interactive generative environment from unlabeled video", "confidence": 90, "one_line_claim": "Genie learns action-controllable virtual worlds from unlabeled Internet videos, making generative models into interactive simulators rather than one-shot clips."}, {"id": "arxiv:2302.02648", "source": "harvest", "scope": "main", "title": "Learning Universal Policies via Text-Guided Video Generation", "authors": ["Yilun Du", "Sherry Yang", "Bo Dai", "Hanjun Dai", "Ofir Nachum", "Joshua B. Tenenbaum", "Dale Schuurmans", "Pieter Abbeel"], "year": 2023, "venue": "ICLR", "url": "https://arxiv.org/abs/2302.02648", "doi": "", "citation_count": 650, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "peer-reviewed method that closes video generation into control", "confidence": 96, "one_line_claim": "UniPi casts sequential decision making as text-conditioned video generation, then infers actions from the generated frames."}, {"id": "arxiv:2405.12399", "source": "harvest", "scope": "main", "title": "Diffusion for World Modeling: Visual Details Matter in Atari", "authors": ["Eloi Alonso", "Adam Jelley", "Vincent Micheli", "Anssi Kanervisto", "Amos Storkey", "Tim Pearce", "François Fleuret"], "year": 2024, "venue": "NeurIPS", "url": "https://arxiv.org/abs/2405.12399", "doi": "", "citation_count": 280, "open_access": true, "stance": "test_condition", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "Atari-scale diffusion world model; tests visual fidelity as a planning variable", "confidence": 84, "one_line_claim": "DIAMOND argues that high-fidelity visual detail in imagined rollouts is what makes a diffusion world model useful for planning, not clip quality alone."}, {"id": "arxiv:2309.17080", "source": "harvest", "scope": "main", "title": "GAIA-1: A Generative World Model for Autonomous Driving", "authors": ["Anthony Hu", "Lloyd Russell", "Hudson Yeo", "Zak Murez", "George Fedoseev", "Alex Kendall", "Jamie Shotton", "Gianluca Corrado"], "year": 2023, "venue": "Wayve Technical Report", "url": "https://arxiv.org/abs/2309.17080", "doi": "", "citation_count": 900, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "industry tech report; action-conditioned driving video, proprietary data", "confidence": 91, "one_line_claim": "GAIA-1 generates realistic driving futures from video, text, and action so the video model can serve as a scenario simulator for autonomous driving."}, {"id": "arxiv:2501.03575", "source": "harvest", "scope": "main", "title": "Cosmos World Foundation Model Platform for Physical AI", "authors": ["NVIDIA"], "year": 2025, "venue": "NVIDIA Technical Report", "url": "https://arxiv.org/abs/2501.03575", "doi": "", "citation_count": 150, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "lab platform paper; Physical AI claim without independent physics tests", "confidence": 82, "one_line_claim": "NVIDIA Cosmos presents world foundation models meant to support embodied simulation workflows, not entertainment video."}, {"id": "web:openai-sora-world-simulators", "source": "harvest", "scope": "main", "title": "Video generation models as world simulators", "authors": ["OpenAI"], "year": 2024, "venue": "OpenAI Research Blog", "url": "https://openai.com/index/video-generation-models-as-world-simulators/", "doi": "", "citation_count": null, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "weak", "evidence_strength_reason": "position note; no independent evaluation of simulator claims", "confidence": 94, "one_line_claim": "OpenAI argues that video generation models such as Sora are progressing toward general-purpose world simulators rather than remaining clip generators."}, {"id": "arxiv:2408.14837", "source": "harvest", "scope": "main", "title": "Diffusion Models Are Real-Time Game Engines", "authors": ["Dani Valevski", "Yaniv Leviathan", "Moab Arar", "Shlomi Fruchter"], "year": 2024, "venue": "arXiv", "url": "https://arxiv.org/abs/2408.14837", "doi": "", "citation_count": 220, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "interactive DOOM demo; limited domain, not real-world physics", "confidence": 86, "one_line_claim": "GameNGen shows a diffusion model can simulate DOOM in real time, treating generative dynamics as an interactive engine rather than a rendered clip."}, {"id": "arxiv:2312.14125", "source": "harvest", "scope": "main", "title": "VideoPoet: A Large Language Model for Zero-Shot Video Generation", "authors": ["Dan Kondratyuk", "Lijun Yu", "Xiuye Gu", "José Lezama", "Jonathan Huang", "Lu Jiang"], "year": 2023, "venue": "arXiv", "url": "https://arxiv.org/abs/2312.14125", "doi": "", "citation_count": 550, "open_access": true, "stance": "contradicts", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "strong zero-shot video model with no action/planning loop", "confidence": 80, "one_line_claim": "VideoPoet is a language-model recipe for zero-shot video generation, i.e. media synthesis without a planner or action-conditioned world."}, {"id": "openalex:W4389473504", "source": "harvest", "scope": "main", "title": "Trust-Region Based Policy Optimization for Efficient Reinforcement Learning", "authors": ["Hepfeng Li"], "year": 2023, "venue": "PhD Dissertation, University of Rhode Island", "url": "https://doi.org/10.23860/diss-li-hepfeng-2023", "doi": "10.23860/diss-li-hepfeng-2023", "citation_count": 5, "open_access": true, "stance": "neutral", "relevance": "low", "evidence_strength": "weak", "evidence_strength_reason": "dissertation on trust-region RL; adjacent control methods only", "confidence": 62, "one_line_claim": "The thesis develops trust-region policy optimization for sample-efficient reinforcement learning and does not test video models as simulators."}, {"id": "openalex:W3003667836", "source": "harvest", "scope": "main", "title": "Digital Twin: Values, Challenges and Enablers From a Modeling Perspective", "authors": ["Adil Rasheed", "Omer San", "Trond Kvamsdal"], "year": 2020, "venue": "IEEE Access", "url": "https://ieeexplore.ieee.org/ielx7/6287639/8948470/08972429.pdf", "doi": "10.1109/access.2020.2970143", "citation_count": 1763, "open_access": true, "stance": "neutral", "relevance": "medium", "evidence_strength": "moderate", "evidence_strength_reason": "modeling survey of digital twins; conceptual cousin of simulators, no video generators", "confidence": 58, "one_line_claim": "A digital twin is defined as a data-enabled virtual copy of a physical asset used for prediction and control, which is simulator infrastructure rather than generative video."}, {"id": "openalex:W4385431115", "source": "harvest", "scope": "main", "title": "ConceptFusion: Open-set multimodal 3D mapping", "authors": ["Krishna Murthy Jatavallabhula", "Alihusein Kuwajerwala", "Qiao Gu", "Mohd Omama", "Ganesh Iyer", "Soroush Saryazdi", "Tao Chen", "Alaa Maalouf", "Shuang Li", "Nikhil Keetha", "Ayush Tewari", "Joshua B. Tenenbaum"], "year": 2023, "venue": "", "url": "https://doi.org/10.15607/rss.2023.xix.066", "doi": "10.15607/rss.2023.xix.066", "citation_count": 193, "open_access": true, "stance": "neutral", "relevance": "low", "evidence_strength": "weak", "evidence_strength_reason": "open-set 3D mapping; spatial reasoning without video world models", "confidence": 40, "one_line_claim": "ConceptFusion fuses language, image, and audio features into 3D SLAM maps for zero-shot spatial reasoning, not for video-based rollouts."}, {"id": "openalex:W4394606408", "source": "harvest", "scope": "main", "title": "Foundations &amp; Trends in Multimodal Machine Learning: Principles, Challenges, and Open Questions", "authors": ["Paul Pu Liang", "Amir Zadeh", "Louis‐Philippe Morency"], "year": 2024, "venue": "ACM Computing Surveys", "url": "https://dl.acm.org/doi/pdf/10.1145/3656580", "doi": "10.1145/3656580", "citation_count": 161, "open_access": true, "stance": "neutral", "relevance": "medium", "evidence_strength": "moderate", "evidence_strength_reason": "foundations survey of multimodal ML; methods background only", "confidence": 55, "one_line_claim": "The authors survey principles and open questions in multimodal machine learning across language, audio, and vision, without testing video models as simulators."}, {"id": "openalex:W4402890475", "source": "harvest", "scope": "main", "title": "Foundation models in robotics: Applications, challenges, and the future", "authors": ["Roya Firoozi", "Johnathan Tucker", "Stephen Tian", "Anirudha Majumdar", "Jiankai Sun", "Weiyu Liu", "Yuke Zhu", "Shuran Song", "Ashish Kapoor", "Karol Hausman", "Brian Ichter", "Danny Driess"], "year": 2024, "venue": "The International Journal of Robotics Research", "url": "https://journals.sagepub.com/history/e3eb5469-f176-4c99-8231-efe683fe6399/02783649241281508.17904978.pdf", "doi": "10.1177/02783649241281508", "citation_count": 173, "open_access": true, "stance": "neutral", "relevance": "medium", "evidence_strength": "moderate", "evidence_strength_reason": "robotics foundation-model survey; flags decision-data scarcity", "confidence": 68, "one_line_claim": "The survey argues that robotics foundation models are limited by scarce action-labelled data, so scaling generators into decision-making remains an open transfer problem."}, {"id": "openalex:W4393177776", "source": "harvest", "scope": "main", "title": "Sora OpenAI's Prelude: Social Media Perspectives on Sora OpenAI and the Future of AI Video Generation", "authors": ["Reza Hadi Mogavi", "D. Wang", "Joseph Tu", "Hilda Hadan", "Sabrina Alicia Sgandurra", "Pan Hui", "Lennart E. Nacke"], "year": 2024, "venue": "arXiv (Cornell University)", "url": "https://doi.org/10.48550/arxiv.2403.14665", "doi": "10.48550/arxiv.2403.14665", "citation_count": 9, "open_access": true, "stance": "contradicts", "relevance": "medium", "evidence_strength": "weak", "evidence_strength_reason": "social-media perception study; not a physics or planning eval", "confidence": 64, "one_line_claim": "Public discussion treats Sora as a generative video tool for HCI, not as a tested world simulator for planning."}, {"id": "openalex:W4409365815", "source": "harvest", "scope": "main", "title": "Driving in the Occupancy World: Vision-Centric 4D Occupancy Forecasting and Planning via World Models for Autonomous Driving", "authors": ["Yu Yang", "Jianbiao Mei", "Yukai Ma", "Siliang Du", "Wenqing Chen", "Yijie Qian", "Yuxiang Feng", "Yong Liu"], "year": 2025, "venue": "Proceedings of the AAAI Conference on Artificial Intelligence", "url": "https://ojs.aaai.org/index.php/AAAI/article/download/33010/35165", "doi": "10.1609/aaai.v39i9.33010", "citation_count": 9, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "driving world model for occupancy forecasting and planning", "confidence": 83, "one_line_claim": "The authors use a vision-centric world model to forecast 4D occupancy and plan driving, i.e. generation in the service of control rather than media."}, {"id": "openalex:W4392954640", "source": "harvest", "scope": "main", "title": "Generate Impressive Videos with Text Instructions: A Review of OpenAI Sora, Stable Diffusion, Lumiere and Comparable Models", "authors": ["Enis Karaarslan", "Ömer Aydın"], "year": 2024, "venue": "", "url": "https://www.techrxiv.org/doi/pdf/10.36227/techrxiv.170862194.43871446/v2", "doi": "10.36227/techrxiv.170862194.43871446/v2", "citation_count": 6, "open_access": true, "stance": "contradicts", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "text-to-video systems review (Sora, Lumiere, diffusion)", "confidence": 74, "one_line_claim": "This review frames Sora, Stable Diffusion, and Lumiere as text-to-video generators — a media-synthesis problem — not as planners or physics engines."}, {"id": "openalex:W4404717804", "source": "harvest", "scope": "main", "title": "AVID: Adapting Video Diffusion Models to World Models", "authors": ["Marc Rigter", "Tarun Sen Gupta", "Agrin Hilmkil", "Chao Ma"], "year": 2024, "venue": "Qeios", "url": "https://www.qeios.com/read/H7BFDW/pdf", "doi": "10.32388/h7bfdw", "citation_count": 0, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "method paper adapting video diffusion into world models for decisions", "confidence": 92, "one_line_claim": "AVID adapts pretrained video diffusion models into world models so they can be used for sequential decision-making despite scarce action labels."}, {"id": "openalex:W4392341509", "source": "harvest", "scope": "main", "title": "Sora: A Review on Background, Technology, Limitations, and Opportunities of Large Vision Models", "authors": ["Yixin Liu", "Kai Zhang", "Yuan Li", "Zhiling Yan", "Chujie Gao", "Ruoxi Chen", "Zhengqing Yuan", "Yue Huang", "Hanchi Sun", "Jianfeng Gao", "Lifang He", "Lichao Sun"], "year": 2024, "venue": "arXiv (Cornell University)", "url": "https://doi.org/10.48550/arxiv.2402.17177", "doi": "10.48550/arxiv.2402.17177", "citation_count": 102, "open_access": true, "stance": "test_condition", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "Sora survey of public reports; catalogs limitations rather than a new test", "confidence": 78, "one_line_claim": "This Sora review says the model can generate realistic scenes and may simulate the physical world, while stressing that public reports and reverse engineering have not yet proven that claim."}, {"id": "openalex:W4386655647", "source": "harvest", "scope": "main", "title": "NExT-GPT: Any-to-Any Multimodal LLM", "authors": ["Shengqiong Wu", "Fei, Hao", "Leigang Qu", "Wei Ji", "Tat‐Seng Chua"], "year": 2023, "venue": "arXiv (Cornell University)", "url": "https://doi.org/10.48550/arxiv.2309.05519", "doi": "10.48550/arxiv.2309.05519", "citation_count": 95, "open_access": true, "stance": "contradicts", "relevance": "low", "evidence_strength": "weak", "evidence_strength_reason": "any-to-any multimodal LLM; generation without a dynamics/planning loop", "confidence": 60, "one_line_claim": "NExT-GPT aims to generate content in many modalities from many inputs, which is media transformation rather than a controllable world simulator."}, {"id": "openalex:W4308638386", "source": "seed", "scope": "seed", "title": "Highly processed foods can be considered addictive substances based on established scientific criteria", "authors": ["Ashley N. Gearhardt", "Alexandra G. DiFeliceantonio"], "year": 2022, "venue": "Addiction", "url": "https://doi.org/10.1111/add.16065", "doi": "10.1111/add.16065", "citation_count": 121, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "Applies established tobacco-addiction criteria to highly processed foods.", "confidence": 88, "one_line_claim": "Highly processed foods can meet the same scientific criteria used to label tobacco as addictive: compulsive use, psychoactive effects, reinforcement, and craving."}, {"id": "openalex:W3173791435", "source": "seed", "scope": "seed", "title": "Is Food Addictive? A Review of the Science", "authors": ["Ashley N. Gearhardt", "Erica M. Schulte"], "year": 2021, "venue": "Annual Review of Nutrition", "url": "https://doi.org/10.1146/annurev-nutr-110420-111710", "doi": "10.1146/annurev-nutr-110420-111710", "citation_count": 214, "open_access": false, "stance": "supports", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "Narrative review synthesizing biological and behavioral parallels with substance addiction.", "confidence": 84, "one_line_claim": "Ultra-processed foods high in added fat and refined carbohydrate show biological and behavioral parallels with addictive substances."}, {"id": "openalex:W2946281272", "source": "seed", "scope": "seed", "title": "Ultra-Processed Diets Cause Excess Calorie Intake and Weight Gain: An Inpatient Randomized Controlled Trial of Ad Libitum Food Intake", "authors": ["Kevin D. Hall", "Alexis Ayuketah", "Robert J. Brychta", "Hongyi Cai", "Thomas M. Cassimatis", "Kong Y. Chen", "Stephanie T. Chung", "Elise Costa", "Amber B. Courville", "Valerie L. Darcey", "Laura A. Fletcher", "Ciarán G. Forde"], "year": 2019, "venue": "Cell Metabolism", "url": "https://doi.org/10.1016/j.cmet.2019.05.008", "doi": "10.1016/j.cmet.2019.05.008", "citation_count": 1897, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "Inpatient RCT: matched meals, yet UPF drove extra calorie intake and weight gain.", "confidence": 90, "one_line_claim": "Even when meals are matched for calories and macros, an ultra-processed diet leads people to eat ~500 extra kcal/day and gain weight."}, {"id": "openalex:W4387443459", "source": "seed", "scope": "seed", "title": "Social, clinical, and policy implications of ultra-processed food addiction", "authors": ["Ashley N. Gearhardt", "Nassib Bezerra Bueno", "Alexandra G. DiFeliceantonio", "Christina A. Roberto", "Susana Jiménez‐Múrcia", "Fernando Fernández‐Aranda"], "year": 2023, "venue": "BMJ", "url": "https://doi.org/10.1136/bmj-2023-075354", "doi": "10.1136/bmj-2023-075354", "citation_count": 94, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "Policy analysis that assumes the addiction framing rather than a new trial.", "confidence": 72, "one_line_claim": "Treating ultra-processed foods as addictive substances would change clinical care and food policy, not just personal willpower."}, {"id": "openalex:W2167512478", "source": "seed", "scope": "seed", "title": "“Eating addiction”, rather than “food addiction”, better captures addictive-like eating behavior", "authors": ["Johannes Hebebrand", "Özgür Albayrak", "Roger A.H. Adan", "Jochen Antel", "Carlos Diéguez", "Johannes W. de Jong", "Gareth Leng", "John Menzies", "Julian G. Mercer", "Michelle Murphy", "G Plasse", "Suzanne L. Dickson"], "year": 2014, "venue": "Neuroscience & Biobehavioral Reviews", "url": "https://doi.org/10.1016/j.neubiorev.2014.08.016", "doi": "10.1016/j.neubiorev.2014.08.016", "citation_count": 526, "open_access": true, "stance": "contradicts", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "Widely cited critique: substance-based food addiction evidence is poor; behavior is the better frame.", "confidence": 86, "one_line_claim": "“Food addiction” is a misnomer: evidence for a substance-based addiction to specific foods is poor; addictive-like eating is better described as a behavioral eating addiction."}, {"id": "openalex:W2033383318", "source": "seed", "scope": "seed", "title": "Obesity and the brain: how convincing is the addiction model?", "authors": ["Hisham Ziauddeen", "I. Sadaf Farooqi", "Paul C. Fletcher"], "year": 2012, "venue": "Nature reviews. Neuroscience", "url": "https://doi.org/10.1038/nrn3212", "doi": "10.1038/nrn3212", "citation_count": 464, "open_access": false, "stance": "contradicts", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "Influential review arguing the addiction model of obesity is not well supported.", "confidence": 82, "one_line_claim": "The brain-addiction model of obesity is not convincing: key features of drug addiction do not map cleanly onto overeating."}, {"id": "openalex:W4248193078", "source": "seed", "scope": "seed", "title": "The concept of “food addiction” helps inform the understanding of overeating and obesity: NO", "authors": ["Johannes Hebebrand", "Ashley N. Gearhardt"], "year": 2020, "venue": "American Journal of Clinical Nutrition", "url": "https://doi.org/10.1093/ajcn/nqaa344", "doi": "10.1093/ajcn/nqaa344", "citation_count": 71, "open_access": false, "stance": "contradicts", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "Point/counterpoint “NO” essay, not new experimental data.", "confidence": 74, "one_line_claim": "The food-addiction concept does not usefully explain overeating and obesity compared with existing eating-disorder and behavioral frames."}, {"id": "openalex:W2922373530", "source": "seed", "scope": "seed", "title": "Halving warming with idealized solar geoengineering moderates key climate hazards", "authors": ["Peter Irvine", "Kerry Emanuel", "Jie He", "Larry W. Horowitz", "Gabriel A. Vecchi", "David W. Keith"], "year": 2019, "venue": "Nature Climate Change", "url": "https://doi.org/10.1038/s41558-019-0398-8", "doi": "10.1038/s41558-019-0398-8", "citation_count": 265, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "Multi-model climate analysis of a half-warming solar-geoengineering scenario.", "confidence": 80, "one_line_claim": "Offsetting about half of CO₂-driven warming with idealized solar geoengineering moderates key climate hazards in most regions rather than creating obvious regional losers."}, {"id": "openalex:W2121444587", "source": "seed", "scope": "seed", "title": "A temporary, moderate and responsive scenario for solar geoengineering", "authors": ["David W. Keith", "Douglas G. MacMartin"], "year": 2015, "venue": "Nature Climate Change", "url": "https://doi.org/10.1038/nclimate2493", "doi": "10.1038/nclimate2493", "citation_count": 153, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "Scenario paper arguing for limited, temporary, responsive deployment — not a full earth-system trial.", "confidence": 70, "one_line_claim": "Solar geoengineering could be used temporarily, moderately, and responsively to slow warming while emissions fall — not as a permanent substitute for cutting carbon."}, {"id": "openalex:W4236715633", "source": "seed", "scope": "seed", "title": "20 reasons why geoengineering may be a bad idea", "authors": ["Alan Robock", "Kirsten Jerch", "Martin Bunzl"], "year": 2008, "venue": "Bulletin of the Atomic Scientists", "url": "https://doi.org/10.1080/00963402.2008.11461140", "doi": "10.1080/00963402.2008.11461140", "citation_count": 251, "open_access": false, "stance": "contradicts", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "Commentary listing risks; influential but not a new empirical study.", "confidence": 78, "one_line_claim": "Blocking sunlight to cool Earth may be a cure worse than the disease: ozone, weather disruption, termination shock, and a moral hazard against cutting emissions."}, {"id": "openalex:W2792594403", "source": "seed", "scope": "seed", "title": "Potentially dangerous consequences for biodiversity of solar geoengineering implementation and termination", "authors": ["Christopher H. Trisos", "Giuseppe Amatulli", "Jessica Gurevitch", "Alan Robock", "Lili Xia", "Brian Zambri"], "year": 2018, "venue": "Nature Ecology & Evolution", "url": "https://doi.org/10.1038/s41559-017-0431-0", "doi": "10.1038/s41559-017-0431-0", "citation_count": 160, "open_access": false, "stance": "contradicts", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "Models climate-velocity impacts on biodiversity from rapid start or sudden stop.", "confidence": 83, "one_line_claim": "Sudden termination of solar geoengineering would more than double climate velocities, pushing biodiversity hotspots faster than species can track."}, {"id": "openalex:W4205904364", "source": "seed", "scope": "seed", "title": "Reflecting Sunlight", "authors": ["Board on Atmospheric Sciences and Climate", "Division on Earth and Life Studies", "Policy and Global Affairs", "National Academies of Sciences, Engineering, and Medicine"], "year": 2021, "venue": "National Academies Press eBooks", "url": "https://doi.org/10.17226/25762", "doi": "10.17226/25762", "citation_count": 178, "open_access": false, "stance": "contradicts", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "National Academies assessment: research agenda, not a recommendation to deploy.", "confidence": 76, "one_line_claim": "A National Academies assessment treats sunlight reflection as a research topic with large governance and risk gaps — not as a technology ready to deploy."}, {"id": "openalex:W2103280702", "source": "seed", "scope": "seed", "title": "Why nuclear energy is sustainable and has to be part of the energy mix", "authors": ["Barry W. Brook", "A. Alonso", "D.A. Meneley", "Jozef Misak", "Tom Blees", "J.B. van Erp"], "year": 2014, "venue": "Sustainable materials and technologies", "url": "https://doi.org/10.1016/j.susmat.2014.11.001", "doi": "10.1016/j.susmat.2014.11.001", "citation_count": 290, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "Advocacy review arguing fission is the only developed source at the needed scale.", "confidence": 72, "one_line_claim": "Nuclear fission is the only developed source that can deliver industrial-scale, reliable, low-carbon power; wind and solar need backup that is usually fossil."}, {"id": "openalex:W1593294389", "source": "seed", "scope": "seed", "title": "Key role for nuclear energy in global biodiversity conservation", "authors": ["Barry W. Brook", "Corey J. A. Bradshaw"], "year": 2014, "venue": "Conservation Biology", "url": "https://doi.org/10.1111/cobi.12433", "doi": "10.1111/cobi.12433", "citation_count": 128, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "Multi-criteria ranking of electricity sources for biodiversity and cost.", "confidence": 74, "one_line_claim": "Among major electricity sources, nuclear and wind rank highest on benefit-to-cost for biodiversity; shutting nuclear off the table risks more land-hungry generation."}, {"id": "openalex:W2723344177", "source": "seed", "scope": "seed", "title": "Evaluation of a proposal for reliable low-cost grid power with 100% wind, water, and solar", "authors": ["C. Clack", "Staffan Qvist", "Jay Apt", "Morgan Bazilian", "Adam R. Brandt", "Ken Caldeira", "Steven J. Davis", "Victor Diakov", "Mark A. Handschy", "Paul Hines", "Paulina Jaramillo", "Daniel M. Kammen"], "year": 2017, "venue": "Proceedings of the National Academy of Sciences", "url": "https://doi.org/10.1073/pnas.1610381114", "doi": "10.1073/pnas.1610381114", "citation_count": 352, "open_access": true, "stance": "supports", "relevance": "high", "evidence_strength": "strong", "evidence_strength_reason": "Peer critique documenting modeling errors in a 100% WWS-without-nuclear proposal.", "confidence": 85, "one_line_claim": "A widely cited 100% wind-water-solar roadmap (no nuclear) relies on invalid modeling and unsupported assumptions; a diverse clean portfolio including dispatchable plants is more feasible."}, {"id": "openalex:W2112497712", "source": "seed", "scope": "seed", "title": "100% clean and renewable wind, water, and sunlight (WWS) all-sector energy roadmaps for the 50 United States", "authors": ["Mark Z. Jacobson", "Mark A. Delucchi", "Guillaume Bazouin", "Zack A.F. Bauer", "Christa C. Heavey", "Emma Fisher", "Sean Morris", "Diniana J. Y. Piekutowski", "Taylor A. Vencill", "Tim Yeskoo"], "year": 2015, "venue": "Energy & Environmental Science", "url": "https://doi.org/10.1039/c5ee01283j", "doi": "10.1039/c5ee01283j", "citation_count": 457, "open_access": false, "stance": "contradicts", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "State-level WWS roadmaps arguing nuclear is unnecessary; later heavily critiqued.", "confidence": 68, "one_line_claim": "Each U.S. state could convert all energy uses to wind, water, and sunlight by 2050 — nuclear is not required in these roadmaps."}, {"id": "web:mit-nuclear-2018", "source": "seed", "scope": "seed", "title": "The Future of Nuclear Energy in a Carbon-Constrained World", "authors": ["MIT Energy Initiative"], "year": 2018, "venue": "MIT Energy Initiative", "url": "https://energy.mit.edu/research/future-nuclear-energy-carbon-constrained-world/", "doi": "", "citation_count": null, "open_access": true, "stance": "contradicts", "relevance": "high", "evidence_strength": "moderate", "evidence_strength_reason": "Major lab study: nuclear can help decarbonize, but cost has risen and expansion prospects are dim.", "confidence": 80, "one_line_claim": "Nuclear can cut the cost of deep decarbonization in models, but new plants have only gotten more expensive — cost, not physics, is the barrier to replacing fossil fuels."}], "rooms": [{"id": "sim-vs-media", "group": "related", "source": "harvest", "category": "Machine learning", "status": "ready", "title": "Simulators or just clips?", "question": "Do Sora-class video models work as world simulators for planning, or only as generative media?", "blurb": "Labs pitch video models as world simulators; critics say they still just generate plausible clips.", "for_ids": ["arxiv:2301.04104", "arxiv:2402.15391", "arxiv:2302.02648", "arxiv:2309.17080", "arxiv:2501.03575", "web:openai-sora-world-simulators", "arxiv:2408.14837", "openalex:W4409365815", "openalex:W4404717804"], "against_ids": ["arxiv:2312.14125", "openalex:W4393177776", "openalex:W4392954640", "openalex:W4386655647"]}, {"id": "can-video-plan", "group": "related", "source": "harvest", "category": "Machine learning", "status": "ready", "title": "Can a video model plan?", "question": "Is generating a video enough to produce a usable plan, or is that still just media?", "blurb": "Some papers treat generated video as a plan; others say planning needs structure the clip never had.", "for_ids": ["arxiv:2302.02648", "openalex:W4404717804", "arxiv:2301.04104"], "against_ids": ["arxiv:2312.14125", "openalex:W4392954640"]}, {"id": "lab-claims", "group": "related", "source": "harvest", "category": "Machine learning", "status": "ready", "title": "Do the lab demos count?", "question": "Should Sora/Cosmos-style lab notes be treated as evidence that video models simulate the world?", "blurb": "Company tech notes claim simulator status; peer-reviewed work often treats those claims as unproven.", "for_ids": ["web:openai-sora-world-simulators", "arxiv:2501.03575", "arxiv:2309.17080"], "against_ids": ["openalex:W4392341509", "openalex:W4393177776", "openalex:W4392954640"]}, {"id": "interactive-worlds", "group": "related", "source": "harvest", "category": "Machine learning", "status": "ready", "title": "Playable world or one-shot clip?", "question": "Does interactivity (actions in, next frame out) make a generator a simulator?", "blurb": "Action-conditioned next-frame models look like simulators; one-shot generators still aren't worlds you can query.", "for_ids": ["arxiv:2402.15391", "arxiv:2408.14837"], "against_ids": ["arxiv:2312.14125", "openalex:W4386655647"]}, {"id": "pixels-or-physics", "group": "related", "source": "harvest", "category": "Machine learning", "status": "ready", "title": "Pretty pixels or usable physics?", "question": "Does visual fidelity in generated video actually help planning, or just look convincing?", "blurb": "Photorealism looks like understanding; planning may only need coarse dynamics.", "for_ids": ["arxiv:2405.12399", "arxiv:2408.14837"], "against_ids": ["openalex:W4392341509", "openalex:W4392954640"]}, {"id": "robots-and-roads", "group": "related", "source": "harvest", "category": "Machine learning", "status": "ready", "title": "Will it transfer to cars and robots?", "question": "Do action-conditioned video world models help real driving or robotics, or stay in demo-land?", "blurb": "Driving and robot demos suggest transfer; the leap from video to real control is still contested.", "for_ids": ["arxiv:2309.17080", "openalex:W4409365815", "arxiv:2501.03575"], "against_ids": ["openalex:W4402890475"]}, {"id": "seed-upf-addictive", "source": "seed", "group": "common", "category": "Food & Health", "title": "Are ultra-processed foods addictive?", "question": "Are ultra-processed foods addictive?", "blurb": "Triggers brain reward centers similarly to addictive substances, but exact mechanism is debated", "status": "ready", "for_ids": ["openalex:W4308638386", "openalex:W3173791435", "openalex:W2946281272", "openalex:W4387443459"], "against_ids": ["openalex:W2167512478", "openalex:W2033383318", "openalex:W4248193078"]}, {"id": "seed-if-longterm", "source": "seed", "group": "common", "category": "Food & Health", "title": "Is intermittent fasting safe long-term?", "question": "Is intermittent fasting safe long-term?", "blurb": "Effective for short-term weight loss, but emerging studies raise heart-health questions", "status": "coming_soon", "for_ids": [], "against_ids": []}, {"id": "seed-gene-edit", "source": "seed", "group": "common", "category": "Food & Health", "title": "Should we edit human genes to prevent disease?", "question": "Should we edit human genes to prevent disease?", "blurb": "CRISPR can correct genetic illness, but embryo editing raises ethical concerns", "status": "coming_soon", "for_ids": [], "against_ids": []}, {"id": "seed-microplastics", "source": "seed", "group": "common", "category": "Food & Health", "title": "Do microplastics in the body cause disease?", "question": "Do microplastics in the body cause disease?", "blurb": "Now found in human organs, but toxic thresholds aren't well established yet", "status": "coming_soon", "for_ids": [], "against_ids": []}, {"id": "seed-solar-geo", "source": "seed", "group": "common", "category": "Earth & Climate", "title": "Should we block sunlight to cool the Earth?", "question": "Should we block sunlight to cool the Earth?", "blurb": "Solar geoengineering could slow warming quickly, but may disrupt global weather patterns", "status": "ready", "for_ids": ["openalex:W2922373530", "openalex:W2121444587"], "against_ids": ["openalex:W4236715633", "openalex:W2792594403", "openalex:W4205904364"]}, {"id": "seed-nuclear-replace", "source": "seed", "group": "common", "category": "Earth & Climate", "title": "Can nuclear energy fully replace fossil fuels?", "question": "Can nuclear energy fully replace fossil fuels?", "blurb": "Constant clean power vs. unresolved waste storage and high build costs", "status": "ready", "for_ids": ["openalex:W2103280702", "openalex:W1593294389", "openalex:W2723344177"], "against_ids": ["openalex:W2112497712", "web:mit-nuclear-2018"]}, {"id": "seed-organic-farming", "source": "seed", "group": "common", "category": "Earth & Climate", "title": "Is organic farming actually better for the planet?", "question": "Is organic farming actually better for the planet?", "blurb": "Fewer chemicals, but higher land use can drive deforestation", "status": "coming_soon", "for_ids": [], "against_ids": []}, {"id": "seed-ai-agi", "source": "seed", "group": "common", "category": "Technology & Future", "title": "Will AI surpass human intelligence soon?", "question": "Will AI surpass human intelligence soon?", "blurb": "Some predict this decade, researchers argue true general reasoning remains far off", "status": "coming_soon", "for_ids": [], "against_ids": []}, {"id": "seed-aging-disease", "source": "seed", "group": "common", "category": "Technology & Future", "title": "Should aging be treated as a disease?", "question": "Should aging be treated as a disease?", "blurb": "Longevity science is testing treatments, critics argue aging is natural, not pathological", "status": "coming_soon", "for_ids": [], "against_ids": []}, {"id": "seed-phone-radiation", "source": "seed", "group": "common", "category": "Technology & Future", "title": "Is there a safe limit for cell phone radiation?", "question": "Is there a safe limit for cell phone radiation?", "blurb": "Regulators deem current limits safe, some researchers want more long-term study", "status": "coming_soon", "for_ids": [], "against_ids": []}], "gaps": ["Independent tests that try to prove or disprove whether Sora-class models are true physics simulators are still scarce.", "Few apples-to-apples comparisons of pretty video quality versus success when an agent actually plans with the model.", "Robotics transfer from foundation video world models into the real world is thinner than the demo videos suggest."], "next_queries": ["video world model action conditioning physics consistency benchmark", "Sora world simulator critique counterfactual planning evaluation", "sim-to-real robotics generative video world foundation model"]}</script>
   <script>
-/* Skill71717 — dossier mode switcher and debate rooms.
+/* Skill71717 — dossier mode switcher, debate rooms, belief timeline.
    Embedded into generated HTML. Consumes #dossier-data JSON. */
 (function () {
   "use strict";
@@ -2188,6 +2355,9 @@ a.arena-cite {
     try {
       history.replaceState(null, "", "#" + mode);
     } catch (e) {}
+    if (mode === "belief") {
+      window.dispatchEvent(new Event("dossier:belief-show"));
+    }
   }
   window.dossierSetMode = setMode;
 
@@ -2198,7 +2368,7 @@ a.arena-cite {
       });
     });
     var hash = (location.hash || "").replace("#", "");
-    if (hash === "debate" || hash === "synthesis") {
+    if (hash === "debate" || hash === "belief" || hash === "synthesis") {
       setMode(hash);
     } else {
       setMode("synthesis");
@@ -2430,10 +2600,250 @@ a.arena-cite {
     });
   }
 
+  /* ——— Belief timeline ——— */
+  function signedDelta(p) {
+    var w = paperWeight(p);
+    if (p.stance === "supports") return w;
+    if (p.stance === "contradicts") return -w;
+    return 0;
+  }
+
+  function logistic(x) {
+    return 1 / (1 + Math.exp(-x));
+  }
+
+  function beliefAfter(papers, prior, throughIndex) {
+    var logodds = Math.log(prior / (1 - prior));
+    papers.forEach(function (p, i) {
+      if (i > throughIndex) return;
+      logodds += signedDelta(p) * 0.35;
+    });
+    return logistic(logodds);
+  }
+
+  function bindBelief(data) {
+    var canvas = $("#belief-canvas");
+    var readout = $("#belief-readout");
+    var claimBox = $("#belief-claim");
+    var replay = $("#belief-replay");
+    if (!canvas || !canvas.getContext) return;
+
+    var papers = (data.papers || [])
+      .filter(function (p) {
+        if (p.scope === "seed" || p.source === "seed") return false;
+        return p.stance === "supports" || p.stance === "contradicts";
+      })
+      .slice()
+      .sort(function (a, b) {
+        return (a.year || 0) - (b.year || 0);
+      });
+    var prior = typeof data.prior === "number" ? data.prior : 0.5;
+    var hover = -1;
+    var selected = -1;
+    var playUntil = papers.length - 1;
+    var anim = null;
+
+    function hitIndex(ev) {
+      var rect = canvas.getBoundingClientRect();
+      var x = ev.clientX - rect.left;
+      var y = ev.clientY - rect.top;
+      var hit = -1;
+      ptsCache.forEach(function (pt) {
+        if (pt.i > playUntil) return;
+        var dx = pt.x - x;
+        var dy = pt.y - y;
+        if (dx * dx + dy * dy < 140) hit = pt.i;
+      });
+      return hit;
+    }
+
+    function showClaim(i) {
+      if (!claimBox) return;
+      if (i < 0 || !papers[i]) {
+        claimBox.innerHTML =
+          "<p>Hover or click a node to see how that paper moved the meter.</p>";
+        return;
+      }
+      var p = papers[i];
+      var dir = signedDelta(p) > 0 ? "nudged belief up" : "nudged belief down";
+      var href = p.url || (p.doi ? "https://doi.org/" + p.doi : "");
+      var title = escapeHtml(p.title || "Untitled");
+      var titleHtml = href
+        ? '<a href="' +
+          escapeHtml(href) +
+          '" target="_blank" rel="noopener noreferrer">' +
+          title +
+          "</a>"
+        : title;
+      var authors = (p.authors || []).join(", ");
+      var meta = [];
+      if (authors) meta.push(escapeHtml(authors));
+      if (p.year) meta.push(escapeHtml(String(p.year)));
+      if (p.venue) meta.push(escapeHtml(p.venue));
+      var openHtml = href
+        ? '<p class="belief-open"><a href="' +
+          escapeHtml(href) +
+          '" target="_blank" rel="noopener noreferrer">Open paper →</a></p>'
+        : "";
+      claimBox.innerHTML =
+        "<strong>" +
+        titleHtml +
+        "</strong>" +
+        (meta.length ? '<p class="belief-meta">' + meta.join(" · ") + "</p>" : "") +
+        "<p>" +
+        escapeHtml(p.one_line_claim || "") +
+        "</p>" +
+        openHtml +
+        '<p class="belief-why">' +
+        dir +
+        " · " +
+        escapeHtml(p.evidence_strength || "") +
+        " evidence · confidence " +
+        escapeHtml(String(p.confidence || "—")) +
+        "</p>";
+    }
+
+    function draw(until) {
+      var ctx = canvas.getContext("2d");
+      var dpr = window.devicePixelRatio || 1;
+      var cssW = canvas.clientWidth || 720;
+      var cssH = 280;
+      canvas.width = Math.floor(cssW * dpr);
+      canvas.height = Math.floor(cssH * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, cssW, cssH);
+
+      var pad = { l: 36, r: 24, t: 28, b: 48 };
+      var w = cssW - pad.l - pad.r;
+      var h = cssH - pad.t - pad.b;
+      var n = Math.max(papers.length - 1, 1);
+
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--ink-soft") || "#3d4a5c";
+      ctx.font = "12px 'Source Sans 3', sans-serif";
+      ctx.fillText("media-only", pad.l, 16);
+      ctx.textAlign = "right";
+      ctx.fillText("simulator", cssW - pad.r, 16);
+      ctx.textAlign = "left";
+
+      ctx.strokeStyle = "rgba(26,35,50,0.12)";
+      ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t + h * 0.5);
+      ctx.lineTo(pad.l + w, pad.t + h * 0.5);
+      ctx.stroke();
+
+      var pts = [];
+      papers.forEach(function (p, i) {
+        var b = beliefAfter(papers, prior, Math.min(i, until));
+        var x = pad.l + (i / n) * w;
+        var y = pad.t + (1 - b) * h;
+        pts.push({ x: x, y: y, b: b, p: p, i: i });
+      });
+
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = "#2f6f4e";
+      ctx.beginPath();
+      pts.forEach(function (pt, i) {
+        if (i > until) return;
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.stroke();
+
+      pts.forEach(function (pt) {
+        if (pt.i > until) return;
+        var active = pt.i === hover || pt.i === selected;
+        ctx.beginPath();
+        ctx.fillStyle = pt.p.stance === "supports" ? "#2f6f4e" : "#9a3412";
+        ctx.arc(pt.x, pt.y, active ? 8 : 5.5, 0, Math.PI * 2);
+        ctx.fill();
+        if (active) {
+          ctx.strokeStyle = "#fff";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+      });
+
+      var last = Math.max(0, Math.min(until, papers.length - 1));
+      var bel = papers.length ? beliefAfter(papers, prior, last) : prior;
+      if (readout) {
+        readout.textContent =
+          Math.round(bel * 100) + "% toward “simulators for planning”  ·  prior " + Math.round(prior * 100) + "%";
+      }
+      return pts;
+    }
+
+    var ptsCache = draw(playUntil);
+
+    canvas.addEventListener("mousemove", function (ev) {
+      var hit = hitIndex(ev);
+      canvas.style.cursor = hit >= 0 ? "pointer" : "default";
+      if (hit !== hover) {
+        hover = hit;
+        ptsCache = draw(playUntil);
+        showClaim(hover >= 0 ? hover : selected);
+      }
+    });
+
+    canvas.addEventListener("mouseleave", function () {
+      hover = -1;
+      canvas.style.cursor = "default";
+      ptsCache = draw(playUntil);
+      showClaim(selected);
+    });
+
+    canvas.addEventListener("click", function (ev) {
+      var hit = hitIndex(ev);
+      if (hit < 0) return;
+      selected = hit;
+      hover = hit;
+      ptsCache = draw(playUntil);
+      showClaim(selected);
+    });
+
+    function play() {
+      if (anim) cancelAnimationFrame(anim);
+      playUntil = -1;
+      function step() {
+        playUntil += 1;
+        ptsCache = draw(playUntil);
+        if (playUntil < papers.length - 1) {
+          anim = requestAnimationFrame(function () {
+            setTimeout(step, 420);
+          });
+        }
+      }
+      step();
+    }
+
+    if (replay) replay.addEventListener("click", play);
+    window.addEventListener("dossier:belief-show", function () {
+      ptsCache = draw(playUntil);
+    });
+    window.addEventListener("resize", function () {
+      ptsCache = draw(playUntil);
+    });
+  }
+
+  function bindJoinLive() {
+    $all("a.join-live-debate, a.mode-live-now").forEach(function (a) {
+      a.addEventListener("click", function (ev) {
+        var url = a.href;
+        var win = window.open(url, "_blank");
+        if (win) {
+          ev.preventDefault();
+          try {
+            win.focus();
+          } catch (err) {}
+        }
+      });
+    });
+  }
+
   function boot() {
     var node = $("#dossier-data");
     if (!node) {
       bindSwitcher();
+      bindJoinLive();
       return;
     }
     var data = {};
@@ -2443,7 +2853,9 @@ a.arena-cite {
       data = {};
     }
     bindSwitcher();
+    bindJoinLive();
     bindDebate(data);
+    bindBelief(data);
   }
 
   if (document.readyState === "loading") {
