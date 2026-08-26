@@ -22,6 +22,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
+import re
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 PID_FILE = SKILL_ROOT / ".mode1-server.pid"
@@ -56,8 +57,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self) -> None:
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Filename")
         self.end_headers()
 
     def do_GET(self) -> None:
@@ -83,6 +84,40 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         self._send(404, b"Not found")
+
+    def do_POST(self) -> None:
+        parsed = urlparse(self.path)
+        if parsed.path != "/api/blog-pdf":
+            self._send(404, b"Not found")
+            return
+        try:
+            length = int(self.headers.get("Content-Length") or "0")
+        except ValueError:
+            length = 0
+        if length < 8 or length > 2_000_000:
+            status, body = _json_err("invalid pdf size", 400)
+            self._send(status, body, "application/json; charset=utf-8")
+            return
+        payload = self.rfile.read(length)
+        if not payload.startswith(b"%PDF"):
+            status, body = _json_err("not a pdf", 400)
+            self._send(status, body, "application/json; charset=utf-8")
+            return
+        raw_name = self.headers.get("X-Filename") or "literature-scan.pdf"
+        name = re.sub(r"[^A-Za-z0-9._-]+", "-", raw_name).strip("-")[:80]
+        if not name.lower().endswith(".pdf"):
+            name = (name or "literature-scan") + ".pdf"
+        dest_dir = Path.home() / "Downloads"
+        if not dest_dir.is_dir():
+            dest_dir = self.html_path.parent
+        dest = dest_dir / name
+        n = 1
+        stem = dest.stem
+        while dest.exists():
+            dest = dest_dir / f"{stem}-{n}.pdf"
+            n += 1
+        dest.write_bytes(payload)
+        self._send(200, _json_ok({"path": str(dest), "filename": dest.name}), "application/json; charset=utf-8")
 
     def _api(self, path: str, q: dict[str, str]) -> tuple[int, bytes]:
         term = (q.get("q") or q.get("term") or "").strip()

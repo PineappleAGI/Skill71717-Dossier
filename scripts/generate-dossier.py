@@ -18,6 +18,7 @@ import re
 import subprocess
 import sys
 import webbrowser
+import base64
 from datetime import datetime
 from pathlib import Path
 
@@ -62,6 +63,7 @@ STRENGTH_RANK = {"strong": 3, "moderate": 2, "weak": 1}
 UI_JS_PATH = SKILL_ROOT / "scripts" / "dossier-ui.js"
 MODE1_JS_PATH = SKILL_ROOT / "scripts" / "mode1-flow.js"
 MODE1_BLOG_JS_PATH = SKILL_ROOT / "scripts" / "mode1-blog.js"
+BLOG_HERO_PATH = SKILL_ROOT / "assets" / "blog-hero-proteins.jpg"
 
 
 def _open_html(path: Path) -> None:
@@ -180,12 +182,24 @@ def _load_css() -> str:
     return CSS_PATH.read_text(encoding="utf-8") if CSS_PATH.is_file() else ""
 
 
+def _blog_hero_js() -> str:
+    if not BLOG_HERO_PATH.is_file():
+        return ""
+    raw = BLOG_HERO_PATH.read_bytes()
+    b64 = base64.b64encode(raw).decode("ascii")
+    return (
+        "window.M1_BLOG_HERO = 'data:image/jpeg;base64," + b64 + "';\n"
+        "window.M1_BLOG_HERO_W = 1100;\n"
+        "window.M1_BLOG_HERO_H = 733;\n"
+    )
+
+
 def _load_js() -> str:
-    parts: list[str] = []
+    parts: list[str] = [_blog_hero_js()]
     for path in (UI_JS_PATH, MODE1_JS_PATH, MODE1_BLOG_JS_PATH):
         if path.is_file():
             parts.append(path.read_text(encoding="utf-8"))
-    return "\n".join(parts)
+    return "\n".join(p for p in parts if p)
 
 
 def _by_id(enrichment: dict) -> dict[str, dict]:

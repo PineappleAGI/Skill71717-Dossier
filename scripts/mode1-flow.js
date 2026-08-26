@@ -1675,11 +1675,24 @@
     var pdfBtn = $("#m1-blog-pdf");
     if (pdfBtn && typeof window.downloadMode1BlogPdf === "function") {
       pdfBtn.addEventListener("click", function () {
-        window.downloadMode1BlogPdf({
+        var label = pdfBtn.textContent;
+        pdfBtn.disabled = true;
+        var result = window.downloadMode1BlogPdf({
           question: displayQuestion(),
           extracted: state.extracted,
           synthesis: state.synthesis,
           verdict: state.verdict,
+        });
+        Promise.resolve(result).then(function (info) {
+          pdfBtn.disabled = false;
+          var saved = info && info.ok && info.data && info.data.filename;
+          pdfBtn.textContent = saved ? "Saved to Downloads" : label;
+          if (saved) {
+            setTimeout(function () { pdfBtn.textContent = label; }, 2500);
+          }
+        }).catch(function () {
+          pdfBtn.disabled = false;
+          pdfBtn.textContent = label;
         });
       });
     }
