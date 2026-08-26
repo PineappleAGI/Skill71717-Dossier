@@ -60,6 +60,8 @@ STANCE_SECTIONS = [
 
 STRENGTH_RANK = {"strong": 3, "moderate": 2, "weak": 1}
 UI_JS_PATH = SKILL_ROOT / "scripts" / "dossier-ui.js"
+MODE1_JS_PATH = SKILL_ROOT / "scripts" / "mode1-flow.js"
+MODE1_BLOG_JS_PATH = SKILL_ROOT / "scripts" / "mode1-blog.js"
 
 
 def _open_html(path: Path) -> None:
@@ -81,12 +83,109 @@ def _esc(s: object) -> str:
     return html.escape("" if s is None else str(s), quote=True)
 
 
+def _example_chip(text: str, target: str = "#m1-question") -> str:
+    """Clickable, selectable example — never a placeholder attribute."""
+    return (
+        f'<button type="button" class="m1-ex-chip" data-fill="{_esc(target)}" '
+        f'data-insert="{_esc(text)}">{_esc(text)}</button>'
+    )
+
+
+def _inspire_card(question: str, note: str = "") -> str:
+    note_html = f'<p class="m1-inspire-note">{_esc(note)}</p>' if note else ""
+    return (
+        f'<button type="button" class="m1-inspire-card" data-fill="#m1-question" '
+        f'data-insert="{_esc(question)}" data-scroll-to="#m1-question">'
+        f'<span class="m1-inspire-q">{_esc(question)}</span>{note_html}'
+        f'<span class="m1-inspire-hint">Use as a starting point</span>'
+        f"</button>"
+    )
+
+
+def _inspire_html() -> str:
+    health = (
+        _inspire_card(
+            "How does drinking coffee after 2:00 PM change the number of hours I stay asleep?",
+            "Can be tracked with a notebook or wearable",
+        )
+        + _inspire_card(
+            "Does reducing phone use in the evening improve my morning focus and mood?"
+        )
+        + _inspire_card(
+            "How does adding a short ten-minute walk after meals affect my daily energy levels?"
+        )
+    )
+    home = (
+        _inspire_card(
+            "Which home appliance uses the most power during the month?",
+            "Can be tested with a portable power meter",
+        )
+        + _inspire_card(
+            "Does opening windows for ten minutes each morning change how dusty or stuffy my rooms feel?"
+        )
+        + _inspire_card(
+            "What specific grocery items do I throw away the most each week, and how can I buy less of them?"
+        )
+    )
+    community = (
+        _inspire_card(
+            "What kinds of birds or insects live in my local park during different seasons?",
+            "Can be logged using iNaturalist",
+        )
+        + _inspire_card(
+            "At what exact times of day is traffic loudest on my street, and does it match local rush hours?"
+        )
+        + _inspire_card(
+            "Who lived in my house or neighborhood fifty years ago, and how has the street changed?",
+            "Can be researched via regional public library archives",
+        )
+    )
+    big = (
+        _inspire_card("Why is there a housing crisis in the Netherlands?")
+        + _inspire_card("Does the US or the UK have a better healthcare system?")
+    )
+    return f"""
+<div class="m1-inspire">
+  <button type="button" class="m1-inspire-toggle" id="m1-inspire-toggle" aria-expanded="false" aria-controls="m1-inspire-panel">
+    Not sure what to ask? Browse ideas
+  </button>
+  <div class="m1-inspire-panel" id="m1-inspire-panel" hidden>
+    <p class="m1-inspire-lede">Wander a bit. Pick a card, then rewrite it into the question that’s actually yours.</p>
+    <div class="m1-inspire-tabs" role="tablist" aria-label="Idea categories">
+      <button type="button" class="m1-inspire-tab" role="tab" id="m1-tab-health" data-cat="health" aria-selected="true" aria-controls="m1-pane-health">Health &amp; Daily Habits</button>
+      <button type="button" class="m1-inspire-tab" role="tab" id="m1-tab-home" data-cat="home" aria-selected="false" aria-controls="m1-pane-home">Home &amp; Energy</button>
+      <button type="button" class="m1-inspire-tab" role="tab" id="m1-tab-community" data-cat="community" aria-selected="false" aria-controls="m1-pane-community">Community &amp; Nature</button>
+      <button type="button" class="m1-inspire-tab" role="tab" id="m1-tab-big" data-cat="big" aria-selected="false" aria-controls="m1-pane-big">Big Questions</button>
+    </div>
+    <div class="m1-inspire-panes">
+      <div class="m1-inspire-pane" id="m1-pane-health" data-cat="health" role="tabpanel" aria-labelledby="m1-tab-health">
+        <div class="m1-inspire-track">{health}</div>
+      </div>
+      <div class="m1-inspire-pane" id="m1-pane-home" data-cat="home" role="tabpanel" aria-labelledby="m1-tab-home" hidden>
+        <div class="m1-inspire-track">{home}</div>
+      </div>
+      <div class="m1-inspire-pane" id="m1-pane-community" data-cat="community" role="tabpanel" aria-labelledby="m1-tab-community" hidden>
+        <div class="m1-inspire-track">{community}</div>
+      </div>
+      <div class="m1-inspire-pane" id="m1-pane-big" data-cat="big" role="tabpanel" aria-labelledby="m1-tab-big" hidden>
+        <div class="m1-inspire-track">{big}</div>
+      </div>
+    </div>
+  </div>
+</div>
+"""
+
+
 def _load_css() -> str:
     return CSS_PATH.read_text(encoding="utf-8") if CSS_PATH.is_file() else ""
 
 
 def _load_js() -> str:
-    return UI_JS_PATH.read_text(encoding="utf-8") if UI_JS_PATH.is_file() else ""
+    parts: list[str] = []
+    for path in (UI_JS_PATH, MODE1_JS_PATH, MODE1_BLOG_JS_PATH):
+        if path.is_file():
+            parts.append(path.read_text(encoding="utf-8"))
+    return "\n".join(parts)
 
 
 def _by_id(enrichment: dict) -> dict[str, dict]:
@@ -406,6 +505,7 @@ def _paper_payload(m: dict, claim: dict) -> dict:
         "doi": m.get("doi") or "",
         "citation_count": m.get("citation_count"),
         "open_access": bool(m.get("open_access")),
+        "abstract": m.get("abstract") or "",
         "stance": (claim.get("stance") or "neutral"),
         "relevance": claim.get("relevance") or "medium",
         "evidence_strength": claim.get("evidence_strength") or "moderate",
@@ -524,7 +624,13 @@ def _room_is_coming_soon(room: dict) -> bool:
 
 
 def _question_guide_html() -> str:
-    return """
+    sora = "Are Sora-class video models genuine world simulators, or just generative media?"
+    fasting = "Is intermittent fasting safe for cardiovascular health long-term?"
+    sora_pico = (
+        "Are Sora-class video models (P) used as simulators for planning (I) "
+        "genuine world models, or just generative media (C)?"
+    )
+    return f"""
 <div class="qg-wrap">
   <details class="qg-details">
     <summary class="qg-summary">How to ask a good research question</summary>
@@ -532,44 +638,44 @@ def _question_guide_html() -> str:
 
       <div class="qg-examples">
         <div class="qg-ex-pair">
-          <div class="qg-vague"><span class="qg-label">Vague</span>"AI world models"</div>
-          <div class="qg-better"><span class="qg-label">Better</span>"Are Sora-class video models genuine world simulators, or just generative media?"</div>
+          <div class="qg-vague"><span class="qg-label">Vague</span><span class="qg-copy">AI world models</span></div>
+          <div class="qg-better"><span class="qg-label">Better</span>{_example_chip(sora)}</div>
         </div>
         <div class="qg-ex-pair">
-          <div class="qg-vague"><span class="qg-label">Vague</span>"Intermittent fasting"</div>
-          <div class="qg-better"><span class="qg-label">Better</span>"Is intermittent fasting safe for cardiovascular health long-term?"</div>
+          <div class="qg-vague"><span class="qg-label">Vague</span><span class="qg-copy">Intermittent fasting</span></div>
+          <div class="qg-better"><span class="qg-label">Better</span>{_example_chip(fasting)}</div>
         </div>
       </div>
 
       <div class="qg-section-title">The standard framework — PICO</div>
-      <div class="qg-pico-note">Borrowed from clinical/health systematic reviews, and useful well beyond medicine.</div>
+      <div class="qg-pico-note">Borrowed from clinical/health systematic reviews, and useful well beyond medicine. Click an example to use it.</div>
       <div class="qg-pico">
         <div class="qg-pico-cell">
           <div class="qg-pico-letter">P</div>
           <div class="qg-pico-word">Population</div>
           <div class="qg-pico-desc">The subject or domain in question</div>
-          <div class="qg-pico-example">"Sora-class video models"</div>
+          {_example_chip("Sora-class video models")}
         </div>
         <div class="qg-pico-cell">
           <div class="qg-pico-letter">I</div>
           <div class="qg-pico-word">Intervention</div>
           <div class="qg-pico-desc">What's being examined or applied</div>
-          <div class="qg-pico-example">"used as simulators for planning"</div>
+          {_example_chip("used as simulators for planning")}
         </div>
         <div class="qg-pico-cell">
           <div class="qg-pico-letter">C</div>
           <div class="qg-pico-word">Comparison</div>
           <div class="qg-pico-desc">Optional — a contrasting condition</div>
-          <div class="qg-pico-example">"vs. generative media only"</div>
+          {_example_chip("vs. generative media only")}
         </div>
         <div class="qg-pico-cell">
           <div class="qg-pico-letter">O</div>
           <div class="qg-pico-word">Outcome</div>
           <div class="qg-pico-desc">What would count as an answer</div>
-          <div class="qg-pico-example">"do they function as genuine world models"</div>
+          {_example_chip("do they function as genuine world models")}
         </div>
       </div>
-      <div class="qg-pico-assembled">Put together: <b>"Are Sora-class video models (P) used as simulators for planning (I) genuine world models, or just generative media (C)?"</b></div>
+      <div class="qg-pico-assembled">Put together: {_example_chip(sora_pico)}</div>
 
       <div class="qg-section-title">Your question can take a few shapes</div>
       <div class="qg-types">
@@ -601,6 +707,99 @@ def _question_guide_html() -> str:
 
     </div>
   </details>
+</div>
+"""
+
+
+def _question_hero_inner(topic: str, original_topic: str) -> str:
+    """Hero question block shared by Evidence Synthesis and Debate Arena."""
+    topic = (topic or "").strip()
+    original = (original_topic or "").strip()
+    if original and original != topic:
+        return (
+            '<p class="hero-typed">'
+            '<span class="hero-kicker">You typed</span>'
+            f"{_esc(original)}</p>"
+            '<p class="hero-kicker hero-kicker-interpreted">Interpreted as</p>'
+            f"<h1>{_esc(topic)}</h1>"
+        )
+    return f"<h1>{_esc(topic)}</h1>"
+
+
+def _mode1_html(
+    question_guide: str,
+    topic: str = "",
+    situation: str = "",
+    original_topic: str = "",
+) -> str:
+    topic = (topic or "").strip()
+    situation = (situation or "").strip()
+    inspire = _inspire_html()
+    sit_chips = (
+        '<div class="m1-ex-chips" role="list" aria-label="Example situations">'
+        + _example_chip("a parent with type 2 diabetes", "#m1-situation")
+        + "</div>"
+    )
+    return """
+<div id="m1-root" class="m1-root">
+  <div id="m1-stepper-sentinel"></div>
+  <div id="m1-stepper" class="m1-stepper">
+    <div class="m1-stepper-head">
+      <p class="m1-prisma">This follows PRISMA — the standard systematic-review methodology researchers use to answer questions from evidence, not opinion.</p>
+      <button type="button" class="btn m1-new-q" id="m1-new-question">Ask a new question</button>
+    </div>
+    <ol id="m1-steps" class="m1-steps"></ol>
+    <p class="m1-sticky-tip"></p>
+    <div class="m1-search-live" id="m1-search-live" hidden>
+      <span class="m1-spinner" aria-hidden="true"></span>
+      <div class="m1-search-live-copy">
+        <p class="m1-search-live-title">Working — querying live databases. This is not frozen.</p>
+        <p class="m1-search-live-msg" id="m1-status" aria-live="polite"></p>
+      </div>
+      <p class="m1-search-live-time" id="m1-search-elapsed"></p>
+    </div>
+  </div>
+
+  <section class="m1-section" data-m1-section="1" id="m1-intake-sec">
+    <h2>Question intake</h2>
+    <form id="m1-intake">
+      <label class="m1-label" for="m1-question">What do you want to find out?</label>
+      <textarea id="m1-question" name="question" rows="3" required>""" + _esc(topic) + """</textarea>
+""" + question_guide + """
+      <label class="m1-label" for="m1-situation">Is this about a specific situation? <span class="m1-hint">(optional — a condition, medication, or context that changes what’s relevant)</span></label>
+      <input id="m1-situation" name="situation" type="text" value=\"""" + _esc(situation) + """\" />
+      """ + sit_chips + """
+      <div class="m1-actions">
+        <button type="submit" class="btn btn-primary">Continue</button>
+      </div>
+    </form>
+    """ + inspire + """
+  </section>
+
+  <section class="m1-section" data-m1-section="2" id="m1-understand" hidden>
+    <h2>What I understood</h2>
+    <div id="m1-understand-body"></div>
+  </section>
+
+  <section class="m1-section" data-m1-section="3" id="m1-screen" hidden>
+    <h2>Search &amp; rank</h2>
+    <div id="m1-screen-body"></div>
+  </section>
+
+  <section class="m1-section" data-m1-section="4" id="m1-extract" hidden>
+    <h2>Extracted evidence table</h2>
+    <div id="m1-extract-body"></div>
+  </section>
+
+  <section class="m1-section" data-m1-section="5" id="m1-synth" hidden>
+    <h2>Synthesis</h2>
+    <div id="m1-synth-body"></div>
+  </section>
+
+  <section class="m1-section" data-m1-section="6" id="m1-verdict" hidden>
+    <h2>The briefing</h2>
+    <div id="m1-verdict-body"></div>
+  </section>
 </div>
 """
 
@@ -753,7 +952,14 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
             c = _claim_entry(claims_by_id, m.get("id"))
             if c and not _is_off_topic(c):
                 shown.append(m)
-    dropped = len(materials) - len(shown) if claims_by_id else 0
+    else:
+        for m in materials:
+            en = enr_map.get(m.get("id")) or {}
+            score = en.get("relevance_score")
+            if isinstance(score, int) and score < 50:
+                continue
+            shown.append(m)
+    dropped = len(materials) - len(shown)
     has_claims = bool(claims_by_id)
 
     years = [m.get("year") for m in shown if m.get("year")] or [m.get("year") for m in materials if m.get("year")]
@@ -762,6 +968,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     oa_pct = int(round(100 * oa_n / len(shown))) if shown else 0
 
     topic = request.get("topic") or "Research topic"
+    original_topic = (request.get("original_topic") or "").strip()
     gaps = enrichment.get("coverage_gaps") or []
     next_q = enrichment.get("suggested_next_queries") or []
 
@@ -776,13 +983,11 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
 
     classification_html = _render_classification(enrichment)
     question_guide_html = _question_guide_html()
-    synthesis_explainer = _explainer_html(
-        "synthesis",
-        "Systematic review methodology",
-        "This view follows a <strong>systematic review</strong> process: frame a research question, "
-        "search the literature, screen sources in or out, classify each paper by its epistemic role "
-        "(supporting, contradicting, test conditions, or background), and record what the scan still misses. "
-        "The aim is a map of the evidence, not a single narrative.",
+    mode1_html = _mode1_html(
+        question_guide_html,
+        topic,
+        str(request.get("discipline") or ""),
+        original_topic,
     )
 
     gaps_html = (
@@ -839,6 +1044,8 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
             seen_paper_ids.add(sp.get("id"))
     payload = {
         "topic": topic,
+        "original_topic": original_topic,
+        "discipline": request.get("discipline") or "",
         "prior": (claims or {}).get("prior", 0.5),
         "papers": papers,
         "rooms": rooms,
@@ -846,6 +1053,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
         "next_queries": next_q,
     }
     payload_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
+    question_hero = _question_hero_inner(topic, original_topic)
 
     css = _load_css()
     js = _load_js()
@@ -889,7 +1097,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     </div>
 
     <header class="hero">
-      <h1>{_esc(topic)}</h1>
+      {question_hero}
       <div class="meta-row">{chips}<span class="chip">Generated <strong>{_esc(generated)}</strong></span></div>
       <div class="stats">
         <div class="stat"><div class="n">{len(shown)}</div><div class="l">In scope</div></div>
@@ -900,28 +1108,8 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     </header>
 
     <div class="mode-panel" data-mode="synthesis">
-    {synthesis_explainer}
-    {question_guide_html}
     {classification_html}
-
-    {guide_table}
-
-    <div class="layout">
-      <main>
-        {materials_html}
-        {verdict_html}
-      </main>
-      <aside>
-        <section class="panel" id="open-questions">
-          <h2>What's missing from this list</h2>
-          {gaps_html}
-        </section>
-        <section class="panel">
-          <h2>BibTeX</h2>
-          <pre class="bibtex">{_esc(bib)}</pre>
-        </section>
-      </aside>
-    </div>
+    {mode1_html}
     </div>
 
     <div class="mode-panel" data-mode="debate" hidden>

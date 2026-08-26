@@ -9,7 +9,7 @@ Generate a single interactive HTML **research dossier** from a topic: URLs, shor
 
 ## Core Principles
 
-1. **Hybrid Intake** — A local HTML form captures topic + filters; submit writes `request.json`.
+1. **Hybrid Intake** — A local HTML form captures topic + filters; submit writes `raw_submission.json`. The assistant interprets that into `request.json` before harvest.
 2. **Scripted Harvest** — `harvest-sources.py` pulls OpenAlex / arXiv / CrossRef / Semantic Scholar (Python stdlib only).
 3. **Claim classification** — `classify-claims.py` calls the Claude API once per uncached paper (title + abstract) and caches stance in `claims.json`.
 4. **Single HTML Output** — One self-contained dossier with embedded CSS; Google Fonts are the only external dependency.
@@ -18,14 +18,15 @@ Generate a single interactive HTML **research dossier** from a topic: URLs, shor
 
 ## Non-Negotiable Rules
 
-- **MUST NOT ask setup questions** after the form. Defaults come from the submitted `request.json`.
+- **MUST NOT ask setup questions** after the form. Defaults come from the submitted `raw_submission.json` / enriched `request.json`.
+- **MUST NOT wait for a follow-up chat** after **Start harvest**. Poll until the form writes `raw_submission.json`, then immediately run Phase 1b → harvest → classify (if possible) → enrich → generate → open. Do not stop after harvest. Do not ask “did you submit?”
 - Output MUST be a single `.html` dossier (plus optional font CDN).
 - Every dossier MUST embed the full contents of `visualization-base.css`.
 - **MUST NOT invent DOIs, URLs, or citation counts.** Only use harvested fields; mark missing data clearly.
 - Enrichment `relevance_score` is an integer 0–100 with a one-sentence `relevance_rationale`.
 - Prefer publisher/DOI landing pages over bare arXiv links when both exist.
 - Industry items MUST have a real verified URL and an organization when known.
-- Open the dossier **once** (`generate-dossier.py --no-open`, then `open` / `xdg-open`).
+- Generate with `generate-dossier.py --no-open`. Open the dossier **once** over HTTP via `scripts/mode1-server.py` (not `file://`).
 - Stop the intake server when the run finishes: `python scripts/intake-server.py --stop`.
 - **Do not hand-edit generated HTML.** Change scripts/fixtures, then regenerate with `generate-dossier.py`.
 
@@ -64,15 +65,25 @@ python SKILL_ROOT/scripts/intake-server.py --port 8765 --out RUNTIME_DIR
 ```
 
 - Run in background.
-- Tell the user the form opened at `http://127.0.0.1:8765/` and to click **Start harvest**.
-- Poll until `RUNTIME_DIR/raw_submission.json` exists (check every 2s; timeout ~10 minutes). Then run Phase 1b — do not harvest yet.
-- If the user pastes a topic in chat instead, you MAY write `request.json` yourself with sensible defaults (`material_tracks` all five, year_from=2018, year_to=current, max_results=20, audience=lit_review) and skip waiting on the form **and skip Phase 1b** — but still prefer the form when they invoked the skill without a topic.
+- Tell the user the form opened at `http://127.0.0.1:8765/` and to click **Start harvest**. Say you will pick it up from there — they do not need to message again.
+- **Do not end the turn.** Wait for the form:
+
+```bash
+python SKILL_ROOT/scripts/wait-for-submission.py RUNTIME_DIR --timeout 600
+```
+
+On Cursor, set the Shell `block_until_ms` above the wait timeout (e.g. 610000) so the command is not backgrounded before submit.
+
+- When that exits 0, `RUNTIME_DIR/raw_submission.json` exists. Immediately run Phase 1b (do not harvest yet), then Phases 2–4 in the same run.
+- If wait times out, tell the user the form is still at `http://127.0.0.1:8765/` and keep waiting if they still want a dossier.
+- If the user pastes a topic in chat instead, you MAY write `request.json` yourself with a sharpened `topic` (and `original_topic` if you rewrote it), sensible defaults (`material_tracks` all five, year_from=2018, year_to=current, max_results=20, audience=lit_review), and skip waiting on the form **and skip Phase 1b** — but still prefer the form when they invoked the skill without a topic.
 
 ### `request.json` schema
 
 ```json
 {
   "topic": "string",
+  "original_topic": "optional string — raw form wording if Phase 1b rewrote topic",
   "discipline": "string",
   "year_from": 2020,
   "year_to": 2026,
@@ -108,12 +119,15 @@ python SKILL_ROOT/scripts/intake-server.py --port 8765 --out RUNTIME_DIR
 This phase runs **only** after the intake form writes `RUNTIME_DIR/raw_submission.json`. Skip it for chat-pasted topics (you already wrote `request.json`), example mode, replay, and regen.
 
 1. Read `RUNTIME_DIR/raw_submission.json`.
-2. **Discipline:** if blank, generic, or mismatched to the topic, fill in a concise field name a researcher in that area would use (e.g. `environmental epidemiology`, `NLP`, `energy systems`). Keep the user's text when it is already specific.
-3. **Seed queries:** add up to **4** `seed_queries`. Phrase them like real paper titles in that discipline — noun-heavy scholarly titles, not keyword Boolean soup and not the topic copied four times. These go to OpenAlex as extra recall queries.
-4. **Year range:** if `year_from` / `year_to` is missing, inverted, or implausible for the topic, correct it. Keep a reasonable user-chosen window.
-5. Write the enriched object as `RUNTIME_DIR/request.json` using the schema above. Preserve `topic`, `material_tracks`, `max_results`, `audience`, `submitted_at`, and `skill` unless a value is invalid.
+2. **Interpret the question.** Form wording is often chatty, ungrammatical, or missing a population / comparison / outcome. Rewrite it as a single searchable research question (who, exposure, comparison, outcome). Store the form text as `original_topic` and the sharpened question as `topic`. Do **not** paste the raw form sentence into the dossier or the harvest query as-is.
+   - Example: *is college student eating lots of eggs vs meat or fish as a source of protein safe for cardiovascular health for the long term?* → `original_topic` stays that sentence; `topic` becomes *In college-aged young adults, is high egg intake as a protein source associated with worse long-term cardiovascular outcomes than protein from meat or fish?*
+3. **Discipline:** if blank, generic, or mismatched to the sharpened question, fill in a concise field name a researcher in that area would use (e.g. `nutritional epidemiology`, `NLP`, `energy systems`). Keep the user's text when it is already specific.
+4. **Seed queries:** add up to **4** `seed_queries` from the sharpened question. Phrase them like real paper titles in that discipline — noun-heavy scholarly titles, not keyword Boolean soup and not the topic copied four times. These go to OpenAlex as extra recall queries.
+5. **Year range:** if `year_from` / `year_to` is missing, inverted, or implausible for the topic, correct it. Keep a reasonable user-chosen window.
+6. Optionally add `stance_definitions.supports` / `contradicts` so classification uses this question, not leftover defaults.
+7. Write the enriched object as `RUNTIME_DIR/request.json` using the schema above. Preserve `material_tracks`, `max_results`, `audience`, `submitted_at`, and `skill` unless a value is invalid.
 
-Do **not** harvest from `raw_submission.json`. Do **not** ask the user questions. Then continue to Phase 2.
+Do **not** harvest from `raw_submission.json`. Do **not** ask the user questions. Then continue to Phase 2 **in the same run**.
 
 ---
 
@@ -144,7 +158,7 @@ Harvest already:
 - Pulls arXiv when `preprint` enabled
 - Assigns `track` via heuristics (thesis type, industry org hints, citation threshold, preprint)
 
-If harvest returns 0 materials, tell the user and offer to broaden years or rephrase the topic — do not fabricate papers.
+If harvest returns 0 materials, tell the user and offer to broaden years or rephrase the topic — do not fabricate papers. Otherwise continue immediately to Phase 3 (do not wait for the user).
 
 ---
 
@@ -155,6 +169,8 @@ python SKILL_ROOT/scripts/classify-claims.py RUNTIME_DIR/harvest.json RUNTIME_DI
 ```
 
 Requires `ANTHROPIC_API_KEY` for papers not already in `claims.json`. Cached items are skipped. Empty or broken abstracts are marked skipped and dropped from the dossier.
+
+If the API key is missing, **skip this phase** and continue to 3b + generate + open. Do not stall the dossier on classification.
 
 Writes `RUNTIME_DIR/claims.json` keyed by paper `id` (`stance`, `confidence`, `evidence_strength`, `one_line_claim`, `relevance`).
 
@@ -222,17 +238,21 @@ python SKILL_ROOT/scripts/generate-dossier.py \
   --no-open
 ```
 
-Then open once:
+Then serve and open **once** over HTTP (Mode 1 cannot run as `file://`):
 
 ```bash
-open RUNTIME_DIR/dossier-….html          # macOS
-xdg-open RUNTIME_DIR/dossier-….html      # Linux
+python SKILL_ROOT/scripts/mode1-server.py --stop
+python SKILL_ROOT/scripts/mode1-server.py --html RUNTIME_DIR/dossier-YYYYMMDD-HHMMSS.html --port 8767
 ```
+
+The generated page must prefill the interpreted `topic` (and show `original_topic` when it differs). Mode 1 auto-starts the live search from that question.
+
+Tell the user the dossier is at `http://127.0.0.1:8767/`. Do not wait for them to ask you to open it.
 
 Dossier UI contracts:
 
 - Persistent top switcher: **Evidence Synthesis** / **Debate Arena**
-- Mode 1 is a single-page PRISMA flow (intake → scope → screen → extract → synthesis → verdict → story deck). It must be served via `scripts/mode1-server.py` so PubMed / Europe PMC / trials / OpenAlex / Unpaywall calls work.
+- Mode 1 is a single-page PRISMA flow (intake → restatement → search → extract → synthesis → briefing). Search starts as soon as the restatement is shown; there is no “yes that’s right” gate. **Use my correction** reruns the live search from the rewritten question. The last step is a cited briefing (headline, lede, paper walkthroughs, close, references) built only from retrieved abstracts, plus a blog-style reading of the same papers with a **Download PDF** control (print dialog → Save as PDF). The research question is interpreted in Phase 1b before the page loads; Mode 1 does not offer a second question rewrite or a Boolean editor. The query used is shown on the results list. It must be served via `scripts/mode1-server.py` so PubMed / Europe PMC / trials / OpenAlex / Unpaywall calls work.
 - Debate lobby has two labeled sections:
   1. **Related to your question** — contested sub-questions from the Mode 1 paper set (`group: related`, `source: harvest`)
   2. **Commonly misunderstood** — curated everyday contested claims, **not** the user's topic (`group: common`, `source: seed` from `data/seed-debates.json`). Category sub-headers. At launch, 2–3 rooms ship with harvested for/against cards; the rest are `status: coming_soon` placeholder tiles.
@@ -276,7 +296,7 @@ python scripts/classify-claims.py example/harvest.json example --enrichment exam
 
 ```bash
 python scripts/generate-dossier.py example/harvest.json example/enrichment.json example/dossier.html --no-open
-open example/dossier.html
+python scripts/mode1-server.py --html example/dossier.html --port 8767
 ```
 
 ---
@@ -291,7 +311,7 @@ open example/dossier.html
 
 ## Supporting Files
 
-- `scripts/intake-server.py`
+- `scripts/wait-for-submission.py` — blocks until the form writes `raw_submission.json`
 - `scripts/harvest-sources.py`
 - `scripts/classify-claims.py`
 - `scripts/generate-dossier.py`
