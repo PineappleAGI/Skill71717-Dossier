@@ -81,6 +81,91 @@ def _open_html(path: Path) -> None:
         pass
 
 
+def _first_sentences(text: str, max_chars: int) -> str:
+    t = re.sub(r"\s+", " ", text or "").strip()
+    if not t:
+        return ""
+    if len(t) <= max_chars:
+        return t
+    cut = t[:max_chars]
+    m = re.match(r"^(.*?[.!?])(\s|$)", cut)
+    if m and len(m.group(1)) > 70:
+        return m.group(1)
+    return re.sub(r"\s+\S*$", "", cut) + "…"
+
+
+_ABSTRACT_HEADINGS = re.compile(
+    r"(?:^|[.!?\s])(background|introduction|objective|objectives|aim|aims|purpose|purposes|"
+    r"methods?|materials and methods|results?|findings?|conclusions?|discussion)\s*[:.\u2014\u2013-]\s+",
+    re.I,
+)
+_AIM_PATTERNS = (
+    re.compile(
+        r"\b(?:the\s+)?(?:aim|aims|objective|objectives|purpose)\s+"
+        r"(?:of\s+(?:the|this)\s+(?:study|review|paper|work)\s+)?"
+        r"(?:was|were|is|are)\s+to\s+[^.?]{12,240}[.?]?",
+        re.I,
+    ),
+    re.compile(r"\bwe\s+(?:aimed|sought|intended)\s+to\s+[^.?]{12,240}[.?]?", re.I),
+    re.compile(
+        r"\bthis\s+(?:study|review|paper)\s+(?:aimed|aims|sought)\s+to\s+[^.?]{12,240}[.?]?",
+        re.I,
+    ),
+)
+
+
+def _parse_abstract_sections(text: str) -> tuple[str, str]:
+    raw = re.sub(r"\s+", " ", text or "").strip()
+    background = ""
+    objective = ""
+    if not raw:
+        return background, objective
+    hits = list(_ABSTRACT_HEADINGS.finditer(raw))
+
+    def kind(label: str) -> str:
+        lab = label.lower()
+        if lab in ("background", "introduction"):
+            return "background"
+        if lab in ("objective", "objectives", "aim", "aims", "purpose", "purposes"):
+            return "objective"
+        return ""
+
+    for i, hit in enumerate(hits):
+        key = kind(hit.group(1))
+        if not key:
+            continue
+        start = hit.end()
+        end = hits[i + 1].start() if i + 1 < len(hits) else len(raw)
+        chunk = raw[start:end].strip()
+        if key == "background" and not background:
+            background = chunk
+        if key == "objective" and not objective:
+            objective = chunk
+    if not objective:
+        for pat in _AIM_PATTERNS:
+            found = pat.search(raw)
+            if found:
+                objective = found.group(0)
+                break
+    if not background:
+        lead = _first_sentences(raw, 240)
+        if lead and (not objective or objective[:36] not in lead):
+            background = lead
+    return _first_sentences(background, 280), _first_sentences(objective, 220)
+
+
+def _aim_html(abstract: str) -> str:
+    background, objective = _parse_abstract_sections(abstract)
+    bg = background or "Not specified in abstract"
+    obj = objective or "Not specified in abstract"
+    return (
+        '<dl class="m1-pico m1-aim">'
+        f"<div><dt>Background</dt><dd>{_esc(bg)}</dd></div>"
+        f"<div><dt>Objective</dt><dd>{_esc(obj)}</dd></div>"
+        "</dl>"
+    )
+
+
 def _esc(s: object) -> str:
     return html.escape("" if s is None else str(s), quote=True)
 
@@ -314,6 +399,7 @@ def _render_claim_material(m: dict, claim: dict, enr: dict | None) -> str:
   </div>
   <p class="byline">{byline}</p>
   <p class="claim">{_esc(one_line)}</p>
+  {_aim_html(m.get("abstract") or "")}
   <div class="badges">{''.join(badges)}</div>
 </article>
 """
@@ -507,6 +593,7 @@ def _load_seed_debates() -> dict:
 
 
 def _paper_payload(m: dict, claim: dict) -> dict:
+    background, objective = _parse_abstract_sections(m.get("abstract") or "")
     return {
         "id": m.get("id"),
         "source": claim.get("source") or "harvest",
@@ -526,12 +613,16 @@ def _paper_payload(m: dict, claim: dict) -> dict:
         "evidence_strength_reason": claim.get("evidence_strength_reason") or "",
         "confidence": claim.get("confidence"),
         "one_line_claim": claim.get("one_line_claim") or "",
+        "background": background,
+        "objective": objective,
     }
 
 
 def _seed_paper_payload(paper: dict) -> dict:
     """Seed-room papers live only in Debate Arena, not Mode 1 synthesis."""
     url = paper.get("url") or (f"https://doi.org/{paper['doi']}" if paper.get("doi") else "")
+    abstract = paper.get("abstract") or ""
+    background, objective = _parse_abstract_sections(abstract)
     return {
         "id": paper.get("id"),
         "source": paper.get("source") or "seed",
@@ -544,6 +635,9 @@ def _seed_paper_payload(paper: dict) -> dict:
         "doi": paper.get("doi") or "",
         "citation_count": paper.get("citation_count"),
         "open_access": bool(paper.get("open_access")),
+        "abstract": abstract,
+        "background": background,
+        "objective": objective,
         "stance": paper.get("stance") or "neutral",
         "relevance": paper.get("relevance") or "high",
         "evidence_strength": paper.get("evidence_strength") or "moderate",
@@ -801,12 +895,12 @@ def _mode1_html(
   </section>
 
   <section class="m1-section" data-m1-section="4" id="m1-extract" hidden>
-    <h2>Extracted evidence table</h2>
+    <h2>Extracted evidence</h2>
     <div id="m1-extract-body"></div>
   </section>
 
   <section class="m1-section" data-m1-section="5" id="m1-synth" hidden>
-    <h2>Synthesis</h2>
+    <h2>Weigh the evidence</h2>
     <div id="m1-synth-body"></div>
   </section>
 
