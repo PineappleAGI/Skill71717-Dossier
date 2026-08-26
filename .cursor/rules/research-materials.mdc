@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Skill71717: Pineapple Research Materials — Cursor Integration
 
-This rule activates the `pineapple-research-materials` skill for Cursor. The full workflow is defined in `SKILL.md` at the project root.
+This rule activates the `pineapple-research-materials` skill for Cursor. The full workflow is defined in `SKILL.md` at the project root. Follow it end to end in one run.
 
 ## Quick Reference
 
@@ -14,13 +14,15 @@ When this rule is invoked, follow the phased workflow in `SKILL.md`:
 
 1. **Read `SKILL.md`** — complete phase-by-phase instructions
 2. **Phase 0:** Detect mode (live intake, example replay, or regenerate)
-3. **Phase 1:** Start `python scripts/intake-server.py` and open the form (unless example/request already provided)
-4. **Phase 2:** Poll for `.research-materials/request.json` (or use `example/request.json`)
-5. **Phase 3:** Run `python scripts/harvest-sources.py <request.json> <out_dir>`
-6. **Phase 4:** Run `python scripts/classify-claims.py <harvest.json> <out_dir>` (Claude API; uses `claims.json` cache)
-7. **Phase 5:** Write `enrichment.json` (inquiry lens + gaps; no fabricated URLs)
-8. **Phase 6:** Run `python scripts/generate-dossier.py ... --no-open`, then open once — **never hand-edit HTML**. Dossier has two views: Evidence Synthesis and Debate Arena. Live debate and Belief Timeline live in `example/older-version/`.
-9. **Phase 7:** Stop the intake server and summarize by stance
+3. **Phase 1:** Start `python scripts/intake-server.py --port 8765 --out .research-materials`. Tell the user to click **Start harvest**. **Do not end the turn.** Run `python scripts/wait-for-submission.py .research-materials --timeout 600`
+4. **Phase 1b:** On submit, read `raw_submission.json`. Interpret the question (who / exposure / comparison / outcome). Write `original_topic` + sharpened `topic`, discipline, up to 4 title-like `seed_queries`, year sanity-check → `request.json`. Never harvest from the raw form sentence.
+5. **Phase 2:** `python scripts/harvest-sources.py .research-materials/request.json .research-materials`
+6. **Phase 3:** `python scripts/classify-claims.py …` if `ANTHROPIC_API_KEY` is set; otherwise skip and continue
+7. **Phase 3b:** Write `enrichment.json` (inquiry lens + gaps; no fabricated URLs)
+8. **Phase 4:** `python scripts/generate-dossier.py … --no-open`, then `python scripts/mode1-server.py --html <dossier.html> --port 8767` so the page opens at `http://127.0.0.1:8767/`. Never hand-edit HTML. Never wait for the user to ask you to open it.
+9. **Phase 5:** Stop the intake server and summarize (original wording, interpreted question, counts, gaps, URL)
+
+Do not stop after harvest. Do not ask “did you submit?”
 
 ## Tool Mapping
 
@@ -34,10 +36,12 @@ When this rule is invoked, follow the phased workflow in `SKILL.md`:
 ## Supporting Files
 
 - `visualization-base.css` — Mandatory CSS embedded by the generator
-- `scripts/intake-server.py` — Local topic form
+- `scripts/intake-server.py` — Local topic form (writes `raw_submission.json`)
+- `scripts/wait-for-submission.py` — Blocks until the form is submitted
 - `scripts/harvest-sources.py` — Academic API harvest
 - `scripts/classify-claims.py` — Claude API stance classification + cache
 - `scripts/generate-dossier.py` — HTML dossier builder
+- `scripts/mode1-server.py` — HTTP server for Evidence Synthesis APIs
 - `data/seed-debates.json` — Debate Arena “commonly misunderstood” starter rooms
 
 ## Example Invocation
@@ -49,4 +53,4 @@ When this rule is invoked, follow the phased workflow in `SKILL.md`:
 
 ## Built-in Example
 
-If the user wants to try the skill without live APIs, use `example/` at the project root. Open `example/dossier.html` directly, or regenerate from the committed JSON fixtures.
+If the user wants to try the skill without live APIs, use `example/` at the project root. Serve `example/dossier.html` with `scripts/mode1-server.py`, or regenerate from the committed JSON fixtures.
