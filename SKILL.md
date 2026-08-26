@@ -65,8 +65,8 @@ python SKILL_ROOT/scripts/intake-server.py --port 8765 --out RUNTIME_DIR
 
 - Run in background.
 - Tell the user the form opened at `http://127.0.0.1:8765/` and to click **Start harvest**.
-- Poll until `RUNTIME_DIR/request.json` exists (check every 2s; timeout ~10 minutes).
-- If the user pastes a topic in chat instead, you MAY write `request.json` yourself with sensible defaults (`material_tracks` all five, year_from=2018, year_to=current, max_results=20, audience=lit_review) and skip waiting on the form — but still prefer the form when they invoked the skill without a topic.
+- Poll until `RUNTIME_DIR/raw_submission.json` exists (check every 2s; timeout ~10 minutes). Then run Phase 1b — do not harvest yet.
+- If the user pastes a topic in chat instead, you MAY write `request.json` yourself with sensible defaults (`material_tracks` all five, year_from=2018, year_to=current, max_results=20, audience=lit_review) and skip waiting on the form **and skip Phase 1b** — but still prefer the form when they invoked the skill without a topic.
 
 ### `request.json` schema
 
@@ -100,6 +100,20 @@ python SKILL_ROOT/scripts/intake-server.py --port 8765 --out RUNTIME_DIR
 | `preprint` | Preprints (e.g. arXiv) not filed under another section |
 
 `audience` guides enrichment tone only (`lit_review` | `thesis` | `coursework` | `industry`) — **never shown** on the dossier hero.
+
+---
+
+## Phase 1b — Enrich the raw submission (form path only)
+
+This phase runs **only** after the intake form writes `RUNTIME_DIR/raw_submission.json`. Skip it for chat-pasted topics (you already wrote `request.json`), example mode, replay, and regen.
+
+1. Read `RUNTIME_DIR/raw_submission.json`.
+2. **Discipline:** if blank, generic, or mismatched to the topic, fill in a concise field name a researcher in that area would use (e.g. `environmental epidemiology`, `NLP`, `energy systems`). Keep the user's text when it is already specific.
+3. **Seed queries:** add up to **4** `seed_queries`. Phrase them like real paper titles in that discipline — noun-heavy scholarly titles, not keyword Boolean soup and not the topic copied four times. These go to OpenAlex as extra recall queries.
+4. **Year range:** if `year_from` / `year_to` is missing, inverted, or implausible for the topic, correct it. Keep a reasonable user-chosen window.
+5. Write the enriched object as `RUNTIME_DIR/request.json` using the schema above. Preserve `topic`, `material_tracks`, `max_results`, `audience`, `submitted_at`, and `skill` unless a value is invalid.
+
+Do **not** harvest from `raw_submission.json`. Do **not** ask the user questions. Then continue to Phase 2.
 
 ---
 
@@ -218,7 +232,7 @@ xdg-open RUNTIME_DIR/dossier-….html      # Linux
 Dossier UI contracts:
 
 - Persistent top switcher: **Evidence Synthesis** / **Debate Arena**
-- Synthesis: persistent “Systematic review methodology” note; stance sections; searches under Test conditions; Open questions sidebar
+- Mode 1 is a single-page PRISMA flow (intake → scope → screen → extract → synthesis → verdict → story deck). It must be served via `scripts/mode1-server.py` so PubMed / Europe PMC / trials / OpenAlex / Unpaywall calls work.
 - Debate lobby has two labeled sections:
   1. **Related to your question** — contested sub-questions from the Mode 1 paper set (`group: related`, `source: harvest`)
   2. **Commonly misunderstood** — curated everyday contested claims, **not** the user's topic (`group: common`, `source: seed` from `data/seed-debates.json`). Category sub-headers. At launch, 2–3 rooms ship with harvested for/against cards; the rest are `status: coming_soon` placeholder tiles.
@@ -281,7 +295,9 @@ open example/dossier.html
 - `scripts/harvest-sources.py`
 - `scripts/classify-claims.py`
 - `scripts/generate-dossier.py`
-- `scripts/dossier-ui.js` — mode switcher and debate rooms (embedded into HTML)
+- `scripts/mode1-flow.js` — Mode 1 PRISMA client flow (embedded)
+- `scripts/mode1-server.py` — local HTTP server + PubMed/Europe PMC/trials/OpenAlex/Unpaywall proxy
+- `scripts/evidence_apis.py` — public REST clients used by the Mode 1 server
 - `visualization-base.css`
 - `data/seed-debates.json` — Mode 2 “commonly misunderstood” starter rooms + harvested proof-of-concept papers
 - `example/` — demo fixtures + prebuilt dossier

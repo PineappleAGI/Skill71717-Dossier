@@ -2,8 +2,8 @@
 """
 Local intake form for Skill71717 (Pineapple Research Materials).
 
-Serves a professional topic form. On submit, writes request.json to the
-output directory so the agent can continue the harvest pipeline.
+Serves a professional topic form. On submit, writes raw_submission.json to the
+output directory so the agent can enrich it into request.json before harvest.
 
 Usage:
   python scripts/intake-server.py [--port 8765] [--out .research-materials]
@@ -129,7 +129,7 @@ def _confirm_html() -> str:
       <span class="brand-mark">Pineapple 71717</span>
     </div>
     <h1>Request submitted</h1>
-    <p class="lede">Your topic was saved to <code>request.json</code>. Return to Cursor or Claude — the assistant will harvest sources and open the dossier when ready. You can close this tab.</p>
+    <p class="lede">Your topic was saved to <code>raw_submission.json</code>. Return to Cursor or Claude — the assistant will enrich it, harvest sources, and open the dossier when ready. You can close this tab.</p>
   </div>
 </body>
 </html>
@@ -209,7 +209,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, b'{"ok":true}', "application/json")
             return
         if self.path == "/status":
-            req = self.out_dir / "request.json"
+            req = self.out_dir / "raw_submission.json"
             payload = json.dumps({"ready": req.is_file(), "path": str(req)}).encode("utf-8")
             self._send(200, payload, "application/json")
             return
@@ -229,10 +229,10 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         self.out_dir.mkdir(parents=True, exist_ok=True)
-        out_path = self.out_dir / "request.json"
+        out_path = self.out_dir / "raw_submission.json"
         out_path.write_text(json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         # Signal file for agents that prefer a simple existence check
-        (self.out_dir / "REQUEST_READY").write_text("1\n", encoding="utf-8")
+        (self.out_dir / "RAW_SUBMISSION_READY").write_text("1\n", encoding="utf-8")
         self._send(200, _confirm_html().encode("utf-8"))
 
 
@@ -267,8 +267,8 @@ def main() -> int:
     _stop_existing()
     out_dir = args.out.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
-    # Clear stale request so the agent waits for a fresh submit
-    for name in ("request.json", "REQUEST_READY"):
+    # Clear stale submission so the agent waits for a fresh submit
+    for name in ("raw_submission.json", "RAW_SUBMISSION_READY", "request.json", "REQUEST_READY"):
         p = out_dir / name
         if p.exists():
             p.unlink()
@@ -279,7 +279,7 @@ def main() -> int:
 
     url = f"http://127.0.0.1:{args.port}/"
     print(f"intake listening on {url}")
-    print(f"will write request to {out_dir / 'request.json'}")
+    print(f"will write raw submission to {out_dir / 'raw_submission.json'}")
     if not args.no_open:
         try:
             webbrowser.open(url)
