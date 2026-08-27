@@ -25,6 +25,9 @@ Thumbs.db
 .research-materials/
 !example/
 
+# Local Claude Design import (do not ship)
+.design-import/
+
 # Server pid / lock
 .intake-server.pid
 *.pid

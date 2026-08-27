@@ -27,6 +27,7 @@ SKILL_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = SKILL_ROOT / ".research-materials"
 PID_FILE = SKILL_ROOT / ".intake-server.pid"
 CSS_PATH = SKILL_ROOT / "visualization-base.css"
+FOCUS_JS_PATH = SKILL_ROOT / "scripts" / "desktop-focus.js"
 
 
 def _load_css() -> str:
@@ -35,14 +36,22 @@ def _load_css() -> str:
     return "body{font-family:system-ui,sans-serif;padding:2rem;}"
 
 
+def _desktop_focus_js() -> str:
+    return FOCUS_JS_PATH.read_text(encoding="utf-8") if FOCUS_JS_PATH.is_file() else ""
+
+
 def _form_html() -> str:
     css = _load_css()
+    focus_js = _desktop_focus_js()
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pineapple 71717 — Research Intake</title>
+  <script>
+{focus_js}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -112,12 +121,16 @@ def _form_html() -> str:
 
 def _confirm_html() -> str:
     css = _load_css()
+    focus_js = _desktop_focus_js()
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Submitted — Pineapple 71717</title>
+  <script>
+{focus_js}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />

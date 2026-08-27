@@ -53,6 +53,7 @@ STANCE_SECTIONS = [
 STRENGTH_RANK = {"strong": 3, "moderate": 2, "weak": 1}
 MODE1_JS_PATH = SKILL_ROOT / "scripts" / "mode1-flow.js"
 MODE1_BLOG_JS_PATH = SKILL_ROOT / "scripts" / "mode1-blog.js"
+FOCUS_JS_PATH = SKILL_ROOT / "scripts" / "desktop-focus.js"
 BLOG_HERO_PATH = SKILL_ROOT / "assets" / "blog-hero-proteins.jpg"
 
 
@@ -255,6 +256,10 @@ def _inspire_html() -> str:
 
 def _load_css() -> str:
     return CSS_PATH.read_text(encoding="utf-8") if CSS_PATH.is_file() else ""
+
+
+def _desktop_focus_js() -> str:
+    return FOCUS_JS_PATH.read_text(encoding="utf-8") if FOCUS_JS_PATH.is_file() else ""
 
 
 def _blog_hero_js() -> str:
@@ -571,6 +576,150 @@ def _render_classification(enrichment: dict) -> str:
 """
 
 
+TRACK_LABELS = {
+    "key_reference": "Key references",
+    "research": "research",
+    "industry": "industry",
+    "thesis": "theses",
+    "preprint": "preprints",
+}
+
+
+def _tracks_label(request: dict) -> str:
+    tracks = request.get("material_tracks") or []
+    names = [TRACK_LABELS.get(str(t), str(t).replace("_", " ")) for t in tracks]
+    return " · ".join(names)
+
+
+def _chip(strong: str, label: str) -> str:
+    return (
+        f'<span class="chip"><strong>{_esc(strong)}</strong> {_esc(label)}</span>'
+    )
+
+
+def _restatement_html(topic: str, original_topic: str, request: dict, generated: str) -> str:
+    topic = (topic or "").strip()
+    original = (original_topic or "").strip()
+    heading = f"<h1>{_esc(topic)}</h1>"
+    if original and original != topic:
+        question = (
+            f'<p class="hero-typed"><span class="hero-kicker">You typed</span>{_esc(original)}</p>'
+            f'<div class="hero-interpreted">'
+            f'<p class="hero-kicker hero-kicker-interpreted">Interpreted as</p>'
+            f"{heading}</div>"
+        )
+    else:
+        question = f'<div class="hero-interpreted">{heading}</div>'
+
+    chips: list[str] = []
+    if request.get("discipline"):
+        chips.append(_chip("Field", str(request["discipline"])))
+    year_from = request.get("year_from")
+    year_to = request.get("year_to")
+    if year_from or year_to:
+        chips.append(_chip("Years searched", f"{year_from or '—'}–{year_to or '—'}"))
+    tracks = _tracks_label(request)
+    if tracks:
+        chips.append(_chip("Tracks", tracks))
+    chips.append(_chip("Generated", generated))
+    return f"""
+<header class="hero" id="restatement" data-m1-section="1">
+  {question}
+  <div class="meta-row">{"".join(chips)}</div>
+</header>
+"""
+
+
+def _simple_material_card(m: dict, enr: dict | None = None) -> str:
+    enr = enr or {}
+    url = m.get("url") or (f"https://doi.org/{m['doi']}" if m.get("doi") else "")
+    title = m.get("title") or "Untitled"
+    title_html = (
+        f'<a href="{_esc(url)}" target="_blank" rel="noopener noreferrer">{_esc(title)}</a>'
+        if url
+        else _esc(title)
+    )
+    authors = ", ".join(m.get("authors") or []) or "Authors unavailable"
+    year = m.get("year") or ""
+    byline = _esc(authors) if not year else f"{_esc(authors)} · {_esc(year)}"
+    desc = (
+        (enr.get("short_description") or "").strip()
+        or _first_sentences(m.get("abstract") or "", 280)
+        or "No description harvested."
+    )
+    return f"""
+<article class="material" data-id="{_esc(m.get('id'))}">
+  <div class="material-head">
+    <h3>{title_html}</h3>
+  </div>
+  <p class="byline">{byline}</p>
+  <p class="claim">{_esc(desc)}</p>
+</article>
+"""
+
+
+def _key_refs_html(materials: list[dict], enr_map: dict[str, dict]) -> str:
+    keyed = [m for m in materials if (m.get("track") or "") == "key_reference"]
+    pool = keyed or _sort_materials(materials, enr_map)[:7]
+    if not pool:
+        return '<p class="m1-empty">No key-reference track items in this harvest.</p>'
+    extra = max(0, len(pool) - 2)
+    cards = "\n".join(_simple_material_card(m, enr_map.get(m.get("id"))) for m in pool)
+    more = (
+        f'<div class="m1-list-meta">'
+        f'<button type="button" class="btn m1-synth-more" data-expand="keyRef">Show {extra} more</button>'
+        f'<span class="m1-list-count">Showing 2 of {len(pool)} papers</span>'
+        f"</div>"
+        if extra
+        else f'<p class="m1-list-count">Showing {len(pool)} of {len(pool)} papers</p>'
+    )
+    return (
+        f'<div class="m1-keyref-stack{" is-collapsed" if extra else ""}" data-col="keyRef">'
+        f"{cards}</div>{more}"
+    )
+
+
+def _empty_track_html(shown: list[dict], request: dict) -> str:
+    tracks = [str(t) for t in (request.get("material_tracks") or [])]
+    if "thesis" not in tracks:
+        return ""
+    if any((m.get("track") or "") == "thesis" for m in shown):
+        return ""
+    return (
+        '<p class="m1-empty"><strong>No thesis-track results</strong> '
+        "Nothing in the dissertation queries matched this question. "
+        "Broaden the year range or drop the track.</p>"
+    )
+
+
+def _footer_html() -> str:
+    return """
+<footer class="m1-site-footer">
+  <p class="m1-site-footer-note">Triage, not a finished bibliography — verify primary sources before citing.</p>
+  <div class="m1-site-footer-row">
+    <p class="m1-site-footer-brand">Built by The Pineapple Project</p>
+    <p class="m1-site-footer-copy">Fusing all minds like individual berries in a pineapple into an organic whole. At the speed of thought. Every project we vibe-code is serialized — this one is Pineapple 71717.</p>
+    <a class="m1-site-footer-x" href="https://x.com/AnanasCosmo" target="_blank" rel="noopener noreferrer">The Pineapple Project on X · @AnanasCosmo</a>
+  </div>
+</footer>
+"""
+
+
+def _jump_nav_html() -> str:
+    return """
+<nav class="m1-jump" aria-label="Jump to">
+  <span class="m1-jump-kicker">Jump to</span>
+  <a href="#evidence">The evidence</a>
+  <span class="m1-jump-dot" aria-hidden="true">·</span>
+  <a href="#confidence">How confident is this?</a>
+  <span class="m1-jump-dot" aria-hidden="true">·</span>
+  <a href="#related">Related papers</a>
+  <span class="m1-jump-dot" aria-hidden="true">·</span>
+  <a href="#briefing">What's missing</a>
+</nav>
+"""
+
+
 def _question_guide_html() -> str:
     sora = "Are Sora-class video models genuine world simulators, or just generative media?"
     fasting = "Is intermittent fasting safe for cardiovascular health long-term?"
@@ -678,7 +827,10 @@ def _question_hero_inner(topic: str, original_topic: str) -> str:
 def _mode1_html(
     topic: str = "",
     situation: str = "",
+    restatement_html: str = "",
     classification_html: str = "",
+    briefing_main: str = "",
+    briefing_side: str = "",
 ) -> str:
     topic = (topic or "").strip()
     situation = (situation or "").strip()
@@ -687,48 +839,88 @@ def _mode1_html(
   <textarea id="m1-question" name="question" hidden>""" + _esc(topic) + """</textarea>
   <input id="m1-situation" name="situation" type="hidden" value=\"""" + _esc(situation) + """\" />
 
-  <section class="m1-section m1-blog-lead" id="m1-blog-sec">
-    <div id="m1-blog-body"></div>
-  </section>
-
-  """ + (classification_html or "") + """
-
   <div id="m1-stepper-sentinel"></div>
   <div id="m1-stepper-slot">
   <div id="m1-stepper" class="m1-stepper">
     <div class="m1-stepper-head">
-      <p class="m1-prisma">This follows PRISMA — the standard systematic-review methodology researchers use to answer questions from evidence, not opinion.</p>
+      <p class="m1-prisma"><strong>Follows PRISMA</strong>, the reporting standard for systematic reviews</p>
+      <a class="btn btn-primary m1-new-q" id="m1-new-q" href="/ask">Ask another question</a>
     </div>
     <ol id="m1-steps" class="m1-steps"></ol>
-    <div class="m1-behind" id="m1-behind">
-      <p class="m1-behind-kicker">Behind “See the results”</p>
-      <ol class="m1-behind-flow" id="m1-behind-flow" aria-label="PRISMA work behind the results"></ol>
+  </div>
+  </div>
+
+  """ + (restatement_html or "") + """
+
+  <section class="m1-section m1-blog-lead" id="essay">
+    <div class="m1-sec-head is-plain">
+      <h2>A lighter read</h2>
+      <button type="button" class="m1-collapse-btn" data-collapse="essay">Hide</button>
     </div>
-    <p class="m1-sticky-tip"></p>
-    <div class="m1-search-live" id="m1-search-live" hidden>
-      <span class="m1-spinner" aria-hidden="true"></span>
-      <div class="m1-search-live-copy">
-        <p class="m1-search-live-title">Working — querying live databases. This is not frozen.</p>
-        <p class="m1-search-live-msg" id="m1-status" aria-live="polite"></p>
+    <div id="m1-blog-sec" data-collapse-panel="essay">
+      <div id="m1-blog-body"></div>
+    </div>
+  </section>
+
+  """ + _jump_nav_html() + """
+
+  <section class="m1-section" data-m1-section="2" id="evidence" hidden>
+    <div class="m1-sec-head">
+      <h2>The evidence</h2>
+      <button type="button" class="m1-collapse-btn" data-collapse="evidence">Hide</button>
+    </div>
+    <div data-collapse-panel="evidence">
+      <div class="m1-behind" id="m1-behind">
+        <p class="m1-behind-kicker">The work behind this step</p>
+        <ol class="m1-behind-flow" id="m1-behind-flow" aria-label="PRISMA work behind the results"></ol>
       </div>
-      <p class="m1-search-live-time" id="m1-search-elapsed"></p>
+      <div class="m1-search-live" id="m1-search-live" hidden>
+        <span class="m1-spinner" aria-hidden="true"></span>
+        <div class="m1-search-live-copy">
+          <p class="m1-search-live-title">Working — querying live databases. This is not frozen.</p>
+          <p class="m1-search-live-msg" id="m1-status" aria-live="polite"></p>
+        </div>
+        <p class="m1-search-live-time" id="m1-search-elapsed"></p>
+      </div>
+      <div class="m1-kpis" id="m1-kpis"></div>
+      <div id="m1-results-body"></div>
     </div>
-  </div>
-  </div>
-
-  <section class="m1-section" data-m1-section="1" id="m1-understand" hidden>
-    <h2>What I understood</h2>
-    <div id="m1-understand-body"></div>
   </section>
 
-  <section class="m1-section" data-m1-section="2" id="m1-results" hidden>
-    <h2>Results</h2>
-    <div id="m1-results-body"></div>
+  <section class="m1-section" id="confidence" hidden>
+    <div class="m1-sec-head is-gold">
+      <h2>How confident is this?</h2>
+      <button type="button" class="m1-collapse-btn" data-collapse="confidence">Hide</button>
+    </div>
+    <div id="m1-confidence-body" data-collapse-panel="confidence"></div>
   </section>
 
-  <section class="m1-section" data-m1-section="3" id="m1-verdict" hidden>
-    <h2>The briefing</h2>
-    <div id="m1-verdict-body"></div>
+  <section class="m1-section" id="related" hidden>
+    <div class="m1-sec-head is-gold">
+      <h2>Related papers in this field</h2>
+      <button type="button" class="m1-collapse-btn" data-collapse="related">Hide</button>
+    </div>
+    <div id="m1-related-body" data-collapse-panel="related"></div>
+  </section>
+
+  <section class="m1-section" data-m1-section="3" id="briefing" hidden>
+    <div class="m1-sec-head is-ink">
+      <h2>Briefing and what's missing</h2>
+      <button type="button" class="m1-collapse-btn" data-collapse="briefing">Hide</button>
+    </div>
+    <div data-collapse-panel="briefing">
+      <p class="m1-briefing-lede" id="m1-briefing-lede"></p>
+      <div class="m1-briefing-grid">
+        <div>
+          """ + (classification_html or "") + """
+          """ + (briefing_main or "") + """
+          <div id="m1-verdict-body"></div>
+        </div>
+        <div class="m1-briefing-side">
+          """ + (briefing_side or "") + """
+        </div>
+      </div>
+    </div>
   </section>
 </div>
 """
@@ -782,79 +974,71 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
         if stance_defs.get("contradicts"):
             stance_blurbs["contradicts"] = str(stance_defs["contradicts"])
 
-    if has_claims:
-        materials_html = _stance_sections_html(
-            shown, claims_by_id, enr_map, next_q, stance_blurbs=stance_blurbs
-        )
-        verdict_html = _verdict_html(shown, claims_by_id, dropped)
-    else:
-        materials_html = (
-            "<p>No claims.json yet — run <code>scripts/classify-claims.py</code> before generating.</p>"
-        )
-        verdict_html = ""
-
-    classification_html = _render_classification(enrichment)
-    mode1_html = _mode1_html(
-        topic,
-        str(request.get("discipline") or ""),
-        classification_html,
-    )
-
+    generated = datetime.now().strftime("%Y-%m-%d")
     gaps_html = (
         "<ul>" + "".join(f"<li>{_esc(g)}</li>" for g in gaps) + "</ul>" if gaps else "<p>None noted.</p>"
     )
     next_html = (
         "<ul>" + "".join(f"<li>{_esc(q)}</li>" for q in next_q) + "</ul>" if next_q else "<p>None noted.</p>"
     )
-
     ordered_for_bib = _sort_by_strength(shown, claims_by_id) if has_claims else _sort_materials(shown, enr_map)
     bib = "\n\n".join(_to_bibtex(m) for m in ordered_for_bib)
-    generated = datetime.now().strftime("%Y-%m-%d")
 
-    filters = []
-    if request.get("discipline"):
-        filters.append(f"Field: {request['discipline']}")
-    if request.get("year_from") or request.get("year_to"):
-        filters.append(f"Years: {request.get('year_from')}–{request.get('year_to')}")
-
-    chips = "".join(f'<span class="chip"><strong>{_esc(c)}</strong></span>' for c in filters)
-
-    guide_rows = "".join(
-        f"<tr><th scope=\"row\">{_esc(title)}</th><td>{_esc(blurb)}</td></tr>"
-        for _, title, blurb in STANCE_SECTIONS
-    )
-    guide_table = f"""
-<section class="guide panel" aria-label="What each section means">
-  <h2>What each section means</h2>
-  <table class="guide-table">
-    <thead>
-      <tr><th scope="col">Section</th><th scope="col">Meaning</th></tr>
-    </thead>
-    <tbody>
-      {guide_rows}
-    </tbody>
-  </table>
-</section>
+    classification_html = _render_classification(enrichment)
+    restatement_html = _restatement_html(topic, original_topic, request, generated)
+    key_refs = _key_refs_html(shown, enr_map)
+    briefing_main = f"""
+          <h2>Key references</h2>
+          <p class="m1-col-blurb">Canonical starting points for this question.</p>
+          {key_refs}
+          <h2>BibTeX</h2>
+          <pre class="bibtex">{_esc(bib)}</pre>
 """
+    briefing_side = f"""
+          <section class="panel">
+            <h2>What's missing from this list</h2>
+            {gaps_html}
+          </section>
+          <section class="panel">
+            <h2>Searches to try next</h2>
+            {next_html}
+          </section>
+          {_empty_track_html(shown, request)}
+"""
+    mode1_html = _mode1_html(
+        topic,
+        str(request.get("discipline") or ""),
+        restatement_html,
+        classification_html,
+        briefing_main,
+        briefing_side,
+    )
 
     payload = {
         "topic": topic,
         "original_topic": original_topic,
         "discipline": request.get("discipline") or "",
+        "year_from": request.get("year_from"),
+        "year_to": request.get("year_to"),
         "gaps": gaps,
         "next_queries": next_q,
+        "support_blurb": stance_blurbs.get("supports") or "",
+        "contra_blurb": stance_blurbs.get("contradicts") or "",
     }
     payload_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
-    question_hero = _question_hero_inner(topic, original_topic)
 
     css = _load_css()
     js = _load_js()
+    focus_js = _desktop_focus_js()
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{_esc(topic)} — Research Dossier</title>
+  <script>
+{focus_js}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;650;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -867,23 +1051,13 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     <div class="topbar">
       <div class="brand">
         <span class="brand-mark">Pineapple 71717</span>
-        <span class="brand-sub">Research Materials Dossier</span>
+        <span class="brand-sub">Research Dossier</span>
       </div>
-      <a class="btn btn-primary m1-new-q" id="m1-new-q" href="/ask">Ask another question</a>
+      <button type="button" class="m1-theme-toggle" id="m1-theme-toggle" title="Switch the page between the reading theme and the print-friendly theme">Switch to print view</button>
     </div>
 
-    <header class="hero">
-      {question_hero}
-      <div class="meta-row">{chips}<span class="chip">Generated <strong>{_esc(generated)}</strong></span></div>
-      <div class="stats">
-        <div class="stat"><div class="n">{len(shown)}</div><div class="l">In scope</div></div>
-        <div class="stat"><div class="n">{dropped}</div><div class="l">Off-topic dropped</div></div>
-        <div class="stat"><div class="n">{_esc(year_span)}</div><div class="l">Year span</div></div>
-        <div class="stat"><div class="n">{oa_pct}%</div><div class="l">Open access</div></div>
-      </div>
-    </header>
-
     {mode1_html}
+    {_footer_html()}
   </div>
   <script type="application/json" id="dossier-data">{payload_json}</script>
   <script>
