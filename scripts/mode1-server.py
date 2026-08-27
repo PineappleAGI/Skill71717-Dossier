@@ -117,26 +117,31 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/submit":
             self._handle_intake_submit()
             return
-        if parsed.path != "/api/blog-pdf":
+        if parsed.path not in ("/api/blog-pdf", "/api/save-file"):
             self._send(404, b"Not found")
             return
         try:
             length = int(self.headers.get("Content-Length") or "0")
         except ValueError:
             length = 0
-        if length < 8 or length > 2_000_000:
-            status, body = _json_err("invalid pdf size", 400)
+        max_bytes = 8_000_000 if parsed.path == "/api/save-file" else 2_000_000
+        if length < 8 or length > max_bytes:
+            status, body = _json_err("invalid file size", 400)
             self._send(status, body, "application/json; charset=utf-8")
             return
         payload = self.rfile.read(length)
-        if not payload.startswith(b"%PDF"):
-            status, body = _json_err("not a pdf", 400)
+        if payload.startswith(b"%PDF"):
+            ext, fallback = ".pdf", "literature-scan.pdf"
+        elif payload.startswith(b"\x89PNG"):
+            ext, fallback = ".png", "question-map.png"
+        else:
+            status, body = _json_err("unsupported file", 400)
             self._send(status, body, "application/json; charset=utf-8")
             return
-        raw_name = self.headers.get("X-Filename") or "literature-scan.pdf"
+        raw_name = self.headers.get("X-Filename") or fallback
         name = re.sub(r"[^A-Za-z0-9._-]+", "-", raw_name).strip("-")[:80]
-        if not name.lower().endswith(".pdf"):
-            name = (name or "literature-scan") + ".pdf"
+        if not name.lower().endswith(ext):
+            name = (name or Path(fallback).stem) + ext
         dest_dir = Path.home() / "Downloads"
         if not dest_dir.is_dir():
             dest_dir = self.html_path.parent
@@ -144,7 +149,7 @@ class Handler(BaseHTTPRequestHandler):
         n = 1
         stem = dest.stem
         while dest.exists():
-            dest = dest_dir / f"{stem}-{n}.pdf"
+            dest = dest_dir / f"{stem}-{n}{ext}"
             n += 1
         dest.write_bytes(payload)
         self._send(200, _json_ok({"path": str(dest), "filename": dest.name}), "application/json; charset=utf-8")
