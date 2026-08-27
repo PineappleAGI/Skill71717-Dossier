@@ -130,6 +130,7 @@ def _confirm_html() -> str:
     </div>
     <h1>Request submitted</h1>
     <p class="lede">Your topic was saved. Return to Cursor — the assistant will harvest sources and rebuild the dossier. You can close this tab.</p>
+    <p class="wait-note">Wait time is approximately <strong>5–10 minutes</strong>.</p>
   </div>
 </body>
 </html>

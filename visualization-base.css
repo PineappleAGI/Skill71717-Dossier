@@ -900,6 +900,15 @@ details.material-section[open] > summary.section-heading::after {
   font-family: var(--font-display);
 }
 
+.confirm .wait-note {
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: 1rem;
+}
+
 .test-searches {
   margin-top: 0.85rem;
   padding: 0.85rem 1rem;
