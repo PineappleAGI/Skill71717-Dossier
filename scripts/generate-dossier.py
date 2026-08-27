@@ -663,15 +663,16 @@ def _question_hero_inner(topic: str, original_topic: str) -> str:
     """Hero question block above the Mode 1 flow."""
     topic = (topic or "").strip()
     original = (original_topic or "").strip()
+    heading = f"<h1>{_esc(topic)}</h1>"
     if original and original != topic:
         return (
             '<p class="hero-typed">'
             '<span class="hero-kicker">You typed</span>'
             f"{_esc(original)}</p>"
             '<p class="hero-kicker hero-kicker-interpreted">Interpreted as</p>'
-            f"<h1>{_esc(topic)}</h1>"
+            + heading
         )
-    return f"<h1>{_esc(topic)}</h1>"
+    return heading
 
 
 def _mode1_html(
@@ -697,7 +698,6 @@ def _mode1_html(
   <div id="m1-stepper" class="m1-stepper">
     <div class="m1-stepper-head">
       <p class="m1-prisma">This follows PRISMA — the standard systematic-review methodology researchers use to answer questions from evidence, not opinion.</p>
-      <a class="btn btn-ghost m1-new-q" id="m1-new-q" href="/ask">Ask another question</a>
     </div>
     <ol id="m1-steps" class="m1-steps"></ol>
     <div class="m1-behind" id="m1-behind">
@@ -869,6 +869,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
         <span class="brand-mark">Pineapple 71717</span>
         <span class="brand-sub">Research Materials Dossier</span>
       </div>
+      <a class="btn btn-primary m1-new-q" id="m1-new-q" href="/ask">Ask another question</a>
     </div>
 
     <header class="hero">

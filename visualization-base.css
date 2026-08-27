@@ -1008,11 +1008,19 @@ body.m1-stepper-sticky .m1-search-live {
 }
 .m1-new-q {
   flex: 0 0 auto;
+  margin-left: auto;
   white-space: nowrap;
   text-decoration: none;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
+  padding: 0.65rem 1.15rem;
+  box-shadow: 0 2px 8px rgba(47, 111, 78, 0.28);
+}
+.m1-new-q:hover {
+  color: #fff;
+  filter: brightness(1.08);
 }
 .m1-submitted-q {
   margin: 0 0 0.85rem;
@@ -1065,10 +1073,6 @@ body.m1-stepper-sticky .m1-stepper-head {
 body.m1-stepper-sticky .m1-prisma {
   font-size: 0.78rem;
   max-width: none;
-}
-body.m1-stepper-sticky .m1-new-q {
-  font-size: 0.75rem;
-  padding: 0.22rem 0.65rem;
 }
 .m1-steps {
   list-style: none;
