@@ -24,7 +24,7 @@ If you see something like `Python 3.10.4` you're done. If you see `command not f
 
 ### Step 2 — Download the skill ZIP
 
-1. Open <https://github.com/KingHenryZ/Skill71717-Dossier> in your browser
+1. Open <https://github.com/PineappleAGI/Skill71717-Dossier> in your browser
 2. Click the green **Code** button → **Download ZIP**
 3. Unzip it somewhere you'll remember (e.g. your Desktop or `~/Documents/`)
 4. Open the unzipped `Skill71717-Dossier-main` folder

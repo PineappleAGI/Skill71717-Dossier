@@ -28,7 +28,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
-USER_AGENT = "Pineapple71717-ResearchMaterials/1.0 (https://github.com/KingHenryZ; mailto:{email})"
+USER_AGENT = "Pineapple71717-ResearchMaterials/1.0 (https://github.com/PineappleAGI/Skill71717-Dossier; mailto:{email})"
 
 INDUSTRY_HINTS = (
     "openai",

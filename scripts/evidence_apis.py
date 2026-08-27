@@ -14,7 +14,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from typing import Any
 
-USER_AGENT = "Pineapple71717-Mode1/1.0 (https://github.com/KingHenryZ/Skill-Dossier; mailto:{email})"
+USER_AGENT = "Pineapple71717-Mode1/1.0 (https://github.com/PineappleAGI/Skill71717-Dossier; mailto:{email})"
 NCBI = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 EPMC = "https://www.ebi.ac.uk/europepmc/webservices/rest"
 TRIALS = "https://clinicaltrials.gov/api/v2/studies"
@@ -259,7 +259,7 @@ def _html_headers() -> dict[str, str]:
     return {
         "User-Agent": (
             "Mozilla/5.0 (compatible; Pineapple71717-Mode1/1.0; "
-            "+https://github.com/KingHenryZ/Skill-Dossier)"
+            "+https://github.com/PineappleAGI/Skill71717-Dossier)"
         ),
         "Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
