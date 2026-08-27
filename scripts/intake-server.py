@@ -60,7 +60,7 @@ def _form_html() -> str:
 <body>
   <div class="intake-card">
     <div class="brand" style="margin-bottom:0.75rem">
-      <span class="brand-mark">Pineapple 71717</span>
+      <a class="brand-mark" href="https://github.com/PineappleAGI/Skill71717-Dossier" target="_blank" rel="noopener noreferrer">Pineapple 71717</a>
       <span class="brand-sub">Research Materials</span>
     </div>
     <h1>What are you researching?</h1>
@@ -139,7 +139,7 @@ def _confirm_html() -> str:
 <body>
   <div class="intake-card confirm">
     <div class="brand" style="justify-content:center;margin-bottom:0.75rem">
-      <span class="brand-mark">Pineapple 71717</span>
+      <a class="brand-mark" href="https://github.com/PineappleAGI/Skill71717-Dossier" target="_blank" rel="noopener noreferrer">Pineapple 71717</a>
     </div>
     <h1>Request submitted</h1>
     <p class="lede">Your topic was saved. Return to Cursor — the assistant will harvest sources and rebuild the dossier. You can close this tab.</p>

@@ -1,0 +1,12 @@
+---
+description: Push dossier git changes only to the PineappleAGI GitHub repo.
+alwaysApply: true
+---
+
+# Git remote for this dossier
+
+The only GitHub remote for this project is **https://github.com/PineappleAGI/Skill71717-Dossier**.
+
+- `git remote origin` must be `https://github.com/PineappleAGI/Skill71717-Dossier.git`.
+- Push feature branches to `origin`. Open PRs into `main` on that repo. Do not push or force-push `main` unless the user explicitly asks.
+- Never push to `KingHenryZ/Skill-Dossier` or add it back as `origin`.
