@@ -307,9 +307,9 @@ def _strip_tags(blob: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def _ddg_html_results(query: str) -> list[dict]:
+def _ddg_html_results(query: str, timeout: int = 6) -> list[dict]:
     url = DDG_HTML + "?" + urllib.parse.urlencode({"q": query})
-    page = _get_html(url)
+    page = _get_html(url, timeout=timeout)
     if "anomaly.js" in page or "cc=botnet" in page:
         return []
     out: list[dict] = []
@@ -346,9 +346,9 @@ def _ddg_html_results(query: str) -> list[dict]:
     return out
 
 
-def _ddg_lite_results(query: str) -> list[dict]:
+def _ddg_lite_results(query: str, timeout: int = 6) -> list[dict]:
     url = DDG_LITE + "?" + urllib.parse.urlencode({"q": query})
-    page = _get_html(url)
+    page = _get_html(url, timeout=timeout)
     if "anomaly.js" in page or "cc=botnet" in page:
         return []
     out: list[dict] = []
@@ -368,15 +368,15 @@ def _ddg_lite_results(query: str) -> list[dict]:
     return out
 
 
-def duckduckgo_search(query: str) -> list[dict]:
+def duckduckgo_search(query: str, timeout: int = 6) -> list[dict]:
     try:
-        hits = _ddg_html_results(query)
+        hits = _ddg_html_results(query, timeout=timeout)
         if hits:
             return hits
     except Exception:
         hits = []
     try:
-        return _ddg_lite_results(query)
+        return _ddg_lite_results(query, timeout=timeout)
     except Exception:
         return hits
 
@@ -442,7 +442,7 @@ def _looks_paywalled(url: str, page: str) -> bool:
     return False
 
 
-def _enrich_landing(hit: dict) -> dict:
+def _enrich_landing(hit: dict, timeout: int = 4) -> dict:
     title = (hit.get("title") or "").strip()
     snippet = (hit.get("snippet") or "").strip()
     url = hit.get("url") or ""
@@ -452,7 +452,7 @@ def _enrich_landing(hit: dict) -> dict:
     year = _year_from(title + " " + snippet)
     page = ""
     try:
-        page = _get_html(url, timeout=14)
+        page = _get_html(url, timeout=timeout)
     except Exception:
         page = ""
     if page:
@@ -647,12 +647,13 @@ def _crossref_paper(item: dict) -> dict:
     }
 
 
-def web_literature_sweep(terms: str, max_results: int = 8) -> dict:
+def web_literature_sweep(terms: str, max_results: int = 8, budget_s: float = 8.0) -> dict:
     """Supplementary sweep for ScienceDirect/Elsevier and other publisher pages.
 
     Tries a public web search first. If that is blocked, falls back to CrossRef
     (not the Elsevier API) so ScienceDirect-hosted DOIs still surface. Only
     visible title/author/venue/abstract metadata is kept — never paywalled full text.
+    Hard-capped by budget_s so a blocked DuckDuckGo/publisher crawl cannot stall Mode 1.
     """
     terms = (terms or "").strip()
     if not terms:
@@ -661,10 +662,17 @@ def web_literature_sweep(terms: str, max_results: int = 8) -> dict:
     queries = [f"{terms} site:sciencedirect.com", terms]
     raw: list[dict] = []
     seen_url = set()
+    deadline = time.monotonic() + max(2.0, budget_s)
+
+    def leftover() -> float:
+        return deadline - time.monotonic()
+
     for q in queries:
-        time.sleep(0.2)
+        if leftover() < 1.5:
+            break
+        time.sleep(0.15)
         try:
-            hits = duckduckgo_search(q)
+            hits = duckduckgo_search(q, timeout=min(5, max(2, int(leftover()))))
         except Exception:
             hits = []
         for hit in hits:
@@ -677,8 +685,10 @@ def web_literature_sweep(terms: str, max_results: int = 8) -> dict:
     papers: list[dict] = []
     seen_key: set[str] = set()
     for hit in raw[:cap]:
+        if leftover() < 1.2:
+            break
         try:
-            paper = _enrich_landing(hit)
+            paper = _enrich_landing(hit, timeout=min(4, max(2, int(leftover()))))
         except Exception:
             title = (hit.get("title") or "").strip()
             if not title:
@@ -723,6 +733,8 @@ def web_literature_sweep(terms: str, max_results: int = 8) -> dict:
     ]
     queries.append("crossref:" + terms)
     for kind, params in cr_queries:
+        if leftover() < 1.0:
+            break
         for item in _crossref_items(params):
             paper = _crossref_paper(item)
             key = _record_key(paper)

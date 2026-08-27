@@ -141,6 +141,14 @@
       (year ? " · " + escapeHtml(String(year)) : "") +
       "</span>" +
       (venue ? "<span>" + escapeHtml(venue) + "</span>" : "") +
+      '<dl class="m1-pico m1-aim">' +
+      "<div><dt>Background</dt><dd>" +
+      escapeHtml(p.background || "Not specified in abstract") +
+      "</dd></div>" +
+      "<div><dt>Objective</dt><dd>" +
+      escapeHtml(p.objective || "Not specified in abstract") +
+      "</dd></div>" +
+      "</dl>" +
       openHtml +
       "</span>" +
       "</span></div>"
