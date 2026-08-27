@@ -716,6 +716,8 @@ def _jump_nav_html() -> str:
   <a href="#related">Related papers</a>
   <span class="m1-jump-dot" aria-hidden="true">·</span>
   <a href="#briefing">What's missing</a>
+  <span class="m1-jump-dot" aria-hidden="true">·</span>
+  <a href="#concept-map">How this question maps</a>
 </nav>
 """
 
@@ -922,6 +924,23 @@ def _mode1_html(
       </div>
     </div>
   </section>
+
+  <section class="m1-section" id="concept-map">
+    <div class="m1-sec-head">
+      <h2>How this question maps</h2>
+      <button type="button" class="m1-collapse-btn" data-collapse="concepts">Hide</button>
+    </div>
+    <div data-collapse-panel="concepts">
+      <p class="m1-concept-intro">The interpreted question sits in the centre. Each gold node is a term from the question; green nodes are related phrases that show up in titles and abstracts that mention that term. Size is how many records use it. Labels wrap so the full phrase stays visible — a vocabulary map, not an embedding and not a finding.</p>
+      <div id="m1-concept-body">
+        <div class="m1-cmap m1-cmap-pending" role="status" aria-live="polite">
+          <div class="m1-cmap-spinner" aria-hidden="true"></div>
+          <p class="m1-cmap-pending-label">Mapping this question against the scan…</p>
+          <p class="m1-cmap-pending-hint">The map fills in after titles and abstracts are in.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 """
 
@@ -1052,8 +1071,9 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
       <div class="brand">
         <span class="brand-mark">Pineapple 71717</span>
         <span class="brand-sub">Research Dossier</span>
+        <button type="button" class="m1-theme-toggle" id="m1-theme-toggle" title="Switch the page between the reading theme and the print-friendly theme">Print view</button>
       </div>
-      <button type="button" class="m1-theme-toggle" id="m1-theme-toggle" title="Switch the page between the reading theme and the print-friendly theme">Switch to print view</button>
+      <span class="m1-stamp" aria-hidden="true">Built by<br>The Pineapple Project<br>Nº 71717</span>
     </div>
 
     {mode1_html}
