@@ -24,28 +24,19 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 CSS_PATH = SKILL_ROOT / "visualization-base.css"
-SEED_DEBATES_PATH = SKILL_ROOT / "data" / "seed-debates.json"
 
-RELATED_BLURBS = {
-    "sim-vs-media": "Labs pitch video models as world simulators; critics say they still just generate plausible clips.",
-    "can-video-plan": "Some papers treat generated video as a plan; others say planning needs structure the clip never had.",
-    "lab-claims": "Company tech notes claim simulator status; peer-reviewed work often treats those claims as unproven.",
-    "interactive-worlds": "Action-conditioned next-frame models look like simulators; one-shot generators still aren't worlds you can query.",
-    "pixels-or-physics": "Photorealism looks like understanding; planning may only need coarse dynamics.",
-    "robots-and-roads": "Driving and robot demos suggest transfer; the leap from video to real control is still contested.",
-}
-
-# Epistemic role toward the research question (primary dossier sections)
+# Epistemic role toward the research question (primary dossier sections).
+# Blurbs are overridden from request.stance_definitions when present.
 STANCE_SECTIONS = [
     (
         "supports",
         "Evidence supporting",
-        "Papers whose findings or arguments back video models as world simulators for planning.",
+        "Papers whose findings or arguments back the research question as framed.",
     ),
     (
         "contradicts",
         "Evidence contradicting / limiting",
-        "Papers that treat video models as media generation, or that undercut simulator claims.",
+        "Papers whose findings or arguments cut against the research question as framed.",
     ),
     (
         "test_condition",
@@ -60,7 +51,6 @@ STANCE_SECTIONS = [
 ]
 
 STRENGTH_RANK = {"strong": 3, "moderate": 2, "weak": 1}
-UI_JS_PATH = SKILL_ROOT / "scripts" / "dossier-ui.js"
 MODE1_JS_PATH = SKILL_ROOT / "scripts" / "mode1-flow.js"
 MODE1_BLOG_JS_PATH = SKILL_ROOT / "scripts" / "mode1-blog.js"
 BLOG_HERO_PATH = SKILL_ROOT / "assets" / "blog-hero-proteins.jpg"
@@ -281,7 +271,7 @@ def _blog_hero_js() -> str:
 
 def _load_js() -> str:
     parts: list[str] = [_blog_hero_js()]
-    for path in (UI_JS_PATH, MODE1_JS_PATH, MODE1_BLOG_JS_PATH):
+    for path in (MODE1_JS_PATH, MODE1_BLOG_JS_PATH):
         if path.is_file():
             parts.append(path.read_text(encoding="utf-8"))
     return "\n".join(p for p in parts if p)
@@ -467,6 +457,7 @@ def _stance_sections_html(
     claims_by_id: dict[str, dict],
     enr_map: dict[str, dict],
     next_q: list | None = None,
+    stance_blurbs: dict | None = None,
 ) -> str:
     by_stance: dict[str, list[dict]] = {k: [] for k, _, _ in STANCE_SECTIONS}
     for m in materials:
@@ -475,8 +466,11 @@ def _stance_sections_html(
             stance = "neutral"
         by_stance[stance].append(m)
 
+    overrides = stance_blurbs or {}
     parts: list[str] = []
     for stance_id, title, blurb in STANCE_SECTIONS:
+        if isinstance(overrides.get(stance_id), str) and overrides[stance_id].strip():
+            blurb = overrides[stance_id].strip()
         items = _sort_by_strength(by_stance.get(stance_id) or [], claims_by_id)
         cards = "\n".join(
             _render_claim_material(m, _claim_entry(claims_by_id, m.get("id")), enr_map.get(m.get("id")))
@@ -577,160 +571,6 @@ def _render_classification(enrichment: dict) -> str:
 """
 
 
-def _load_seed_debates() -> dict:
-    if not SEED_DEBATES_PATH.is_file():
-        return {"papers": [], "rooms": []}
-    try:
-        data = json.loads(SEED_DEBATES_PATH.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {"papers": [], "rooms": []}
-    if not isinstance(data, dict):
-        return {"papers": [], "rooms": []}
-    return {
-        "papers": [p for p in (data.get("papers") or []) if isinstance(p, dict) and p.get("id")],
-        "rooms": [r for r in (data.get("rooms") or []) if isinstance(r, dict) and r.get("id")],
-    }
-
-
-def _paper_payload(m: dict, claim: dict) -> dict:
-    background, objective = _parse_abstract_sections(m.get("abstract") or "")
-    return {
-        "id": m.get("id"),
-        "source": claim.get("source") or "harvest",
-        "scope": claim.get("scope") or "main",
-        "title": m.get("title") or "Untitled",
-        "authors": m.get("authors") or [],
-        "year": m.get("year"),
-        "venue": m.get("venue") or m.get("organization") or "",
-        "url": m.get("url") or (f"https://doi.org/{m['doi']}" if m.get("doi") else ""),
-        "doi": m.get("doi") or "",
-        "citation_count": m.get("citation_count"),
-        "open_access": bool(m.get("open_access")),
-        "abstract": m.get("abstract") or "",
-        "stance": (claim.get("stance") or "neutral"),
-        "relevance": claim.get("relevance") or "medium",
-        "evidence_strength": claim.get("evidence_strength") or "moderate",
-        "evidence_strength_reason": claim.get("evidence_strength_reason") or "",
-        "confidence": claim.get("confidence"),
-        "one_line_claim": claim.get("one_line_claim") or "",
-        "background": background,
-        "objective": objective,
-    }
-
-
-def _seed_paper_payload(paper: dict) -> dict:
-    """Seed-room papers live only in Debate Arena, not Mode 1 synthesis."""
-    url = paper.get("url") or (f"https://doi.org/{paper['doi']}" if paper.get("doi") else "")
-    abstract = paper.get("abstract") or ""
-    background, objective = _parse_abstract_sections(abstract)
-    return {
-        "id": paper.get("id"),
-        "source": paper.get("source") or "seed",
-        "scope": paper.get("scope") or "seed",
-        "title": paper.get("title") or "Untitled",
-        "authors": paper.get("authors") or [],
-        "year": paper.get("year"),
-        "venue": paper.get("venue") or paper.get("organization") or "",
-        "url": url,
-        "doi": paper.get("doi") or "",
-        "citation_count": paper.get("citation_count"),
-        "open_access": bool(paper.get("open_access")),
-        "abstract": abstract,
-        "background": background,
-        "objective": objective,
-        "stance": paper.get("stance") or "neutral",
-        "relevance": paper.get("relevance") or "high",
-        "evidence_strength": paper.get("evidence_strength") or "moderate",
-        "evidence_strength_reason": paper.get("evidence_strength_reason") or "",
-        "confidence": paper.get("confidence"),
-        "one_line_claim": paper.get("one_line_claim") or "",
-    }
-
-
-def _weight(claim: dict) -> float:
-    rank = STRENGTH_RANK.get((claim.get("evidence_strength") or "").lower(), 1)
-    conf = claim.get("confidence")
-    c = (conf / 100.0) if isinstance(conf, int) else 0.5
-    return rank * c
-
-
-def _rooms(
-    claims: dict | None,
-    shown: list[dict],
-    claims_by_id: dict[str, dict],
-    topic: str,
-    category: str = "Your question",
-) -> list[dict]:
-    rooms = list((claims or {}).get("rooms") or [])
-    if not rooms:
-        for_ids = [
-            m.get("id")
-            for m in shown
-            if (_claim_entry(claims_by_id, m.get("id")).get("stance") == "supports")
-        ]
-        against_ids = [
-            m.get("id")
-            for m in shown
-            if (_claim_entry(claims_by_id, m.get("id")).get("stance") == "contradicts")
-        ]
-        short = (topic[:72] + "…") if len(topic) > 72 else topic
-        rooms = [
-            {
-                "id": "main-question",
-                "title": short,
-                "question": topic,
-                "for_ids": for_ids,
-                "against_ids": against_ids,
-            }
-        ]
-    out: list[dict] = []
-    for room in rooms:
-        r = dict(room)
-        if (r.get("group") or "related") == "common":
-            out.append(r)
-            continue
-        r.setdefault("group", "related")
-        r.setdefault("source", "harvest")
-        r.setdefault("category", category)
-        r.setdefault("status", "ready")
-        if not r.get("blurb"):
-            r["blurb"] = RELATED_BLURBS.get(r.get("id") or "", r.get("question") or "")
-        out.append(r)
-    return out
-
-
-def _merge_seed_rooms(rooms: list[dict], seed_rooms: list[dict]) -> list[dict]:
-    seen = {r.get("id") for r in rooms}
-    merged = list(rooms)
-    for room in seed_rooms:
-        rid = room.get("id")
-        if not rid or rid in seen:
-            continue
-        r = dict(room)
-        r.setdefault("group", "common")
-        r.setdefault("source", "seed")
-        merged.append(r)
-        seen.add(rid)
-    return merged
-
-
-def _claim_lookup(claims_by_id: dict[str, dict], seed_papers: list[dict]) -> dict[str, dict]:
-    lookup = dict(claims_by_id)
-    for p in seed_papers:
-        pid = p.get("id")
-        if pid and pid not in lookup:
-            lookup[pid] = p
-    return lookup
-
-
-def _room_is_coming_soon(room: dict) -> bool:
-    if (room.get("status") or "") == "coming_soon":
-        return True
-    if room.get("source") == "seed" and not (room.get("for_ids") or room.get("against_ids")):
-        return True
-    return False
-
-
 def _question_guide_html() -> str:
     sora = "Are Sora-class video models genuine world simulators, or just generative media?"
     fasting = "Is intermittent fasting safe for cardiovascular health long-term?"
@@ -820,7 +660,7 @@ def _question_guide_html() -> str:
 
 
 def _question_hero_inner(topic: str, original_topic: str) -> str:
-    """Hero question block shared by Evidence Synthesis and Debate Arena."""
+    """Hero question block above the Mode 1 flow."""
     topic = (topic or "").strip()
     original = (original_topic or "").strip()
     if original and original != topic:
@@ -835,28 +675,35 @@ def _question_hero_inner(topic: str, original_topic: str) -> str:
 
 
 def _mode1_html(
-    question_guide: str,
     topic: str = "",
     situation: str = "",
-    original_topic: str = "",
+    classification_html: str = "",
 ) -> str:
     topic = (topic or "").strip()
     situation = (situation or "").strip()
-    inspire = _inspire_html()
-    sit_chips = (
-        '<div class="m1-ex-chips" role="list" aria-label="Example situations">'
-        + _example_chip("a parent with type 2 diabetes", "#m1-situation")
-        + "</div>"
-    )
     return """
 <div id="m1-root" class="m1-root">
+  <textarea id="m1-question" name="question" hidden>""" + _esc(topic) + """</textarea>
+  <input id="m1-situation" name="situation" type="hidden" value=\"""" + _esc(situation) + """\" />
+
+  <section class="m1-section m1-blog-lead" id="m1-blog-sec">
+    <div id="m1-blog-body"></div>
+  </section>
+
+  """ + (classification_html or "") + """
+
   <div id="m1-stepper-sentinel"></div>
+  <div id="m1-stepper-slot">
   <div id="m1-stepper" class="m1-stepper">
     <div class="m1-stepper-head">
       <p class="m1-prisma">This follows PRISMA — the standard systematic-review methodology researchers use to answer questions from evidence, not opinion.</p>
-      <button type="button" class="btn m1-new-q" id="m1-new-question">Ask a new question</button>
+      <a class="btn btn-ghost m1-new-q" id="m1-new-q" href="/ask">Ask another question</a>
     </div>
     <ol id="m1-steps" class="m1-steps"></ol>
+    <div class="m1-behind" id="m1-behind">
+      <p class="m1-behind-kicker">Behind “See the results”</p>
+      <ol class="m1-behind-flow" id="m1-behind-flow" aria-label="PRISMA work behind the results"></ol>
+    </div>
     <p class="m1-sticky-tip"></p>
     <div class="m1-search-live" id="m1-search-live" hidden>
       <span class="m1-spinner" aria-hidden="true"></span>
@@ -867,176 +714,23 @@ def _mode1_html(
       <p class="m1-search-live-time" id="m1-search-elapsed"></p>
     </div>
   </div>
+  </div>
 
-  <section class="m1-section" data-m1-section="1" id="m1-intake-sec">
-    <h2>Question intake</h2>
-    <form id="m1-intake">
-      <label class="m1-label" for="m1-question">What do you want to find out?</label>
-      <textarea id="m1-question" name="question" rows="3" required>""" + _esc(topic) + """</textarea>
-""" + question_guide + """
-      <label class="m1-label" for="m1-situation">Is this about a specific situation? <span class="m1-hint">(optional — a condition, medication, or context that changes what’s relevant)</span></label>
-      <input id="m1-situation" name="situation" type="text" value=\"""" + _esc(situation) + """\" />
-      """ + sit_chips + """
-      <div class="m1-actions">
-        <button type="submit" class="btn btn-primary">Continue</button>
-      </div>
-    </form>
-    """ + inspire + """
-  </section>
-
-  <section class="m1-section" data-m1-section="2" id="m1-understand" hidden>
+  <section class="m1-section" data-m1-section="1" id="m1-understand" hidden>
     <h2>What I understood</h2>
     <div id="m1-understand-body"></div>
   </section>
 
-  <section class="m1-section" data-m1-section="3" id="m1-screen" hidden>
-    <h2>Search &amp; rank</h2>
-    <div id="m1-screen-body"></div>
+  <section class="m1-section" data-m1-section="2" id="m1-results" hidden>
+    <h2>Results</h2>
+    <div id="m1-results-body"></div>
   </section>
 
-  <section class="m1-section" data-m1-section="4" id="m1-extract" hidden>
-    <h2>Extracted evidence</h2>
-    <div id="m1-extract-body"></div>
-  </section>
-
-  <section class="m1-section" data-m1-section="5" id="m1-synth" hidden>
-    <h2>Weigh the evidence</h2>
-    <div id="m1-synth-body"></div>
-  </section>
-
-  <section class="m1-section" data-m1-section="6" id="m1-verdict" hidden>
+  <section class="m1-section" data-m1-section="3" id="m1-verdict" hidden>
     <h2>The briefing</h2>
     <div id="m1-verdict-body"></div>
   </section>
 </div>
-"""
-
-
-def _explainer_html(kind: str, summary: str, body: str) -> str:
-    return f"""
-<aside class="mode-explainer mode-explainer-static" data-explainer="{_esc(kind)}">
-  <p class="explainer-title">{_esc(summary)}</p>
-  <p>{body}</p>
-</aside>
-"""
-
-
-def _room_tile(room: dict, lookup: dict[str, dict]) -> str:
-    for_ids = room.get("for_ids") or []
-    against_ids = room.get("against_ids") or []
-    coming = _room_is_coming_soon(room)
-    for_w = sum(_weight(lookup.get(i) or {}) for i in for_ids)
-    against_w = sum(_weight(lookup.get(i) or {}) for i in against_ids)
-    tot = for_w + against_w
-    heat = 0.0 if tot <= 0 else 1.0 - abs(for_w - against_w) / tot
-    if coming:
-        heat_label = "Coming soon"
-        heat_class = "heat-soon"
-        stat = "Evidence cards coming soon"
-        enter = "Preview room →"
-    else:
-        heat_label = "Hottest" if heat >= 0.72 else ("Contested" if heat >= 0.4 else "Lopsided")
-        heat_class = f"heat-{int(heat * 10)}"
-        stat = f"supports: {len(for_ids)} cards / contradicts: {len(against_ids)} cards"
-        enter = "Enter room →"
-    seed_mark = (
-        '<span class="room-source">Starter topic</span>' if room.get("source") == "seed" else ""
-    )
-    cat = room.get("category") or ""
-    blurb = room.get("blurb") or room.get("question") or ""
-    soon_cls = " is-soon" if coming else ""
-    return f"""
-<button type="button" class="room-tile {heat_class}{soon_cls}" data-enter-room="{_esc(room.get('id'))}">
-  <span class="room-tile-meta">
-    <span class="room-heat">{_esc(heat_label)}</span>
-    {seed_mark}
-  </span>
-  <span class="room-cat">{_esc(cat)}</span>
-  <strong>{_esc(room.get('title'))}</strong>
-  <span class="room-q">{_esc(blurb)}</span>
-  <span class="room-stat">{_esc(stat)}</span>
-  <span class="room-enter">{_esc(enter)}</span>
-</button>"""
-
-
-def _lobby_section(
-    title: str,
-    lede: str,
-    rooms: list[dict],
-    lookup: dict[str, dict],
-    group_by_category: bool,
-) -> str:
-    if not rooms:
-        return ""
-    head = f"""
-  <div class="lobby-head">
-    <h3 class="lobby-h">{_esc(title)}</h3>
-  </div>
-  <p class="lobby-lede">{lede}</p>"""
-    if not group_by_category:
-        tiles = "".join(_room_tile(r, lookup) for r in rooms)
-        return f"""
-<section class="lobby-section">
-  {head}
-  <div class="room-grid">{tiles}</div>
-</section>"""
-    blocks = []
-    order: list[str] = []
-    buckets: dict[str, list[dict]] = {}
-    for room in rooms:
-        cat = room.get("category") or "Other"
-        if cat not in buckets:
-            buckets[cat] = []
-            order.append(cat)
-        buckets[cat].append(room)
-    for cat in order:
-        tiles = "".join(_room_tile(r, lookup) for r in buckets[cat])
-        blocks.append(
-            f"""
-<div class="lobby-cat">
-  <h4 class="lobby-cat-h">{_esc(cat)}</h4>
-  <div class="room-grid">{tiles}</div>
-</div>"""
-        )
-    return f"""
-<section class="lobby-section">
-  {head}
-  {''.join(blocks)}
-</section>"""
-
-
-def _lobby_html(rooms: list[dict], lookup: dict[str, dict]) -> str:
-    related = [r for r in rooms if (r.get("group") or "related") != "common"]
-    common = [r for r in rooms if (r.get("group") or "") == "common"]
-    explainer = _explainer_html(
-        "debate",
-        "How this view works",
-        "This view uses <strong>argument mapping</strong> — also called dialectical reasoning. "
-        "It lays out the strongest case <em>for</em> and <em>against</em> a claim side by side, "
-        "instead of forcing those arguments to converge on one answer. Some questions are "
-        "genuinely contested rather than settled; the point is to see the tension clearly, not to declare a winner.",
-    )
-    return f"""
-<div id="debate-lobby" class="debate-lobby">
-  <p class="arena-eyebrow">Pick a room</p>
-  <h2>Debate Arena</h2>
-  {explainer}
-  {_lobby_section(
-      "Related to your question",
-      "Contested sub-questions inside the same field as the research question in Evidence Synthesis. Same paper set, split into rooms.",
-      related,
-      lookup,
-      False,
-  )}
-  {_lobby_section(
-      "Vexed Questions",
-      "Curated everyday claims people take strong stances on, even when the evidence is unsettled. These are <strong>not</strong> about your research question; they are starter examples of contested public beliefs.",
-      common,
-      lookup,
-      True,
-  )}
-</div>
-<div id="debate-room" class="debate-room" hidden></div>
 """
 
 
@@ -1080,8 +774,18 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     gaps = enrichment.get("coverage_gaps") or []
     next_q = enrichment.get("suggested_next_queries") or []
 
+    stance_defs = request.get("stance_definitions") if isinstance(request, dict) else None
+    stance_blurbs = {}
+    if isinstance(stance_defs, dict):
+        if stance_defs.get("supports"):
+            stance_blurbs["supports"] = str(stance_defs["supports"])
+        if stance_defs.get("contradicts"):
+            stance_blurbs["contradicts"] = str(stance_defs["contradicts"])
+
     if has_claims:
-        materials_html = _stance_sections_html(shown, claims_by_id, enr_map, next_q)
+        materials_html = _stance_sections_html(
+            shown, claims_by_id, enr_map, next_q, stance_blurbs=stance_blurbs
+        )
         verdict_html = _verdict_html(shown, claims_by_id, dropped)
     else:
         materials_html = (
@@ -1090,12 +794,10 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
         verdict_html = ""
 
     classification_html = _render_classification(enrichment)
-    question_guide_html = _question_guide_html()
     mode1_html = _mode1_html(
-        question_guide_html,
         topic,
         str(request.get("discipline") or ""),
-        original_topic,
+        classification_html,
     )
 
     gaps_html = (
@@ -1135,28 +837,10 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
 </section>
 """
 
-    discipline = (request.get("discipline") or "").strip()
-    related_category = discipline.split("/")[0].strip() if discipline else "Your question"
-    seed = _load_seed_debates()
-    rooms = _merge_seed_rooms(
-        _rooms(claims, shown, claims_by_id, topic, related_category),
-        seed.get("rooms") or [],
-    )
-    lookup = _claim_lookup(claims_by_id, seed.get("papers") or [])
-    lobby_html = _lobby_html(rooms, lookup)
-    papers = [_paper_payload(m, _claim_entry(claims_by_id, m.get("id"))) for m in shown]
-    seen_paper_ids = {p.get("id") for p in papers}
-    for sp in seed.get("papers") or []:
-        if sp.get("id") not in seen_paper_ids:
-            papers.append(_seed_paper_payload(sp))
-            seen_paper_ids.add(sp.get("id"))
     payload = {
         "topic": topic,
         "original_topic": original_topic,
         "discipline": request.get("discipline") or "",
-        "prior": (claims or {}).get("prior", 0.5),
-        "papers": papers,
-        "rooms": rooms,
         "gaps": gaps,
         "next_queries": next_q,
     }
@@ -1177,31 +861,14 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
   <style>
 {css}
   </style>
-  <script>
-  window.dossierSetMode = function (mode) {{
-    document.body.setAttribute("data-mode", mode);
-    document.querySelectorAll(".mode-tab").forEach(function (btn) {{
-      var on = btn.getAttribute("data-mode") === mode;
-      btn.classList.toggle("is-active", on);
-      btn.setAttribute("aria-selected", on ? "true" : "false");
-    }});
-    document.querySelectorAll(".mode-panel").forEach(function (panel) {{
-      panel.hidden = panel.getAttribute("data-mode") !== mode;
-    }});
-  }};
-  </script>
 </head>
-<body data-mode="synthesis">
+<body>
   <div class="shell">
     <div class="topbar">
       <div class="brand">
         <span class="brand-mark">Pineapple 71717</span>
         <span class="brand-sub">Research Materials Dossier</span>
       </div>
-      <nav class="mode-switcher" role="tablist" aria-label="Dossier modes">
-        <button type="button" class="mode-tab is-active" role="tab" aria-selected="true" data-mode="synthesis" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('synthesis')">Evidence Synthesis</button>
-        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="debate" onclick="window.dossierSetMode &amp;&amp; window.dossierSetMode('debate')">Debate Arena</button>
-      </nav>
     </div>
 
     <header class="hero">
@@ -1215,14 +882,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
       </div>
     </header>
 
-    <div class="mode-panel" data-mode="synthesis">
-    {classification_html}
     {mode1_html}
-    </div>
-
-    <div class="mode-panel" data-mode="debate" hidden>
-      {lobby_html}
-    </div>
   </div>
   <script type="application/json" id="dossier-data">{payload_json}</script>
   <script>

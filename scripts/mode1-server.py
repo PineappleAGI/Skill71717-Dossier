@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 import signal
@@ -26,8 +27,17 @@ import re
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 PID_FILE = SKILL_ROOT / ".mode1-server.pid"
+INTAKE_OUT = SKILL_ROOT / ".research-materials"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import evidence_apis as apis  # noqa: E402
+
+
+def _intake_mod():
+    path = Path(__file__).resolve().parent / "intake-server.py"
+    spec = importlib.util.spec_from_file_location("pineapple_intake", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def _json_ok(payload: object) -> bytes:
@@ -41,9 +51,22 @@ def _json_err(message: str, status: int = 502) -> tuple[int, bytes]:
 
 class Handler(BaseHTTPRequestHandler):
     html_path: Path = SKILL_ROOT / "example" / "dossier.html"
+    intake = None
 
     def log_message(self, fmt: str, *args: object) -> None:
         sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
+
+    def _intake(self):
+        if Handler.intake is None:
+            Handler.intake = _intake_mod()
+        return Handler.intake
+
+    def _clear_ready_flag(self) -> None:
+        ready = INTAKE_OUT / "RAW_SUBMISSION_READY"
+        try:
+            ready.unlink(missing_ok=True)
+        except OSError:
+            pass
 
     def _send(self, status: int, body: bytes, content_type: str = "text/html; charset=utf-8") -> None:
         self.send_response(status)
@@ -70,6 +93,10 @@ class Handler(BaseHTTPRequestHandler):
             html = self.html_path.read_bytes() if self.html_path.is_file() else b"<h1>dossier.html missing</h1>"
             self._send(200 if self.html_path.is_file() else 404, html)
             return
+        if path in ("/ask", "/intake"):
+            self._clear_ready_flag()
+            self._send(200, self._intake()._form_html().encode("utf-8"))
+            return
         if path == "/health":
             self._send(200, b'{"ok":true}', "application/json")
             return
@@ -87,6 +114,9 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
+        if parsed.path == "/submit":
+            self._handle_intake_submit()
+            return
         if parsed.path != "/api/blog-pdf":
             self._send(404, b"Not found")
             return
@@ -118,6 +148,25 @@ class Handler(BaseHTTPRequestHandler):
             n += 1
         dest.write_bytes(payload)
         self._send(200, _json_ok({"path": str(dest), "filename": dest.name}), "application/json; charset=utf-8")
+
+    def _handle_intake_submit(self) -> None:
+        try:
+            length = int(self.headers.get("Content-Length") or "0")
+        except ValueError:
+            length = 0
+        body = self.rfile.read(length) if length else b""
+        intake = self._intake()
+        try:
+            request = intake._parse_form(body)
+        except ValueError as exc:
+            msg = f"<h1>Invalid form</h1><p>{exc}</p>".encode("utf-8")
+            self._send(400, msg)
+            return
+        INTAKE_OUT.mkdir(parents=True, exist_ok=True)
+        out_path = INTAKE_OUT / "raw_submission.json"
+        out_path.write_text(json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        (INTAKE_OUT / "RAW_SUBMISSION_READY").write_text("1\n", encoding="utf-8")
+        self._send(200, intake._confirm_html().encode("utf-8"))
 
     def _api(self, path: str, q: dict[str, str]) -> tuple[int, bytes]:
         term = (q.get("q") or q.get("term") or "").strip()
@@ -152,7 +201,10 @@ class Handler(BaseHTTPRequestHandler):
             if not term:
                 return _json_err("missing q", 400)
             per_page = int(q.get("per_page") or "20")
-            return 200, _json_ok(apis.openalex_search(term, per_page=min(per_page, 50)))
+            sort = (q.get("sort") or "relevance_score:desc").strip()
+            return 200, _json_ok(
+                apis.openalex_search(term, per_page=min(per_page, 50), sort=sort)
+            )
         if path == "/api/unpaywall":
             doi = (q.get("doi") or "").strip()
             if not doi:

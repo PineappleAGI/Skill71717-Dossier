@@ -129,7 +129,7 @@ def _confirm_html() -> str:
       <span class="brand-mark">Pineapple 71717</span>
     </div>
     <h1>Request submitted</h1>
-    <p class="lede">Your topic was saved to <code>raw_submission.json</code>. Return to Cursor or Claude — the assistant will enrich it, harvest sources, and open the dossier when ready. You can close this tab.</p>
+    <p class="lede">Your topic was saved. Return to Cursor — the assistant will harvest sources and rebuild the dossier. You can close this tab.</p>
   </div>
 </body>
 </html>
