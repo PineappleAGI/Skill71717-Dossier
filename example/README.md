@@ -27,11 +27,9 @@ Or open [`dossier.html`](dossier.html) if it is already up to date.
 | `request.json` | Sample topic + material tracks |
 | `harvest.json` | Mixed tracks: key references, research, industry, thesis, preprints |
 | `enrichment.json` | Relevance scores and descriptions |
-| `claims.json` | Cached stance classifications (supporting / contradicting / test / background) plus related debate rooms |
-| `dossier.html` | Generated HTML dossier (Evidence Synthesis + Debate Arena) |
-| `older-version/` | Snapshot of the prior build with Live debate + Belief Timeline |
-
-Seed “commonly misunderstood” rooms live in `../data/seed-debates.json` (product-wide, not this topic). Three of those rooms ship with harvested for/against cards; the rest are coming-soon tiles.
+| `claims.json` | Cached stance classifications (supporting / contradicting / test / background) |
+| `dossier.html` | Generated HTML dossier (Mode 1 evidence synthesis) |
+| `older-version/` | Snapshot of the prior build with Debate Arena, Live debate, and Belief Timeline |
 
 ## Ask the assistant
 

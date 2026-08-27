@@ -19,7 +19,7 @@ When this rule is invoked, follow the phased workflow in `SKILL.md`:
 5. **Phase 2:** `python scripts/harvest-sources.py .research-materials/request.json .research-materials`
 6. **Phase 3:** `python scripts/classify-claims.py …` if `ANTHROPIC_API_KEY` is set; otherwise skip and continue
 7. **Phase 3b:** Write `enrichment.json` (inquiry lens + gaps; no fabricated URLs)
-8. **Phase 4:** `python scripts/generate-dossier.py … --no-open`, then `python scripts/mode1-server.py --html <dossier.html> --port 8767` so the page opens at `http://127.0.0.1:8767/`. Never hand-edit HTML. Never wait for the user to ask you to open it.
+8. **Phase 4:** `python scripts/generate-dossier.py … --no-open`, then `python scripts/mode1-server.py --html <dossier.html> --port 8767` so the page opens at `http://127.0.0.1:8767/`. Never hand-edit HTML. Never wait for the user to ask you to open it. **Ask another question** on the dossier opens `http://127.0.0.1:8767/ask`. If they use it, run `python scripts/wait-for-submission.py .research-materials --timeout 600` and continue from Phase 1b.
 9. **Phase 5:** Stop the intake server and summarize (original wording, interpreted question, counts, gaps, URL)
 
 Do not stop after harvest. Do not ask “did you submit?”
@@ -42,7 +42,6 @@ Do not stop after harvest. Do not ask “did you submit?”
 - `scripts/classify-claims.py` — Claude API stance classification + cache
 - `scripts/generate-dossier.py` — HTML dossier builder
 - `scripts/mode1-server.py` — HTTP server for Evidence Synthesis APIs
-- `data/seed-debates.json` — Debate Arena “commonly misunderstood” starter rooms
 
 ## Example Invocation
 

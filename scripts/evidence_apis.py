@@ -167,11 +167,20 @@ def trials_search(term: str, page_size: int = 10) -> dict:
     return _get_json(url)
 
 
-def openalex_search(query: str, per_page: int = 20) -> dict:
+_OPENALEX_SORTS = {
+    "relevance_score:desc",
+    "cited_by_count:desc",
+    "publication_date:desc",
+}
+
+
+def openalex_search(query: str, per_page: int = 20, sort: str = "relevance_score:desc") -> dict:
+    if sort not in _OPENALEX_SORTS:
+        sort = "relevance_score:desc"
     params = {
         "search": query,
         "per_page": str(per_page),
-        "sort": "relevance_score:desc",
+        "sort": sort,
         "mailto": _email(),
     }
     url = f"{OPENALEX}?" + urllib.parse.urlencode(params)

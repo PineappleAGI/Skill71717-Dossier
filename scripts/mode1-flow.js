@@ -4,13 +4,38 @@
   "use strict";
 
   var STEPS = [
-    { n: 1, action: "Ask your question", name: "Question Intake" },
-    { n: 2, action: "See the restatement", name: "Restatement" },
-    { n: 3, action: "Search & rank", name: "Search & Rank" },
-    { n: 4, action: "Extract the data", name: "Extracted Evidence" },
-    { n: 5, action: "Weigh the evidence", name: "Synthesis" },
-    { n: 6, action: "Read the briefing", name: "The Briefing" },
+    { n: 1, action: "See the restatement", name: "Restatement" },
+    { n: 2, action: "See the results", name: "Results" },
+    { n: 3, action: "Read the briefing", name: "The Briefing" },
   ];
+
+  var PIPELINE = [
+    {
+      id: "search",
+      label: "Search",
+      prisma: "Identification",
+      hint: "Query PubMed, Europe PMC, ClinicalTrials.gov, and OpenAlex.",
+    },
+    {
+      id: "screen",
+      label: "Screen & rank",
+      prisma: "Screening",
+      hint: "Keep papers on the question; drop off-topic hits.",
+    },
+    {
+      id: "extract",
+      label: "Extract",
+      prisma: "Data extraction",
+      hint: "Code population, direction, and quality from abstracts.",
+    },
+    {
+      id: "evaluate",
+      label: "Evaluate",
+      prisma: "Synthesis",
+      hint: "Weigh supporting vs contradicting evidence by study quality.",
+    },
+  ];
+  var PIPE_ORDER = { search: 0, screen: 1, extract: 2, evaluate: 3, done: 4 };
 
   var STOP = {
     the: 1, and: 1, for: 1, with: 1, that: 1, this: 1, from: 1, are: 1,
@@ -46,6 +71,7 @@
   function emptyState() {
     return {
       step: 1,
+      viewStep: 1,
       question: "",
       situation: "",
       activeQuestion: "",
@@ -55,8 +81,10 @@
       excluded: [],
       extracted: [],
       synthesis: { supporting: [], contradicting: [], gaps: [] },
+      relatedPopular: [],
       verdict: null,
       screenLogs: [],
+      pipelineStage: "",
       searchGen: 0,
       searching: false,
       searchStartedAt: 0,
@@ -70,6 +98,7 @@
 
   var state = emptyState();
   var STACK_PREVIEW = 4;
+  var RANK_PREVIEW = 9;
   var EXTRACT_PREVIEW = 6;
 
   var SYNONYMS = {
@@ -81,6 +110,11 @@
     "time-restricted eating": ["intermittent fasting", "time-restricted eating"],
     "cardiovascular": ["cardiovascular", "cardiac", "heart"],
     "type 2 diabetes": ["type 2 diabetes", "type 2 diabetes mellitus", "t2dm"],
+    egg: ["egg", "eggs", "egg intake", "egg consumption"],
+    eggs: ["egg", "eggs", "egg intake"],
+    "high egg": ["high egg", "egg", "eggs", "egg intake", "egg consumption"],
+    meat: ["meat", "red meat", "processed meat"],
+    fish: ["fish", "seafood"],
   };
 
   function synonyms(concept) {
@@ -290,6 +324,20 @@
   ];
   var searchClock = null;
 
+  function fitStickySlot() {
+    var host = $("#m1-stepper");
+    var slot = $("#m1-stepper-slot");
+    if (!host || !slot) return;
+    if (!document.body.classList.contains("m1-stepper-sticky")) {
+      slot.style.height = "";
+      return;
+    }
+    slot.style.height = host.offsetHeight + "px";
+    $all("[data-m1-section]").forEach(function (sec) {
+      sec.style.scrollMarginTop = (host.offsetHeight + 12) + "px";
+    });
+  }
+
   function showSearchLive(on) {
     var bar = $("#m1-search-live");
     if (bar) bar.hidden = !on;
@@ -298,6 +346,7 @@
       var t = $("#m1-search-elapsed");
       if (t) t.textContent = "";
     }
+    fitStickySlot();
   }
 
   function elapsedSearchSecs() {
@@ -370,15 +419,136 @@
       }
       sec.hidden = sn > n;
     });
+    syncViewStep();
+    updatePipelineUI();
+  }
+
+  function viewportStep() {
+    var host = $("#m1-stepper");
+    var sticky = document.body.classList.contains("m1-stepper-sticky");
+    var offset = (host && sticky) ? host.offsetHeight + 12 : 96;
+    var line = Math.max(offset, window.innerHeight * 0.42);
+    var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+    var bottom = scrollY + window.innerHeight;
+    var docH = document.documentElement.scrollHeight || 0;
+    if (docH && bottom >= docH - 32) return state.step || 1;
+    var best = 0;
+    $all("[data-m1-section]").forEach(function (sec) {
+      var sn = parseInt(sec.getAttribute("data-m1-section"), 10);
+      if (sn > state.step || sec.hidden) return;
+      if (sec.getBoundingClientRect().top <= line) best = sn;
+    });
+    if (!best) return 1;
+    return best;
+  }
+
+  function paintStepHighlight(viewN) {
     $all(".m1-step").forEach(function (el) {
       var sn = parseInt(el.getAttribute("data-step"), 10);
-      el.classList.toggle("is-current", sn === n);
-      el.classList.toggle("is-done", sn < n);
+      var current = sn === viewN;
+      el.classList.toggle("is-current", current);
+      el.classList.toggle("is-done", sn < viewN);
+      el.classList.toggle("is-locked", sn > state.step);
+      if (current) el.setAttribute("aria-current", "step");
+      else el.removeAttribute("aria-current");
     });
+  }
+
+  function syncViewStep() {
+    var n = viewportStep();
+    state.viewStep = n;
+    paintStepHighlight(n);
+    updateStickyTip();
+  }
+
+  function updateStickyTip() {
+    var n = state.viewStep || state.step;
     var current = STEPS.filter(function (s) { return s.n === n; })[0];
     $all(".m1-sticky-tip").forEach(function (el) {
-      el.textContent = current ? current.action : "";
+      if (!current) {
+        el.textContent = "";
+        return;
+      }
+      if (document.body.classList.contains("m1-searching") && current.n === 2) {
+        var now = PIPELINE.filter(function (p) { return p.id === state.pipelineStage; })[0];
+        el.textContent = now
+          ? current.action + " · " + now.label + "…"
+          : current.action;
+        return;
+      }
+      el.textContent = "Viewing: " + current.name;
     });
+  }
+
+  function pipelineHint(p) {
+    var harvested = (state.papers || []).length;
+    var coreN = (state.included || []).length;
+    var extractedN = (state.extracted || []).length;
+    var supporting = (state.synthesis && state.synthesis.supporting) || [];
+    var contradicting = (state.synthesis && state.synthesis.contradicting) || [];
+    if (state.pipelineStage !== "done") return p.hint;
+    if (p.id === "search" && harvested) {
+      return harvested + " unique record" + (harvested === 1 ? "" : "s") + " from live databases.";
+    }
+    if (p.id === "screen" && harvested) {
+      var dropped = Math.max(0, harvested - coreN);
+      return coreN + " core kept" + (dropped ? "; " + dropped + " off-topic dropped." : ".");
+    }
+    if (p.id === "extract" && extractedN) {
+      return extractedN + " abstract" + (extractedN === 1 ? "" : "s") + " coded for population, direction, and quality.";
+    }
+    if (p.id === "evaluate") {
+      return supporting.length + " supporting vs " + contradicting.length +
+        " contradicting abstracts, then quality-weighted.";
+    }
+    return p.hint;
+  }
+
+  function renderBehindFlow() {
+    var host = $("#m1-behind-flow");
+    if (!host) return;
+    host.innerHTML = PIPELINE.map(function (p, i) {
+      return (
+        (i ? '<li class="m1-pipe-sep" aria-hidden="true">→</li>' : "") +
+        '<li class="m1-pipe" data-pipe="' + p.id + '">' +
+        '<span class="m1-pipe-label">' + escapeHtml(p.label) + "</span>" +
+        '<span class="m1-pipe-prisma">' + escapeHtml(p.prisma) + "</span>" +
+        '<span class="m1-pipe-hint">' + escapeHtml(pipelineHint(p)) + "</span>" +
+        "</li>"
+      );
+    }).join("");
+  }
+
+  function setPipeline(id) {
+    state.pipelineStage = id || "";
+    updatePipelineUI();
+  }
+
+  function updatePipelineUI() {
+    var stage = state.pipelineStage;
+    var idx = PIPE_ORDER.hasOwnProperty(stage) ? PIPE_ORDER[stage] : -1;
+    $all(".m1-pipe[data-pipe]").forEach(function (el) {
+      var pid = el.getAttribute("data-pipe");
+      var i = PIPE_ORDER[pid];
+      el.classList.toggle("is-now", stage !== "done" && i === idx);
+      el.classList.toggle("is-done", stage === "done" || (idx >= 0 && i < idx));
+      var hint = el.querySelector(".m1-pipe-hint");
+      var spec = PIPELINE.filter(function (p) { return p.id === pid; })[0];
+      if (hint && spec) hint.textContent = pipelineHint(spec);
+    });
+    updateStickyTip();
+  }
+
+  function advancePipelineFromLog(msg) {
+    var line = String(msg || "");
+    if (/keeping |core match|widely cited/i.test(line)) {
+      setPipeline("screen");
+      return;
+    }
+    if (/pubmed|europe pmc|clinicaltrials|openalex|web search|publisher/i.test(line)) {
+      if ((PIPE_ORDER[state.pipelineStage] || 0) > 0) return;
+      setPipeline("search");
+    }
   }
 
   function renderStepper() {
@@ -404,17 +574,31 @@
         }
       });
     });
+    renderBehindFlow();
+    updatePipelineUI();
   }
 
   function bindStickyStepper() {
     var host = $("#m1-stepper");
     var sentinel = $("#m1-stepper-sentinel");
     if (!host || !sentinel) return;
+    function applySticky(past) {
+      var was = document.body.classList.contains("m1-stepper-sticky");
+      if (past === was) return;
+      if (past) {
+        document.body.classList.add("m1-stepper-sticky");
+        window.requestAnimationFrame(fitStickySlot);
+      } else {
+        document.body.classList.remove("m1-stepper-sticky");
+        fitStickySlot();
+      }
+    }
     function onScroll() {
-      var past = sentinel.getBoundingClientRect().bottom < 0;
-      document.body.classList.toggle("m1-stepper-sticky", past);
+      applySticky(sentinel.getBoundingClientRect().bottom < 0);
+      syncViewStep();
     }
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     onScroll();
   }
 
@@ -513,30 +697,86 @@
     };
   }
 
-  function paperAims(paper) {
-    paper = paper || {};
-    var blob = ((paper.abstract || "") + " " + (paper.fullTextSnippet || "")).trim();
-    if (paper._aimsBlob === blob && paper._aims) return paper._aims;
-    paper._aims = parseAbstractSections(blob);
-    paper._aimsBlob = blob;
-    paper.background = paper._aims.background;
-    paper.objective = paper._aims.objective;
-    return paper._aims;
-  }
-
   function aimRow(label, value) {
-    var v = unspecified(value) || "Not specified in abstract";
+    var v = unspecified(value);
+    if (!v) return "";
     return "<div><dt>" + escapeHtml(label) + "</dt><dd>" + escapeHtml(v) + "</dd></div>";
   }
 
+  function splitSentences(text) {
+    var t = String(text || "").replace(/\s+/g, " ").trim();
+    if (!t) return [];
+    var out = [];
+    var re = /[^.!?]+[.!?]+|[^.!?]+$/g;
+    var m;
+    while ((m = re.exec(t))) out.push(m[0].trim());
+    return out.filter(Boolean);
+  }
+
+  function clipPhrase(s, maxChars) {
+    var t = stripTags(s);
+    if (!t) return "";
+    if (t.length <= maxChars) return t;
+    var cut = t.slice(0, maxChars);
+    var m = cut.match(/^(.*?[.!?])(\s|$)/);
+    if (m && m[1].length > 50) return m[1];
+    return cut.replace(/\s+\S*$/, "") + "…";
+  }
+
+  function questionTerms() {
+    var q = state.activeQuestion || state.meaning || state.question || "";
+    var terms = distinctiveTerms(q).slice();
+    (state.concepts || []).forEach(function (c) {
+      conceptNeedles(c).forEach(function (s) {
+        var k = String(s || "").toLowerCase().trim();
+        if (k.length >= 4 && terms.indexOf(k) === -1 && !GENERIC_TOPIC[k]) terms.push(k);
+      });
+    });
+    return terms.sort(function (a, b) { return b.length - a.length; });
+  }
+
+  function sentenceScore(sent, terms) {
+    var low = String(sent || "").toLowerCase();
+    var n = 0;
+    (terms || []).forEach(function (t) {
+      if (t && low.indexOf(t) !== -1) n += t.length >= 5 ? 2 : 1;
+    });
+    return n;
+  }
+
+  function questionRelevantAims(paper) {
+    paper = paper || {};
+    var q = state.activeQuestion || state.meaning || state.question || "";
+    var blob = stripTags(((paper.abstract || "") + " " + (paper.fullTextSnippet || "")).trim());
+    var cacheKey = q + "\n" + blob;
+    if (paper._sumKey === cacheKey && paper._sum) return paper._sum;
+    var parsed = parseAbstractSections(blob);
+    var terms = questionTerms();
+    var scored = splitSentences(blob).map(function (s) {
+      return { s: s, n: sentenceScore(s, terms) };
+    }).filter(function (x) { return x.n > 0; }).sort(function (a, b) { return b.n - a.n; });
+    var background = scored[0] ? clipPhrase(scored[0].s, 150) : clipPhrase(parsed.background, 140);
+    var objective = "";
+    if (parsed.objective && sentenceScore(parsed.objective, terms) > 0) {
+      objective = clipPhrase(parsed.objective, 130);
+    } else if (scored[1]) {
+      objective = clipPhrase(scored[1].s, 130);
+    } else {
+      objective = clipPhrase(parsed.objective, 120);
+    }
+    if (objective && background && objective.slice(0, 40) === background.slice(0, 40)) objective = "";
+    paper._sum = { background: background, objective: objective };
+    paper._sumKey = cacheKey;
+    paper.background = background;
+    paper.objective = objective;
+    return paper._sum;
+  }
+
   function aimBlockHTML(paper) {
-    var aims = paperAims(paper);
-    return (
-      '<dl class="m1-pico m1-aim">' +
-      aimRow("Background", aims.background) +
-      aimRow("Objective", aims.objective) +
-      "</dl>"
-    );
+    var aims = questionRelevantAims(paper);
+    var rows = aimRow("Background", aims.background) + aimRow("Objective", aims.objective);
+    if (!rows) return "";
+    return '<dl class="m1-pico m1-aim">' + rows + "</dl>";
   }
 
   function cardsForCol(colId) {
@@ -567,6 +807,9 @@
         return synthCardHTML(x, "gap");
       }).join("");
     }
+    if (colId === "popular") {
+      return (state.relatedPopular || []).map(popularCardHTML).join("");
+    }
     return "";
   }
 
@@ -587,7 +830,7 @@
     });
   }
 
-  function collapsedColumn(title, headingClass, items, colId, emptyLabel, toCard, preview) {
+  function collapsedColumn(title, headingClass, items, colId, emptyLabel, toCard, preview, stackClass) {
     preview = preview == null ? STACK_PREVIEW : preview;
     var extra = Math.max(0, items.length - preview);
     var body = items.length
@@ -597,11 +840,12 @@
       ? '<button type="button" class="btn m1-synth-more" data-expand="' + colId +
         '">Show ' + extra + " more</button>"
       : "";
+    var stack = stackClass || "arena-stack m1-synth-stack";
     return (
       "<section>" +
       '<h3 class="' + headingClass + '">' + escapeHtml(title) +
       " <span>" + items.length + "</span></h3>" +
-      '<div class="arena-stack m1-synth-stack' + (extra ? " is-collapsed" : "") +
+      '<div class="' + stack + (extra ? " is-collapsed" : "") +
       '" data-col="' + colId + '">' + body + "</div>" +
       more +
       "</section>"
@@ -799,10 +1043,30 @@
       year: w.publication_year || null,
       venue: (w.primary_location && w.primary_location.source && w.primary_location.source.display_name) || "",
       pubTypes: w.type ? [w.type] : [],
-      abstract: "",
+      abstract: invertAbstract(w.abstract_inverted_index),
       url: w.doi || (w.primary_location && w.primary_location.landing_page_url) || "",
+      citationCount: typeof w.cited_by_count === "number" ? w.cited_by_count : null,
       sourceApis: ["openalex"],
     };
+  }
+
+  function invertAbstract(idx) {
+    if (!idx || typeof idx !== "object") return "";
+    var slots = [];
+    Object.keys(idx).forEach(function (word) {
+      (idx[word] || []).forEach(function (i) {
+        slots[i] = word;
+      });
+    });
+    return slots.filter(Boolean).join(" ");
+  }
+
+  function paperKey(p) {
+    if (!p) return "";
+    if (p.pmid) return "pmid:" + String(p.pmid);
+    var doi = String(p.doi || "").toLowerCase().replace(/^https?:\/\/doi\.org\//i, "");
+    if (doi) return "doi:" + doi;
+    return "t:" + String(p.title || "").toLowerCase().replace(/\s+/g, " ").slice(0, 80);
   }
 
   function mergePapers(list) {
@@ -824,6 +1088,9 @@
       if (!cur.pmcid && p.pmcid) cur.pmcid = p.pmcid;
       if (!cur.fullTextSnippet && p.fullTextSnippet) cur.fullTextSnippet = p.fullTextSnippet;
       if (!cur.venue && p.venue) cur.venue = p.venue;
+      if (p.citationCount != null && (cur.citationCount == null || p.citationCount > cur.citationCount)) {
+        cur.citationCount = p.citationCount;
+      }
       if (p.paywalled && cur.paywalled == null) cur.paywalled = p.paywalled;
       if (p.paywallNote && !cur.paywallNote) cur.paywallNote = p.paywallNote;
       if (p.foundViaWeb && !(cur.sourceApis || []).filter(function (s) {
@@ -838,6 +1105,14 @@
     return order.map(function (k) { return byKey[k]; });
   }
 
+  function conceptNeedles(c) {
+    var out = synonyms(c).slice();
+    String(c || "").toLowerCase().split(/\s+/).forEach(function (tok) {
+      if (tok.length >= 4 && !GENERIC_TOPIC[tok] && out.indexOf(tok) === -1) out.push(tok);
+    });
+    return out;
+  }
+
   function rankPaper(paper, concepts, central) {
     var title = (paper.title || "").toLowerCase();
     var abs = (paper.abstract || "").toLowerCase();
@@ -845,11 +1120,12 @@
     var hitList = [];
     var titleHits = 0;
     (concepts || []).forEach(function (c) {
-      var matched = synonyms(c).some(function (s) {
+      var needles = conceptNeedles(c);
+      var matched = needles.some(function (s) {
         return blob.indexOf(s.toLowerCase()) !== -1;
       });
       if (matched) hitList.push(c);
-      if (synonyms(c).some(function (s) { return title.indexOf(s.toLowerCase()) !== -1; })) {
+      if (needles.some(function (s) { return title.indexOf(s.toLowerCase()) !== -1; })) {
         titleHits += 1;
       }
     });
@@ -858,9 +1134,23 @@
     var typeBoost = type === "RCT" ? 3 : type === "review" ? 2.2 : type === "observational" ? 1 : type === "case series" ? -1 : 0;
     var recency = paper.year ? Math.max(0, Number(paper.year) - 1990) / 40 : 0;
     var score = hits * 10 + titleHits * 4 + typeBoost + recency;
-    var nConcepts = (concepts || []).length;
+    var weakHit = {
+      adults: 1, adult: 1, intake: 1, source: 1, young: 1, high: 1, people: 1,
+      cardiovascular: 1, cardiac: 1, heart: 1, protein: 1, health: 1, nutrition: 1,
+      diet: 1, dietary: 1, risk: 1, outcome: 1, outcomes: 1,
+    };
+    var strongHits = hitList.filter(function (c) {
+      var k = String(c || "").toLowerCase();
+      return k && !weakHit[k] && !GENERIC_TOPIC[k];
+    });
+    var specificInTitle = strongHits.some(function (c) {
+      return conceptNeedles(c).some(function (s) {
+        return s && title.indexOf(s.toLowerCase()) !== -1;
+      });
+    });
     var tier = "unrelated";
-    if (hits >= 2 || (hits >= 1 && nConcepts <= 1)) tier = "core";
+    if (specificInTitle) tier = "core";
+    else if (strongHits.length >= 2 || hits >= 2) tier = "related";
     else if (hits === 1) tier = "related";
     return {
       score: score,
@@ -969,7 +1259,7 @@
     var first = (paper.authors && paper.authors[0]) || "Authors unavailable";
     var last = first.split(" ").pop();
     var pop = (pico.population || "").trim();
-    var aims = paperAims(paper);
+    var aims = questionRelevantAims(paper);
     return {
       paper: paper,
       study: last + (paper.year ? " " + paper.year : ""),
@@ -987,12 +1277,13 @@
     };
   }
 
-  function beginUnderstanding() {
+  function beginUnderstanding(opts) {
+    opts = opts || {};
     var q = ($("#m1-question") || {}).value || "";
     var sit = ($("#m1-situation") || {}).value || "";
     q = q.trim();
     if (!q) {
-      setStatus("Enter a question first.");
+      setStatus("No research question was seeded from the form.");
       return;
     }
     state.question = q;
@@ -1003,12 +1294,14 @@
     state.concepts = understood.concepts;
     state.central = understood.central;
     state.query = understood.query;
-    setStep(2);
+    setStep(1);
     setStatus("");
     renderUnderstanding();
     startSearch({ scroll: false });
-    var host = $("#m1-understand");
-    if (host) host.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (opts.scroll) {
+      var host = $("#m1-understand");
+      if (host) host.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   function renderUnderstanding() {
@@ -1017,32 +1310,7 @@
     el.innerHTML =
       '<p class="m1-restate-kicker">Here’s what I understand you’re asking</p>' +
       '<p class="m1-restate">' + escapeHtml(state.restatement) + "</p>" +
-      '<p class="m1-lead">Search already started from this reading. If it’s wrong, type what you meant and rerun.</p>' +
-      '<label class="m1-label" for="m1-correction">Not quite — here’s what I actually mean</label>' +
-      '<textarea id="m1-correction" rows="3" placeholder="Rewrite the question in your own words, then click Use my correction to rerun."></textarea>' +
-      '<div class="m1-actions">' +
-      '<button type="button" class="btn btn-primary" id="m1-understand-fix">Use my correction</button>' +
-      "</div>";
-    $("#m1-understand-fix").addEventListener("click", function () {
-      var fix = (($("#m1-correction") || {}).value || "").trim();
-      if (!fix) {
-        setStatus("Type what you actually mean, then click Use my correction.");
-        return;
-      }
-      confirmUnderstanding(fix);
-    });
-  }
-
-  function confirmUnderstanding(correction) {
-    var understood = buildRestatement(state.question, state.situation, correction);
-    state.restatement = understood.text;
-    state.meaning = understood.meaning;
-    state.concepts = understood.concepts;
-    state.central = understood.central;
-    state.query = understood.query;
-    setStatus("");
-    renderUnderstanding();
-    startSearch();
+      '<p class="m1-lead">Search already started from this reading.</p>';
   }
 
   function startSearch(opts) {
@@ -1098,19 +1366,13 @@
     var href = paperHref(p);
     var bits = [escapeHtml(type)];
     if (p.year) bits.push(escapeHtml(String(p.year)));
-    var why = (p.hitList && p.hitList.length)
-      ? '<p class="m1-evidence-bits">Matches ' + escapeHtml(p.hitList.join(", ")) + "</p>"
-      : "";
-    var side = p.tier === "core" ? "for" : p.tier === "related" ? "related" : "tail";
     var cite = shortCiteRow({ paper: p, study: "" });
     return (
-      '<article class="m1-evidence-card side-' + side + '">' +
+      '<article class="m1-evidence-card side-for">' +
       '<p class="arena-claim">' + titleLinkHTML(href, p.title) + "</p>" +
       '<p class="m1-evidence-bits">' + bits.join(" · ") + "</p>" +
-      why +
       aimBlockHTML(p) +
       '<div class="arena-card-foot">' +
-      '<span class="m1-tier">' + escapeHtml(p.tier || "related") + "</span>" +
       citeLinkHTML(href, cite) +
       "</div>" +
       openPaperHTML(href) +
@@ -1119,51 +1381,192 @@
     );
   }
 
-  function renderScreen(statusLines) {
-    var el = $("#m1-screen-body");
-    if (!el) return;
-    state.screenLogs = statusLines || state.screenLogs || [];
-    var ranked = state.papers || [];
-    var core = ranked.filter(function (p) { return p.tier === "core"; });
-    var related = ranked.filter(function (p) { return p.tier === "related"; });
-    var unrelated = ranked.filter(function (p) { return p.tier === "unrelated"; });
-    var searching = !!state.searching;
-    var progress = searching ? searchProgressHTML() : "";
-    var pct = synthPercents([core.length, related.length, unrelated.length]);
-    var bar = ranked.length
-      ? '<div class="arena-bar-wrap m1-synth-bar-wrap">' +
-        '<div class="arena-bar" role="img" aria-label="Core ' + pct[0] +
-        " percent, related " + pct[1] + " percent, lower-ranked " + pct[2] +
-        ' percent">' +
-        '<span class="arena-bar-for" style="width:' + pct[0] + '%"></span>' +
-        '<span class="arena-bar-gap" style="width:' + pct[1] + '%"></span>' +
-        '<span class="arena-bar-tail" style="width:' + pct[2] + '%"></span>' +
-        "</div>" +
-        '<p class="arena-bar-legend m1-synth-legend">' +
-        '<span class="for">Core — ' + pct[0] + "%</span>" +
-        '<span class="gap">Related — ' + pct[1] + "%</span>" +
-        '<span class="tail">Lower-ranked — ' + pct[2] + "%</span>" +
-        "</p></div>"
+  var GENERIC_DISCIPLINE = {
+    epidemiology: 1, medicine: 1, medical: 1, science: 1, sciences: 1,
+    research: 1, studies: 1, study: 1, health: 1, public: 1, clinical: 1,
+    biology: 1, engineering: 1, computer: 1, learning: 1,
+  };
+  var POPULAR_SKIP = {
+    protein: 1, energy: 1, model: 1, data: 1, system: 1, analysis: 1,
+  };
+
+  function populationTerm(t) {
+    return /college|student|adult|aged|young|child|pediatric|elderly/.test(String(t || ""));
+  }
+
+  function popularFocusTerms() {
+    return distinctiveTerms(state.activeQuestion || state.question).filter(function (t) {
+      return !POPULAR_SKIP[t] && !GENERIC_DISCIPLINE[t] && !populationTerm(t);
+    });
+  }
+
+  function popularQuery() {
+    var terms = popularFocusTerms();
+    if (terms[0]) {
+      var phrase = synonyms(terms[0]).filter(function (s) { return /\s/.test(s); })[0];
+      if (phrase) terms[0] = phrase;
+    }
+    if (!terms.length && state.central) terms = [state.central];
+    return terms.slice(0, 3).join(" ").trim();
+  }
+
+  function isFlagshipVenue(venue) {
+    var v = String(venue || "").toLowerCase().replace(/[:.].*$/, "").trim();
+    if (!v) return false;
+    var names = [
+      "new england journal of medicine",
+      "the lancet",
+      "lancet",
+      "jama internal medicine",
+      "jama cardiology",
+      "jama",
+      "british medical journal",
+      "bmj",
+      "nature medicine",
+      "nature reviews",
+      "nature",
+      "science",
+      "cell metabolism",
+      "circulation",
+      "european heart journal",
+      "annals of internal medicine",
+      "plos medicine",
+      "american journal of clinical nutrition",
+      "neurips",
+      "nature machine intelligence",
+    ];
+    return names.some(function (n) {
+      if (v === n) return true;
+      if (v.indexOf(n + " ") === 0 || v.indexOf(n + ",") === 0) return true;
+      if (n.length >= 12 && v.indexOf(n) !== -1) return true;
+      return false;
+    });
+  }
+
+  function popularScore(p) {
+    var cites = p.citationCount || 0;
+    var bonus = 0;
+    if (isFlagshipVenue(p.venue)) bonus += 5000;
+    if ((p.year || 0) >= 2018) bonus += 200;
+    return cites + bonus;
+  }
+
+  function isTopicalPopular(p) {
+    var title = String(p.title || "").toLowerCase();
+    var q = String(state.activeQuestion || state.question || "").toLowerCase();
+    var terms = popularFocusTerms();
+    var must = terms[0];
+    var hasMust = false;
+    if (must) {
+      hasMust = synonyms(must).concat([must]).some(function (s) {
+        var tok = String(s).split(/\s+/)[0];
+        return tok.length >= 3 && title.indexOf(tok) !== -1;
+      });
+    }
+    var healthQ = /cardiovascular|cardiac|heart|coronary|stroke|cholesterol/.test(q);
+    var healthT = /cardiovascular|cardiac|heart|coronary|stroke|cholesterol|diabetes|mortality/.test(title);
+    if (healthQ && !healthT) return false;
+    if (hasMust) return true;
+    return terms.filter(function (t) { return title.indexOf(t) !== -1; }).length >= 2;
+  }
+
+  function popularWhy(p) {
+    if (isFlagshipVenue(p.venue)) return "Major journal in this field";
+    if ((p.citationCount || 0) >= 1000) return "Widely cited in this field";
+    return "Highly cited on this topic";
+  }
+
+  function formatCount(n) {
+    if (n == null || isNaN(n)) return "";
+    return Number(n).toLocaleString("en-US");
+  }
+
+  function skipPopularType(p) {
+    var types = (p.pubTypes || []).join(" ");
+    return /paratext|erratum|peer-review|peer review/i.test(types);
+  }
+
+  function ingestOpenAlex(oa, seen, out) {
+    ((oa && oa.results) || []).forEach(function (w) {
+      var p = normalizeOpenAlex(w);
+      if (!p.title || skipPopularType(p)) return;
+      var k = paperKey(p);
+      if (!k || seen[k]) return;
+      seen[k] = 1;
+      p.popularWhy = popularWhy(p);
+      out.push(p);
+    });
+  }
+
+  function fetchPopularPapers() {
+    var q = popularQuery();
+    if (!q) {
+      state.relatedPopular = [];
+      return Promise.resolve([]);
+    }
+    var extraQ = popularFocusTerms().slice(1, 4).join(" ");
+    var jobs = [apiGet("openalex/search", { q: q, per_page: "50", sort: "relevance_score:desc" })];
+    if (extraQ && extraQ !== q) {
+      jobs.push(apiGet("openalex/search", {
+        q: extraQ,
+        per_page: "40",
+        sort: "relevance_score:desc",
+      }));
+    }
+    return Promise.all(jobs).then(function (results) {
+      var seen = {};
+      var out = [];
+      results.forEach(function (oa) { ingestOpenAlex(oa, seen, out); });
+      var topical = out.filter(isTopicalPopular);
+      topical.sort(function (a, b) { return popularScore(b) - popularScore(a); });
+      state.relatedPopular = topical.slice(0, 12);
+      return state.relatedPopular;
+    });
+  }
+
+  function popularCardHTML(p) {
+    var href = paperHref(p);
+    var bits = [];
+    if (p.venue) bits.push(escapeHtml(p.venue));
+    if (p.year) bits.push(escapeHtml(String(p.year)));
+    var cites = formatCount(p.citationCount);
+    if (cites) bits.push(cites + " citations");
+    var abs = String(p.abstract || "").replace(/\s+/g, " ").trim();
+    var snippet = "";
+    if (abs) {
+      if (abs.length > 220) abs = abs.slice(0, 217) + "…";
+      snippet = '<p class="m1-evidence-pop">' + escapeHtml(abs) + "</p>";
+    }
+    return (
+      '<article class="m1-evidence-card m1-related-card">' +
+      '<p class="m1-related-why">' + escapeHtml(p.popularWhy || popularWhy(p)) + "</p>" +
+      '<p class="arena-claim">' + titleLinkHTML(href, p.title) + "</p>" +
+      (bits.length ? '<p class="m1-evidence-bits">' + bits.join(" · ") + "</p>" : "") +
+      snippet +
+      '<div class="arena-card-foot">' +
+      citeLinkHTML(href, shortCiteRow({ paper: p, study: "" })) +
+      "</div>" +
+      openPaperHTML(href) +
+      "</article>"
+    );
+  }
+
+  function relatedPapersHTML() {
+    var items = state.relatedPopular || [];
+    if (!items.length) return "";
+    var extra = Math.max(0, items.length - 6);
+    var more = extra
+      ? '<button type="button" class="btn m1-synth-more" data-expand="popular">Show more</button>'
       : "";
-    var results = ranked.length
-      ? '<div class="m1-rank-stack">' +
-        collapsedColumn("Core matches", "for", core, "core", "None yet.", paperCard) +
-        collapsedColumn("Related", "gap", related, "related", "None yet.", paperCard) +
-        collapsedColumn("Lower-ranked", "tail", unrelated, "tail", "None yet.", paperCard) +
-        "</div>"
-      : (searching ? "" : "<p>No records returned.</p>");
-    el.innerHTML =
-      progress +
-      '<ul class="m1-status-log">' + state.screenLogs.map(function (s) {
-        return "<li>" + escapeHtml(s) + "</li>";
-      }).join("") + "</ul>" +
-      (state.query
-        ? '<p class="m1-query">Search used: <code>' + escapeHtml(state.query) + "</code></p>"
-        : "") +
-      bar +
-      results;
-    bindCopy(el);
-    bindCollapsedMore(el);
+    return (
+      '<section class="m1-related-section">' +
+      "<h3>Related papers in this field</h3>" +
+      '<p class="m1-footnote">Widely cited papers and work from major journals in the same research area — the kind that often get written up beyond academia. Citation counts come from OpenAlex. This is not a direct test of your exact question, and it is not a news or forum ranking.</p>' +
+      '<div class="m1-related-grid' + (extra ? " is-collapsed" : "") +
+      '" data-col="popular">' +
+      items.map(popularCardHTML).join("") +
+      "</div>" + more + "</section>"
+    );
   }
 
   function looksLikeTrialQuestion(q) {
@@ -1180,13 +1583,11 @@
     state.papers = [];
     state.included = [];
     state.excluded = [];
+    state.relatedPopular = [];
     showSearchLive(true);
+    setPipeline("search");
     startSearchClock();
-    setStep(3);
-    if (opts.scroll !== false) {
-      var host = $("#m1-screen");
-      if (host) host.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    var shouldScroll = opts.scroll !== false;
     var logs = [];
     function stale() {
       return gen !== state.searchGen;
@@ -1194,8 +1595,9 @@
     function log(msg) {
       if (stale()) return;
       logs.push(msg);
+      state.screenLogs = logs.slice();
       setStatus(msg);
-      renderScreen(logs);
+      advancePipelineFromLog(msg);
     }
     var term = (state.query || "").trim();
     if (!term) {
@@ -1306,7 +1708,8 @@
         var merged = mergePapers(papers).filter(function (p) {
           return p.title && !/^contributes evidence/i.test(p.title);
         });
-        log("Ranking " + merged.length + " results…");
+        log("Keeping " + merged.filter(function (p) { return p.tier === "core"; }).length +
+          " core matches…");
         merged.forEach(function (p) {
           var rel = rankPaper(p, state.concepts, state.central);
           p.tier = rel.tier;
@@ -1322,16 +1725,24 @@
           return (b.rankScore || 0) - (a.rankScore || 0);
         });
         state.papers = merged;
-        state.included = merged.filter(function (p) { return p.tier !== "unrelated"; });
-        state.excluded = merged.filter(function (p) { return p.tier === "unrelated"; });
+        state.included = merged.filter(function (p) { return p.tier === "core"; });
+        state.excluded = merged.filter(function (p) { return p.tier !== "core"; });
+        log("Looking up widely cited papers in this field…");
+        return fetchPopularPapers().catch(function () {
+          state.relatedPopular = [];
+        });
+      })
+      .then(function () {
+        if (stale()) return Promise.reject({ stale: true });
         state.searching = false;
         stopSearchClock();
         showSearchLive(false);
-        renderScreen(logs);
-        buildExtract();
-        buildSynthesis();
-        buildVerdict();
+        finishResults();
         setStatus("");
+        if (shouldScroll) {
+          var resultsHost = $("#m1-results");
+          if (resultsHost) resultsHost.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
         return enrichUnpaywall(state.included.slice(0, 15));
       })
       .then(function () {
@@ -1340,9 +1751,7 @@
       })
       .then(function () {
         if (stale()) return;
-        buildExtract();
-        buildSynthesis();
-        buildVerdict();
+        finishResults();
       })
       .catch(function (err) {
         if (err && err.stale) return;
@@ -1350,14 +1759,13 @@
         stopSearchClock();
         showSearchLive(false);
         setStatus("Full review failed: " + (err.message || err));
-        var el = $("#m1-screen-body");
+        setStep(2);
+        var el = $("#m1-results-body");
         if (el) {
-          el.insertAdjacentHTML(
-            "afterbegin",
+          el.innerHTML =
             '<div class="m1-search-panel" role="alert"><h3>Search failed</h3><p>' +
             escapeHtml(err.message || String(err)) +
-            "</p><p>The page is not still loading. Try Use my correction, or Ask a new question.</p></div>"
-          );
+            "</p><p>The page is not still loading. Reload to try the search again.</p></div>";
         }
       });
   }
@@ -1438,30 +1846,78 @@
     );
   }
 
-  function buildExtract() {
-    setStep(4);
-    state.extracted = (state.papers || []).map(function (p) {
+  function finishResults() {
+    setPipeline("extract");
+    state.extracted = (state.papers || []).filter(function (p) {
+      return p.tier === "core";
+    }).map(function (p) {
       return extractRow(p, state.activeQuestion);
     });
-    renderExtractTable();
+    setPipeline("evaluate");
+    var supporting = [];
+    var contradicting = [];
+    var gaps = [];
+    state.extracted.forEach(function (row, i) {
+      if (!row.paper || row.paper.tier !== "core") return;
+      if (row.effect === "supports") supporting.push({ row: row, i: i });
+      else if (row.effect === "contradicts") contradicting.push({ row: row, i: i });
+      else gaps.push({ row: row, i: i });
+    });
+    state.synthesis = { supporting: supporting, contradicting: contradicting, gaps: gaps };
+    setPipeline("done");
+    renderResults();
+    buildVerdict();
   }
 
-  function renderExtractTable() {
-    var el = $("#m1-extract-body");
+  function behindTheResultsHTML() {
+    return (
+      '<p class="m1-behind-inline">' +
+      "<strong>Behind “See the results.”</strong> " +
+      PIPELINE.map(function (p, i) {
+        return (i ? '<span class="m1-behind-inline-sep" aria-hidden="true"> → </span>' : "") +
+          '<span class="m1-behind-inline-item"><strong>' + escapeHtml(p.label) +
+          "</strong> (" + escapeHtml(p.prisma) + "): " + escapeHtml(pipelineHint(p)) + "</span>";
+      }).join("") +
+      "</p>"
+    );
+  }
+
+  function renderResults() {
+    var el = $("#m1-results-body");
     if (!el) return;
-    var all = state.extracted || [];
-    var extra = Math.max(0, all.length - EXTRACT_PREVIEW);
-    var cards = all.slice(0, EXTRACT_PREVIEW).map(extractCardHTML).join("");
-    var moreBtn = extra
-      ? '<button type="button" class="btn m1-synth-more" data-expand="extract">Show ' +
-        extra + " more</button>"
+    var supporting = state.synthesis.supporting || [];
+    var contradicting = state.synthesis.contradicting || [];
+    var coreN = (state.included || []).length;
+    var sw = supporting.reduce(function (n, x) { return n + synthWeight(x.row); }, 0);
+    var cw = contradicting.reduce(function (n, x) { return n + synthWeight(x.row); }, 0);
+    var pct = synthPercents([sw, cw]);
+    var queryLine = state.query
+      ? '<p class="m1-query">Kept ' + coreN + " core paper" + (coreN === 1 ? "" : "s") +
+        ". Search used: <code>" + escapeHtml(state.query) + "</code></p>"
       : "";
+    if (!coreN) {
+      el.innerHTML = behindTheResultsHTML() + queryLine + "<p>No core matches for this question.</p>" + relatedPapersHTML();
+      return;
+    }
     el.innerHTML =
-      '<p class="m1-hint">Background, objective, who was studied, and which way the abstract leans — one card per paper, in rank order. Paywalled full text is never invented.</p>' +
-      '<div class="m1-extract-grid' + (extra ? " is-collapsed" : "") + '" data-col="extract">' +
-      (cards || '<p class="arena-empty">No papers returned.</p>') +
+      behindTheResultsHTML() +
+      queryLine +
+      '<p class="m1-footnote">This is a simplified <strong>direction-of-effect synthesis</strong> — a real systematic-review technique used when studies are too different to pool statistically. Grouping comes from language in each paper’s abstract, not from a meta-analytic model. The bar is weighted by study quality (strong / moderate / weak). Papers whose abstracts are unclear on direction are left off this bar. <span class="m1-tip" title="Direction-of-effect synthesis counts whether each study’s result points for or against, instead of combining numbers into one pooled estimate.">?</span></p>' +
+      '<div class="arena-bar-wrap m1-synth-bar-wrap">' +
+      '<div class="arena-bar" role="img" aria-label="Supporting ' + pct[0] +
+      " percent, contradicting " + pct[1] + ' percent">' +
+      '<span class="arena-bar-for" style="width:' + pct[0] + '%"></span>' +
+      '<span class="arena-bar-against" style="width:' + pct[1] + '%"></span>' +
       "</div>" +
-      '<div class="m1-actions">' + moreBtn + "</div>";
+      '<p class="arena-bar-legend m1-synth-legend">' +
+      '<span class="for">Supporting — weighted ' + pct[0] + "%</span>" +
+      '<span class="against">Contradicting — weighted ' + pct[1] + "%</span>" +
+      "</p></div>" +
+      '<div class="m1-synth-cols">' +
+      synthColumnHTML("Evidence supporting", "for", "for", supporting, "support") +
+      synthColumnHTML("Evidence contradicting", "against", "against", contradicting, "against") +
+      "</div>" +
+      relatedPapersHTML();
     bindCopy(el);
     bindCollapsedMore(el);
   }
@@ -1545,58 +2001,18 @@
   }
 
   function synthPercents(weights) {
-    var tot = weights[0] + weights[1] + weights[2];
-    if (tot <= 0) return [0, 0, 0];
+    var tot = 0;
+    var i;
+    for (i = 0; i < weights.length; i++) tot += weights[i];
+    if (tot <= 0) return weights.map(function () { return 0; });
     var floors = weights.map(function (w) { return Math.floor((w / tot) * 100); });
-    var rem = 100 - (floors[0] + floors[1] + floors[2]);
-    var order = weights.map(function (w, i) {
-      return { i: i, frac: (w / tot) * 100 - floors[i] };
+    var rem = 100;
+    for (i = 0; i < floors.length; i++) rem -= floors[i];
+    var order = weights.map(function (w, idx) {
+      return { i: idx, frac: (w / tot) * 100 - floors[idx] };
     }).sort(function (a, b) { return b.frac - a.frac; });
-    var k;
-    for (k = 0; k < rem; k++) floors[order[k].i] += 1;
+    for (i = 0; i < rem; i++) floors[order[i].i] += 1;
     return floors;
-  }
-
-  function buildSynthesis() {
-    setStep(5);
-    var supporting = [];
-    var contradicting = [];
-    var gaps = [];
-    state.extracted.forEach(function (row, i) {
-      if (row.paper && row.paper.tier === "unrelated") return;
-      if (row.effect === "supports") supporting.push({ row: row, i: i });
-      else if (row.effect === "contradicts") contradicting.push({ row: row, i: i });
-      else gaps.push({ row: row, i: i });
-    });
-    state.synthesis = { supporting: supporting, contradicting: contradicting, gaps: gaps };
-    var el = $("#m1-synth-body");
-    if (!el) return;
-    var sw = supporting.reduce(function (n, x) { return n + synthWeight(x.row); }, 0);
-    var cw = contradicting.reduce(function (n, x) { return n + synthWeight(x.row); }, 0);
-    var gw = gaps.reduce(function (n, x) { return n + synthWeight(x.row); }, 0);
-    var pct = synthPercents([sw, cw, gw]);
-    el.innerHTML =
-      '<p class="m1-footnote">This is a simplified <strong>direction-of-effect synthesis</strong> — a real systematic-review technique used when studies are too different to pool statistically. Grouping comes from language in each paper’s abstract, not from a meta-analytic model. The bar is weighted by study quality (strong / moderate / weak), the same idea as Debate Arena. <span class="m1-tip" title="Direction-of-effect synthesis counts whether each study’s result points for, against, or is unclear, instead of combining numbers into one pooled estimate.">?</span></p>' +
-      '<div class="arena-bar-wrap m1-synth-bar-wrap">' +
-      '<div class="arena-bar" role="img" aria-label="Supporting ' + pct[0] +
-      " percent, contradicting " + pct[1] + " percent, open questions " + pct[2] +
-      ' percent">' +
-      '<span class="arena-bar-for" style="width:' + pct[0] + '%"></span>' +
-      '<span class="arena-bar-against" style="width:' + pct[1] + '%"></span>' +
-      '<span class="arena-bar-gap" style="width:' + pct[2] + '%"></span>' +
-      "</div>" +
-      '<p class="arena-bar-legend m1-synth-legend">' +
-      '<span class="for">Supporting — weighted ' + pct[0] + "%</span>" +
-      '<span class="against">Contradicting — weighted ' + pct[1] + "%</span>" +
-      '<span class="gap">Open questions — weighted ' + pct[2] + "%</span>" +
-      "</p></div>" +
-      '<div class="m1-synth-cols">' +
-      synthColumnHTML("Evidence supporting", "for", "for", supporting, "support") +
-      synthColumnHTML("Evidence contradicting", "against", "against", contradicting, "against") +
-      synthColumnHTML("Open questions", "gap", "gap", gaps, "gap") +
-      "</div>";
-    bindCopy(el);
-    bindCollapsedMore(el);
   }
 
   function unwrapSynth(list) {
@@ -1626,7 +2042,8 @@
     disease: 1, diseases: 1, related: 1, using: 1, based: 1,
     patient: 1, patients: 1, human: 1, people: 1, person: 1,
     health: 1, clinical: 1, aged: 1, student: 1, students: 1,
-    college: 1, vs: 1, versus: 1,
+    college: 1, vs: 1, versus: 1, "college-aged": 1, "young-adult": 1,
+    "young-adults": 1,
   };
 
   function distinctiveTerms(question) {
@@ -1730,12 +2147,8 @@
     }
     var conclusion = plainAnswer +
       " If you need a decision for a real person, that is a clinician’s job and requires the full papers.";
-    var coreN = (state.papers || []).filter(function (p) { return p.tier === "core"; }).length;
-    var relN = (state.papers || []).filter(function (p) { return p.tier === "related"; }).length;
-    var tailN = (state.papers || []).filter(function (p) { return p.tier === "unrelated"; }).length;
-    var paragraph =
-      "Retrieved " + (state.papers || []).length + " unique records (" + coreN +
-      " core, " + relN + " related, " + tailN + " lower-ranked). " + plainAnswer;
+    var coreN = (state.included || []).length;
+    var paragraph = "Kept " + coreN + " core papers for this question. " + plainAnswer;
     return {
       question: tidyQuestion(question),
       headline: headline,
@@ -1766,8 +2179,42 @@
     );
   }
 
+  function bindBlogExports() {
+    function wire(id, runner, busyLabel) {
+      var btn = $(id);
+      if (!btn || typeof runner !== "function") return;
+      btn.addEventListener("click", function () {
+        var label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = busyLabel;
+        Promise.resolve(runner({ question: displayQuestion() })).then(function (info) {
+          btn.disabled = false;
+          var saved = info && info.ok && info.data && (info.data.filename || info.data.copied);
+          btn.textContent = saved ? (info.data.copied ? "Copied" : "Saved") : label;
+          setTimeout(function () { btn.textContent = label; }, 2200);
+        }).catch(function () {
+          btn.disabled = false;
+          btn.textContent = label;
+        });
+      });
+    }
+    wire("#m1-blog-pdf", window.downloadMode1BlogPdf, "Building PDF…");
+    wire("#m1-blog-image", window.downloadMode1BlogImage, "Building cover…");
+    wire("#m1-blog-image-full", window.downloadMode1BlogFullImage, "Building image…");
+    wire("#m1-blog-copy-byline", window.copyMode1BlogText, "Copying…");
+  }
+
+  function renderLeadBlog() {
+    var el = $("#m1-blog-body");
+    if (!el || typeof window.renderMode1BlogPost !== "function") return;
+    el.innerHTML = window.renderMode1BlogPost({
+      question: displayQuestion() || ($("#m1-question") || {}).value || "",
+    }) || "";
+    bindBlogExports();
+  }
+
   function buildVerdict() {
-    setStep(6);
+    setStep(3);
     var onTopic = state.extracted.filter(function (r) {
       return r.paper && r.paper.tier !== "unrelated";
     });
@@ -1788,132 +2235,190 @@
     };
     var el = $("#m1-verdict-body");
     if (!el) return;
-    var blogHtml = "";
-    if (typeof window.renderMode1BlogPost === "function") {
-      blogHtml = window.renderMode1BlogPost({
-        question: displayQuestion(),
-        extracted: state.extracted,
-        synthesis: state.synthesis,
-        verdict: state.verdict,
-      }) || "";
-    }
     el.innerHTML =
       '<p class="m1-confidence">How sure is this scan? <strong>' + escapeHtml(confidence) + "</strong></p>" +
       renderArticleHtml(model) +
-      blogHtml;
-    var pdfBtn = $("#m1-blog-pdf");
-    if (pdfBtn && typeof window.downloadMode1BlogPdf === "function") {
-      pdfBtn.addEventListener("click", function () {
-        var label = pdfBtn.textContent;
-        pdfBtn.disabled = true;
-        var result = window.downloadMode1BlogPdf({
-          question: displayQuestion(),
-          extracted: state.extracted,
-          synthesis: state.synthesis,
-          verdict: state.verdict,
-        });
-        Promise.resolve(result).then(function (info) {
-          pdfBtn.disabled = false;
-          var saved = info && info.ok && info.data && info.data.filename;
-          pdfBtn.textContent = saved ? "Saved to Downloads" : label;
-          if (saved) {
-            setTimeout(function () { pdfBtn.textContent = label; }, 2500);
-          }
-        }).catch(function () {
-          pdfBtn.disabled = false;
-          pdfBtn.textContent = label;
-        });
-      });
-    }
+      bayesGraphHTML();
   }
 
-  function askNewQuestion() {
-    document.body.classList.remove("m1-searching");
-    stopSearchClock();
-    showSearchLive(false);
-    state = emptyState();
-    ["m1-understand-body", "m1-screen-body", "m1-extract-body", "m1-synth-body", "m1-verdict-body"].forEach(function (id) {
-      var el = $("#" + id);
-      if (el) el.innerHTML = "";
-    });
-    $all(".m1-submitted-q").forEach(function (el) {
-      el.hidden = true;
-    });
+  function logGamma(z) {
+    var p = [
+      0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+      771.32342877765313, -176.61502916214059, 12.507343278686905,
+      -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7,
+    ];
+    if (z < 0.5) {
+      return Math.log(Math.PI / Math.sin(Math.PI * z)) - logGamma(1 - z);
+    }
+    z -= 1;
+    var x = p[0];
+    var i;
+    for (i = 1; i < 9; i++) x += p[i] / (z + i);
+    var t = z + 7.5;
+    return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+  }
+
+  function betaPdf(x, a, b) {
+    if (x <= 0 || x >= 1) return 0;
+    return Math.exp(
+      logGamma(a + b) - logGamma(a) - logGamma(b) +
+      (a - 1) * Math.log(x) + (b - 1) * Math.log(1 - x)
+    );
+  }
+
+  function betaCdf(x, a, b) {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    var n = 240;
+    var i;
+    var s = 0;
+    var step = x / n;
+    for (i = 1; i <= n; i++) {
+      s += betaPdf((i - 0.5) * step, a, b);
+    }
+    return Math.min(1, s * step);
+  }
+
+  function betaQuantile(p, a, b) {
+    var lo = 0;
+    var hi = 1;
+    var k;
+    var mid;
+    for (k = 0; k < 48; k++) {
+      mid = (lo + hi) / 2;
+      if (betaCdf(mid, a, b) < p) lo = mid;
+      else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  function bayesModel() {
+    var supporting = state.synthesis.supporting || [];
+    var contradicting = state.synthesis.contradicting || [];
+    var sw = supporting.reduce(function (n, x) { return n + synthWeight(x.row); }, 0);
+    var cw = contradicting.reduce(function (n, x) { return n + synthWeight(x.row); }, 0);
+    var a = 1 + sw;
+    var b = 1 + cw;
+    var mean = a / (a + b);
+    return {
+      a: a,
+      b: b,
+      sw: sw,
+      cw: cw,
+      mean: mean,
+      lo: betaQuantile(0.025, a, b),
+      hi: betaQuantile(0.975, a, b),
+    };
+  }
+
+  function bayesGraphHTML() {
+    var m = bayesModel();
+    var W = 640;
+    var H = 236;
+    var padL = 36;
+    var padR = 16;
+    var padT = 16;
+    var padB = 52;
+    var plotW = W - padL - padR;
+    var plotH = H - padT - padB;
+    var xs = [];
+    var i;
+    var peak = 0;
+    for (i = 1; i < 120; i++) {
+      var x = i / 120;
+      var y = betaPdf(x, m.a, m.b);
+      xs.push({ x: x, y: y });
+      if (y > peak) peak = y;
+    }
+    if (peak <= 0) peak = 1;
+    function X(p) { return padL + p * plotW; }
+    function Y(v) { return padT + plotH - (v / peak) * plotH; }
+    var line = xs.map(function (pt, idx) {
+      return (idx ? "L" : "M") + X(pt.x).toFixed(1) + " " + Y(pt.y).toFixed(1);
+    }).join(" ");
+    var band = xs.filter(function (pt) { return pt.x >= m.lo && pt.x <= m.hi; });
+    var area = "";
+    if (band.length) {
+      area = "M" + X(band[0].x).toFixed(1) + " " + Y(0).toFixed(1) + " " +
+        band.map(function (pt) {
+          return "L" + X(pt.x).toFixed(1) + " " + Y(pt.y).toFixed(1);
+        }).join(" ") +
+        " L" + X(band[band.length - 1].x).toFixed(1) + " " + Y(0).toFixed(1) + " Z";
+    }
+    var ticks = [0, 0.25, 0.5, 0.75, 1].map(function (t) {
+      return (
+        '<line x1="' + X(t).toFixed(1) + '" y1="' + (padT + plotH) +
+        '" x2="' + X(t).toFixed(1) + '" y2="' + (padT + plotH + 5) +
+        '" stroke="#3d4a5c" />' +
+        '<text x="' + X(t).toFixed(1) + '" y="' + (padT + plotH + 16) +
+        '" text-anchor="middle" fill="#3d4a5c" font-size="11">' +
+        Math.round(t * 100) + "%</text>"
+      );
+    }).join("");
+    var meanPct = Math.round(m.mean * 100);
+    var loPct = Math.round(m.lo * 100);
+    var hiPct = Math.round(m.hi * 100);
+    var barX = function (p) { return 36 + p * 568; };
+    var diamond = barX(m.mean);
+    return (
+      '<section class="m1-bayes" aria-label="Bayesian posterior for scan direction">' +
+      "<h3>Posterior confidence</h3>" +
+      '<p class="m1-footnote">A Beta posterior of the chance this scan’s quality-weighted abstracts lean supporting, with a uniform prior — the density-plus-credible-interval figure researchers put on slides. It is <strong>not</strong> a pooled effect size or a clinical posterior.</p>' +
+      '<svg class="m1-bayes-svg" viewBox="0 0 ' + W + " " + H +
+      '" role="img" aria-label="Posterior density. Mean ' + meanPct +
+      " percent, 95 percent credible interval " + loPct + " to " + hiPct + ' percent.">' +
+      '<rect x="' + padL + '" y="' + padT + '" width="' + plotW + '" height="' + plotH +
+      '" fill="#fff" stroke="#ddd8ce"></rect>' +
+      (area ? '<path d="' + area + '" fill="#c4a35a" fill-opacity="0.28"></path>' : "") +
+      '<path d="' + line + '" fill="none" stroke="#2f6f4e" stroke-width="2.4"></path>' +
+      '<line x1="' + X(m.mean).toFixed(1) + '" y1="' + padT + '" x2="' +
+      X(m.mean).toFixed(1) + '" y2="' + (padT + plotH) +
+      '" stroke="#2f6f4e" stroke-width="1.5"></line>' +
+      '<line x1="' + X(0.5).toFixed(1) + '" y1="' + padT + '" x2="' +
+      X(0.5).toFixed(1) + '" y2="' + (padT + plotH) +
+      '" stroke="#3d4a5c" stroke-dasharray="4 4" stroke-opacity="0.45"></line>' +
+      ticks +
+      '<text x="' + (padL + plotW / 2) + '" y="' + (H - 6) +
+      '" text-anchor="middle" fill="#3d4a5c" font-size="11">P(scan leans supporting)</text>' +
+      "</svg>" +
+      '<svg class="m1-bayes-interval" viewBox="0 0 640 56" role="img" aria-label="95 percent credible interval">' +
+      '<line x1="36" y1="28" x2="604" y2="28" stroke="#ddd8ce" stroke-width="6" stroke-linecap="round"></line>' +
+      '<line x1="' + barX(m.lo).toFixed(1) + '" y1="28" x2="' + barX(m.hi).toFixed(1) +
+      '" y2="28" stroke="#2f6f4e" stroke-width="6" stroke-linecap="round"></line>' +
+      '<polygon points="' + diamond.toFixed(1) + ',16 ' + (diamond + 9).toFixed(1) +
+      ",28 " + diamond.toFixed(1) + ",40 " + (diamond - 9).toFixed(1) +
+      ',28" fill="#1a2332"></polygon>' +
+      '<text x="36" y="50" fill="#3d4a5c" font-size="11">0%</text>' +
+      '<text x="604" y="50" text-anchor="end" fill="#3d4a5c" font-size="11">100%</text>' +
+      '<text x="' + diamond.toFixed(1) + '" y="12" text-anchor="middle" fill="#1a2332" font-size="12">' +
+      meanPct + "% · 95% CrI " + loPct + "–" + hiPct + "%</text>" +
+      "</svg>" +
+      '<p class="m1-bayes-stats">Prior Beta(1,1). Posterior Beta(' +
+      (Math.round(m.a * 10) / 10) + ", " + (Math.round(m.b * 10) / 10) +
+      "). Quality-weighted votes: supporting " + m.sw + ", contradicting " + m.cw +
+      ". Dashed line is 50% (equipoise). Shaded band is the 95% credible interval.</p>" +
+      "</section>"
+    );
+  }
+
+  function bootFromSeed() {
+    var seed = readDossierSeed();
     var q = $("#m1-question");
     var sit = $("#m1-situation");
-    if (q) q.value = "";
-    if (sit) sit.value = "";
-    setStatus("");
-    setStep(1);
-    var host = $("#m1-intake-sec");
-    if (host) host.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (q) q.focus();
-  }
-
-  function bindNewQuestion() {
-    var btn = $("#m1-new-question");
-    if (!btn) return;
-    btn.addEventListener("click", function (ev) {
-      ev.preventDefault();
-      askNewQuestion();
-    });
-  }
-
-  function bindExampleChips(root) {
-    (root || document).addEventListener("click", function (ev) {
-      var btn = ev.target.closest("[data-fill]");
-      if (!btn || !(root || document).contains(btn)) return;
-      var sel = window.getSelection && window.getSelection();
-      if (sel && sel.toString() && btn.contains(sel.anchorNode)) return;
-      ev.preventDefault();
-      var text = (btn.getAttribute("data-insert") || btn.textContent || "").trim();
-      var field = $(btn.getAttribute("data-fill") || "#m1-question");
-      if (!field || !text) return;
-      field.value = text;
-      field.focus();
-      if (typeof field.setSelectionRange === "function") {
-        var end = field.value.length;
-        field.setSelectionRange(end, end);
-      }
-      if (btn.getAttribute("data-scroll-to") || btn.classList.contains("m1-inspire-card")) {
-        field.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    });
-  }
-
-  function bindInspiration() {
-    var toggle = $("#m1-inspire-toggle");
-    var panel = $("#m1-inspire-panel");
-    if (toggle && panel) {
-      toggle.addEventListener("click", function () {
-        var open = panel.hidden;
-        panel.hidden = !open;
-        toggle.setAttribute("aria-expanded", open ? "true" : "false");
-        toggle.classList.toggle("is-open", open);
-      });
+    if (q && seed.topic && !String(q.value || "").trim()) q.value = seed.topic;
+    if (sit && seed.discipline && !String(sit.value || "").trim()) sit.value = seed.discipline;
+    renderLeadBlog();
+    if (q && String(q.value || "").trim()) {
+      beginUnderstanding({ scroll: false });
     }
-    $all(".m1-inspire-tab").forEach(function (tab) {
-      tab.addEventListener("click", function () {
-        var cat = tab.getAttribute("data-cat");
-        $all(".m1-inspire-tab").forEach(function (t) {
-          t.setAttribute("aria-selected", t === tab ? "true" : "false");
-        });
-        $all(".m1-inspire-pane").forEach(function (pane) {
-          pane.hidden = pane.getAttribute("data-cat") !== cat;
-        });
-      });
-    });
   }
 
-  function bindIntake() {
-    var form = $("#m1-intake");
-    if (!form) return;
-    form.addEventListener("submit", function (ev) {
-      ev.preventDefault();
-      beginUnderstanding();
-    });
-    bindExampleChips($("#m1-intake-sec") || form);
-    bindInspiration();
+  function boot() {
+    if (!$("#m1-root")) return;
+    renderStepper();
+    bindStickyStepper();
+    setStep(1);
+    bootFromSeed();
   }
 
   function readDossierSeed() {
@@ -1929,27 +2434,6 @@
     } catch (e) {
       return { topic: "", originalTopic: "", discipline: "" };
     }
-  }
-
-  function bootFromIntake() {
-    var seed = readDossierSeed();
-    var q = $("#m1-question");
-    var sit = $("#m1-situation");
-    if (q && seed.topic && !String(q.value || "").trim()) q.value = seed.topic;
-    if (sit && seed.discipline && !String(sit.value || "").trim()) sit.value = seed.discipline;
-    if (q && String(q.value || "").trim()) {
-      beginUnderstanding();
-    }
-  }
-
-  function boot() {
-    if (!$("#m1-root")) return;
-    renderStepper();
-    bindStickyStepper();
-    bindIntake();
-    bindNewQuestion();
-    setStep(1);
-    bootFromIntake();
   }
 
   if (document.readyState === "loading") {

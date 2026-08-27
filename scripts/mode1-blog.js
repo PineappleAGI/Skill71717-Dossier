@@ -1,4 +1,4 @@
-/* Skill71717 — Mode 1 blog post (step 6) plus print-to-PDF.
+/* Skill71717 — Mode 1 blog post (opens the dossier) plus print-to-PDF.
    Isolated from the briefing. Reads only extracted Mode 1 fields. */
 (function (root) {
   "use strict";
@@ -350,7 +350,10 @@
   function articleBodyHtml(article) {
     var html =
       '<p class="m1-blog-dek">' + esc(article.dek) + "</p>" +
-      '<p class="m1-blog-byline">' + esc(article.byline) + "</p>";
+      '<p class="m1-blog-byline">' +
+      '<span class="m1-blog-byline-meta">' + esc(article.byline) + "</span>" +
+      '<button type="button" class="m1-blog-copy-inline" id="m1-blog-copy-byline" title="Copy the full essay to paste into Medium, Substack, or any editor">Copy article</button>' +
+      "</p>";
     if (article.showHero) html += heroFigureHtml();
     (article.paras || []).forEach(function (p, i) {
       html += "<p>" + esc(p) + "</p>";
@@ -361,6 +364,46 @@
       html += "<h3>References</h3>" + renderRefs(article.refs);
     }
     return html;
+  }
+
+  function articlePlainText(article) {
+    var parts = [article.headline, article.dek, article.byline];
+    if (article.showHero) parts.push(heroCaption());
+    (article.paras || []).forEach(function (p, i) {
+      parts.push(p);
+      if (i === 1 && article.showChart) {
+        parts.push("What the dining line actually weighs", chartCaption());
+      }
+    });
+    parts.push(article.disclaimer);
+    return parts.filter(Boolean).join("\n\n");
+  }
+
+  function copyTextFallback(text) {
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) {}
+      document.body.removeChild(ta);
+      if (ok) resolve();
+      else reject(new Error("Copy failed"));
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).catch(function () {
+        return copyTextFallback(text);
+      });
+    }
+    return copyTextFallback(text);
   }
 
   function toAscii(s) {
@@ -707,11 +750,292 @@
       "<h2>" + esc(article.headline) + "</h2>" +
       articleBodyHtml(article) +
       '<div class="m1-blog-actions">' +
-      '<button type="button" class="btn btn-primary" id="m1-blog-pdf">Download PDF</button>' +
+      '<button type="button" class="btn btn-primary" id="m1-blog-image">Download cover</button>' +
+      '<button type="button" class="btn btn-ghost" id="m1-blog-image-full">Download as Image</button>' +
+      '<button type="button" class="btn btn-ghost" id="m1-blog-pdf">Download PDF</button>' +
+      '<p class="m1-blog-share-hint">Cover is 1200×630 for LinkedIn and X. Download as Image is a tall PNG of the whole piece.</p>' +
       "</div>" +
       "</section>"
     );
   };
+
+  function slugImageName(title, suffix) {
+    var base = slugPdfName(title).replace(/\.pdf$/i, "");
+    return base + (suffix ? "-" + suffix : "") + ".png";
+  }
+
+  function wrapCanvasText(ctx, text, maxWidth) {
+    var words = String(text || "").split(/\s+/).filter(Boolean);
+    var lines = [];
+    var line = "";
+    words.forEach(function (w) {
+      var test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width <= maxWidth) {
+        line = test;
+      } else {
+        if (line) lines.push(line);
+        line = w;
+      }
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawCover(ctx, img, x, y, w, h) {
+    if (!img || !img.width) return;
+    var ir = img.width / img.height;
+    var r = w / h;
+    var sx = 0;
+    var sy = 0;
+    var sw = img.width;
+    var sh = img.height;
+    if (ir > r) {
+      sw = sh * r;
+      sx = (img.width - sw) / 2;
+    } else {
+      sh = sw / r;
+      sy = (img.height - sh) / 2;
+    }
+    ctx.save();
+    ctx.beginPath();
+    if (typeof ctx.roundRect === "function") ctx.roundRect(x, y, w, h, 18);
+    else ctx.rect(x, y, w, h);
+    ctx.clip();
+    ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+    ctx.restore();
+  }
+
+  function loadHeroImage() {
+    var src = root.M1_BLOG_HERO;
+    if (!src) return Promise.resolve(null);
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { resolve(null); };
+      img.src = src;
+    });
+  }
+
+  function drawShareCard(article, img) {
+    var W = 1200;
+    var H = 630;
+    var canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#f7f4ef";
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#2f6f4e";
+    ctx.fillRect(0, 0, 10, H);
+
+    var textRight = img ? 690 : 1140;
+    ctx.fillStyle = "#c4a35a";
+    ctx.font = "700 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    ctx.fillText("PINEAPPLE 71717", 48, 72);
+
+    ctx.fillStyle = "#1a2332";
+    ctx.font = "650 42px Fraunces, Georgia, serif";
+    var hed = wrapCanvasText(ctx, article.headline, textRight - 48);
+    if (hed.length > 4) {
+      hed = hed.slice(0, 4);
+      hed[3] = hed[3].replace(/\s+\S*$/, "") + "…";
+    }
+    var y = 128;
+    hed.forEach(function (line) {
+      ctx.fillText(line, 48, y);
+      y += 50;
+    });
+
+    ctx.fillStyle = "#3d4a5c";
+    ctx.font = "400 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    ctx.fillText(article.dek || "", 48, y + 18);
+    ctx.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    ctx.fillText(article.byline || "", 48, y + 52);
+
+    var pull = (article.paras && article.paras[0]) || "";
+    if (pull) {
+      ctx.font = "italic 20px Fraunces, Georgia, serif";
+      ctx.fillStyle = "#1a2332";
+      var quotes = wrapCanvasText(ctx, pull, textRight - 48);
+      var qy = y + 108;
+      quotes.slice(0, 5).forEach(function (line) {
+        ctx.fillText(line, 48, qy);
+        qy += 28;
+      });
+    }
+
+    if (img) drawCover(ctx, img, 720, 48, 432, 430);
+
+    ctx.fillStyle = "#e6f0ea";
+    ctx.fillRect(0, H - 72, W, 72);
+    ctx.fillStyle = "#2f6f4e";
+    ctx.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    ctx.fillText("A lighter read from a literature scan  ·  not medical advice", 48, H - 32);
+
+    return canvas;
+  }
+
+  function fillRoundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    if (typeof ctx.roundRect === "function") ctx.roundRect(x, y, w, h, r);
+    else ctx.rect(x, y, w, h);
+    ctx.fill();
+  }
+
+  function drawSketchChart(ctx, x, y, w) {
+    var bars = sketchBars();
+    var rowH = 52;
+    ctx.fillStyle = "#1a2332";
+    ctx.font = "650 22px Fraunces, Georgia, serif";
+    ctx.fillText("What the dining line actually weighs", x, y + 8);
+    y += 28;
+    bars.forEach(function (b) {
+      ctx.fillStyle = "#3d4a5c";
+      ctx.font = "400 16px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+      ctx.fillText(b.label, x, y + 14);
+      ctx.fillStyle = "#ece7dc";
+      fillRoundRect(ctx, x, y + 20, w, 16, 4);
+      ctx.fillStyle = "#2f6f4e";
+      fillRoundRect(ctx, x, y + 20, Math.max(10, w * b.v), 16, 4);
+      y += rowH;
+    });
+    ctx.fillStyle = "#3d4a5c";
+    ctx.font = "italic 14px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    var cap = wrapCanvasText(ctx, chartCaption(), w);
+    cap.forEach(function (line) {
+      ctx.fillText(line, x, y + 12);
+      y += 20;
+    });
+    return y + 8;
+  }
+
+  function drawFullBlog(article, img) {
+    var W = 1200;
+    var pad = 56;
+    var maxW = W - pad * 2;
+    var probe = document.createElement("canvas").getContext("2d");
+    var y = pad + 8;
+    var heroH = 0;
+    if (img && article.showHero) {
+      heroH = Math.min(480, Math.round(maxW * img.height / img.width));
+    }
+
+    probe.font = "650 40px Fraunces, Georgia, serif";
+    var hed = wrapCanvasText(probe, article.headline, maxW);
+    probe.font = "400 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    y += 28 + hed.length * 50 + 28 + 28 + 36;
+    if (heroH) y += heroH + 48;
+    (article.paras || []).forEach(function (p, i) {
+      probe.font = "400 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+      y += wrapCanvasText(probe, p, maxW).length * 34 + 18;
+      if (i === 1 && article.showChart) y += 28 + sketchBars().length * 52 + 80;
+    });
+    probe.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    y += wrapCanvasText(probe, article.disclaimer, maxW - 24).length * 28 + 120;
+
+    var H = Math.ceil(y + pad);
+    var canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#f7f4ef";
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#2f6f4e";
+    ctx.fillRect(0, 0, 10, H);
+
+    var cy = pad;
+    ctx.fillStyle = "#c4a35a";
+    ctx.font = "700 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    ctx.fillText("A LIGHTER READ  ·  PINEAPPLE 71717", pad, cy + 8);
+    cy += 36;
+
+    ctx.fillStyle = "#1a2332";
+    ctx.font = "650 40px Fraunces, Georgia, serif";
+    hed.forEach(function (line) {
+      ctx.fillText(line, pad, cy);
+      cy += 50;
+    });
+    cy += 8;
+    ctx.fillStyle = "#3d4a5c";
+    ctx.font = "400 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    ctx.fillText(article.dek || "", pad, cy);
+    cy += 32;
+    ctx.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    ctx.fillText(article.byline || "", pad, cy);
+    cy += 36;
+
+    if (img && article.showHero) {
+      drawCover(ctx, img, pad, cy, maxW, heroH);
+      cy += heroH + 12;
+      ctx.fillStyle = "#3d4a5c";
+      ctx.font = "italic 14px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+      wrapCanvasText(ctx, heroCaption(), maxW).forEach(function (line) {
+        ctx.fillText(line, pad, cy + 12);
+        cy += 20;
+      });
+      cy += 16;
+    }
+
+    (article.paras || []).forEach(function (p, i) {
+      ctx.fillStyle = "#1a2332";
+      ctx.font = "400 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+      wrapCanvasText(ctx, p, maxW).forEach(function (line) {
+        ctx.fillText(line, pad, cy);
+        cy += 34;
+      });
+      cy += 18;
+      if (i === 1 && article.showChart) {
+        ctx.fillStyle = "#ffffff";
+        var chartTop = cy;
+        var chartH = 36 + sketchBars().length * 52 + 64;
+        fillRoundRect(ctx, pad - 12, chartTop - 8, maxW + 24, chartH, 12);
+        cy = drawSketchChart(ctx, pad, cy, maxW);
+        cy += 20;
+      }
+    });
+
+    ctx.fillStyle = "#f3ead2";
+    ctx.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    var discLines = wrapCanvasText(ctx, article.disclaimer, maxW - 24);
+    var boxH = discLines.length * 26 + 28;
+    fillRoundRect(ctx, pad - 8, cy, maxW + 16, boxH, 10);
+    ctx.fillStyle = "#1a2332";
+    ctx.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    discLines.forEach(function (line) {
+      ctx.fillText(line, pad + 12, cy + 28);
+      cy += 26;
+    });
+    cy += 36;
+    ctx.fillStyle = "#2f6f4e";
+    ctx.font = "600 16px 'Source Sans 3', 'Helvetica Neue', sans-serif";
+    ctx.fillText("Full essay from a literature scan  ·  not medical advice", pad, cy + 8);
+
+    return canvas;
+  }
+
+  function canvasPngBlob(canvas) {
+    return new Promise(function (resolve, reject) {
+      canvas.toBlob(function (blob) {
+        if (blob) resolve(blob);
+        else reject(new Error("Could not build the image"));
+      }, "image/png");
+    });
+  }
+
+  function triggerBlobDownload(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+      if (a.parentNode) a.parentNode.removeChild(a);
+    }, 2000);
+  }
 
   root.downloadMode1BlogPdf = function (ctx) {
     var article = buildBlogArticle(ctx);
@@ -719,5 +1043,43 @@
     var filename = slugPdfName(article.headline);
     triggerAnchorDownload(bytes, filename);
     return savePdfViaServer(bytes, filename);
+  };
+
+  root.downloadMode1BlogImage = function (ctx) {
+    var article = buildBlogArticle(ctx);
+    var fonts = (document.fonts && document.fonts.ready)
+      ? document.fonts.ready.catch(function () {})
+      : Promise.resolve();
+    return fonts.then(function () {
+      return loadHeroImage();
+    }).then(function (img) {
+      return canvasPngBlob(drawShareCard(article, article.showHero ? img : null));
+    }).then(function (blob) {
+      triggerBlobDownload(blob, slugImageName(article.headline, "cover"));
+      return { ok: true, data: { filename: slugImageName(article.headline, "cover") } };
+    });
+  };
+
+  root.downloadMode1BlogFullImage = function (ctx) {
+    var article = buildBlogArticle(ctx);
+    var fonts = (document.fonts && document.fonts.ready)
+      ? document.fonts.ready.catch(function () {})
+      : Promise.resolve();
+    return fonts.then(function () {
+      return loadHeroImage();
+    }).then(function (img) {
+      return canvasPngBlob(drawFullBlog(article, article.showHero ? img : null));
+    }).then(function (blob) {
+      triggerBlobDownload(blob, slugImageName(article.headline, "full"));
+      return { ok: true, data: { filename: slugImageName(article.headline, "full") } };
+    });
+  };
+
+  root.copyMode1BlogText = function (ctx) {
+    var article = buildBlogArticle(ctx);
+    var text = articlePlainText(article);
+    return copyText(text).then(function () {
+      return { ok: true, data: { copied: true, chars: text.length } };
+    });
   };
 })(window);
