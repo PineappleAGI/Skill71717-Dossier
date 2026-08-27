@@ -1,6 +1,6 @@
 # Skill71717: Pineapple Research Materials
 
-A downloadable agent skill for **students and researchers**. You describe a research topic in a small local form; the skill harvests scholarly materials from public academic APIs, the assistant scores relevance and writes short descriptions, and you get **one self-contained HTML dossier** you can open in any browser.
+A downloadable agent skill for **anyone who wants to research specific topics** (students, researchers, etc.). You describe a research topic in a small local form; the skill harvests scholarly materials from public academic APIs, the assistant scores relevance and writes short descriptions, and you get **one self-contained HTML dossier** you can open in any browser.
 
 > Point it at a research question. It returns a curated list of papers, preprints, and related links — with URLs, short descriptions, relevance scores, reading order, and coverage gaps — ready for a literature review or course project.
 
