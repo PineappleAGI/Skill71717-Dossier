@@ -2531,7 +2531,8 @@
     return (
       '<text x="' + x.toFixed(1) + '" y="' + startY.toFixed(1) +
       '" text-anchor="' + anchor + '" fill="' + fill +
-      '" font-size="' + size + '" font-weight="' + weight + '">' +
+      '" font-family="Source Sans 3, Helvetica Neue, Arial, sans-serif" font-size="' +
+      size + '" font-weight="' + weight + '">' +
       tspans + "</text>"
     );
   }
@@ -2653,8 +2654,7 @@
       '<span class="m1-cmap-key is-question">In the question</span>' +
       '<span class="m1-cmap-key is-literature">Related terms in the papers</span>' +
       '<span class="m1-cmap-count">' + blobs.length + " record" +
-      (blobs.length === 1 ? "" : "s") + " counted</span>" +
-      '<button type="button" class="m1-cmap-download" id="m1-cmap-download">Download map</button></p>' +
+      (blobs.length === 1 ? "" : "s") + " counted</span></p>" +
       '<svg class="m1-cmap-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' +
       W + " " + H +
       '" role="img" aria-label="Concept map: each question term with related phrases from the scan.">' +
@@ -2683,17 +2683,53 @@
     );
   }
 
+  function triggerBlobDownload(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+      if (a.parentNode) a.parentNode.removeChild(a);
+    }, 2000);
+    if (typeof fetch === "function") {
+      fetch("/api/save-file", {
+        method: "POST",
+        headers: { "Content-Type": blob.type || "application/octet-stream", "X-Filename": filename },
+        body: blob,
+      }).catch(function () {});
+    }
+  }
+
+  function setMapDownloadReady(ready) {
+    var btn = $("#m1-cmap-download");
+    if (!btn) return;
+    btn.disabled = !ready;
+  }
+
   function downloadConceptMap() {
-    var svg = document.querySelector(".m1-cmap-svg");
+    var svg = document.querySelector("#m1-concept-body .m1-cmap-svg");
     if (!svg) return;
+    var box = svg.viewBox && svg.viewBox.baseVal;
+    var w = (box && box.width) || svg.clientWidth || 1280;
+    var h = (box && box.height) || svg.clientHeight || 920;
     var clone = svg.cloneNode(true);
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    var xml = new XMLSerializer().serializeToString(clone);
+    clone.setAttribute("width", String(w));
+    clone.setAttribute("height", String(h));
+    var style = document.createElementNS("http://www.w3.org/2000/svg", "style");
+    style.textContent = 'text,tspan{font-family:"Source Sans 3","Helvetica Neue",Arial,sans-serif}';
+    clone.insertBefore(style, clone.firstChild);
+    var xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      new XMLSerializer().serializeToString(clone);
+    var svgBlob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
+    var url = URL.createObjectURL(svgBlob);
     var img = new Image();
     img.onload = function () {
-      var box = svg.viewBox && svg.viewBox.baseVal;
-      var w = (box && box.width) || svg.clientWidth || 1280;
-      var h = (box && box.height) || svg.clientHeight || 920;
       var canvas = document.createElement("canvas");
       canvas.width = Math.round(w * 2);
       canvas.height = Math.round(h * 2);
@@ -2701,21 +2737,24 @@
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
       canvas.toBlob(function (blob) {
-        if (!blob) return;
-        var a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "question-map.png";
-        a.click();
-        setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+        if (!blob) {
+          triggerBlobDownload(svgBlob, "question-map.svg");
+          return;
+        }
+        triggerBlobDownload(blob, "question-map.png");
       }, "image/png");
     };
-    img.onerror = function () {};
-    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      triggerBlobDownload(svgBlob, "question-map.svg");
+    };
+    img.src = url;
   }
 
-  function bindMapDownload(host) {
-    var btn = host && host.querySelector("#m1-cmap-download");
+  function bindMapDownload() {
+    var btn = $("#m1-cmap-download");
     if (!btn || btn.getAttribute("data-bound")) return;
     btn.setAttribute("data-bound", "1");
     btn.addEventListener("click", downloadConceptMap);
@@ -2728,13 +2767,14 @@
     if (sec) sec.hidden = false;
     var blobs = mapPaperBlobs();
     if (!blobs.length) {
+      setMapDownloadReady(false);
       host.innerHTML = state.pipelineStage === "done"
         ? '<div class="m1-cmap m1-cmap-pending"><p class="m1-cmap-pending-label">No titles or abstracts to map yet.</p></div>'
         : conceptMapPendingHTML();
       return;
     }
     host.innerHTML = conceptMapHTML();
-    bindMapDownload(host);
+    setMapDownloadReady(!!host.querySelector(".m1-cmap-svg"));
   }
 
   function paintRelated() {
@@ -3024,6 +3064,7 @@
     if (!$("#m1-root")) return;
     bindThemeToggle();
     bindCollapseToggles();
+    bindMapDownload();
     bindCollapsedMore(document);
     renderStepper();
     bindStickyStepper();

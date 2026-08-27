@@ -24,6 +24,7 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 CSS_PATH = SKILL_ROOT / "visualization-base.css"
+REPO_URL = "https://github.com/PineappleAGI/Skill71717-Dossier"
 
 # Epistemic role toward the research question (primary dossier sections).
 # Blurbs are overridden from request.stance_definitions when present.
@@ -693,12 +694,12 @@ def _empty_track_html(shown: list[dict], request: dict) -> str:
 
 
 def _footer_html() -> str:
-    return """
+    return f"""
 <footer class="m1-site-footer">
-  <p class="m1-site-footer-note">Triage, not a finished bibliography — verify primary sources before citing.</p>
   <div class="m1-site-footer-row">
     <p class="m1-site-footer-brand">Built by The Pineapple Project</p>
     <p class="m1-site-footer-copy">Fusing all minds like individual berries in a pineapple into an organic whole. At the speed of thought. Every project we vibe-code is serialized — this one is Pineapple 71717.</p>
+    <a class="m1-site-footer-x" href="{_esc(REPO_URL)}" target="_blank" rel="noopener noreferrer">Pineapple 71717 on GitHub</a>
     <a class="m1-site-footer-x" href="https://x.com/AnanasCosmo" target="_blank" rel="noopener noreferrer">The Pineapple Project on X · @AnanasCosmo</a>
   </div>
 </footer>
@@ -932,6 +933,9 @@ def _mode1_html(
     </div>
     <div data-collapse-panel="concepts">
       <p class="m1-concept-intro">The interpreted question sits in the centre. Each gold node is a term from the question; green nodes are related phrases that show up in titles and abstracts that mention that term. Size is how many records use it. Labels wrap so the full phrase stays visible — a vocabulary map, not an embedding and not a finding.</p>
+      <div class="m1-cmap-actions">
+        <button type="button" class="btn btn-primary" id="m1-cmap-download" disabled>Download map</button>
+      </div>
       <div id="m1-concept-body">
         <div class="m1-cmap m1-cmap-pending" role="status" aria-live="polite">
           <div class="m1-cmap-spinner" aria-hidden="true"></div>
@@ -1069,7 +1073,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
   <div class="shell">
     <div class="topbar">
       <div class="brand">
-        <span class="brand-mark">Pineapple 71717</span>
+        <a class="brand-mark" href="{_esc(REPO_URL)}" target="_blank" rel="noopener noreferrer">Pineapple 71717</a>
         <span class="brand-sub">Research Dossier</span>
         <button type="button" class="m1-theme-toggle" id="m1-theme-toggle" title="Switch the page between the reading theme and the print-friendly theme">Print view</button>
       </div>

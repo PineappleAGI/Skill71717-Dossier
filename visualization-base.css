@@ -137,6 +137,11 @@ a:hover {
   font-size: 1.65rem;
   letter-spacing: -0.03em;
   line-height: 1.1;
+  color: inherit;
+  text-decoration: none;
+}
+a.brand-mark:hover {
+  color: var(--accent);
 }
 
 .brand-sub {
@@ -2327,6 +2332,7 @@ a.m1-card-title-link:hover {
   .m1-blog-kicker,
   .m1-blog-actions,
   .m1-blog-copy-inline,
+  .m1-cmap-actions,
   .guide,
   .brand,
   .stats,
@@ -2526,21 +2532,17 @@ a.m1-card-title-link:hover {
 .m1-cmap-count {
   margin-left: auto;
 }
-.m1-cmap-download {
-  appearance: none;
-  cursor: pointer;
-  background: transparent;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: 0.25rem 0.7rem;
-  font: inherit;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--ink-soft);
+.m1-cmap-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
 }
-.m1-cmap-download:hover {
-  color: var(--ink);
-  border-color: var(--ink-soft);
+#m1-cmap-download:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
 }
 .m1-cmap-svg {
   display: block;
@@ -2672,12 +2674,6 @@ a.m1-card-title-link:hover {
   border: 1px solid var(--rule);
   border-top: 4px solid var(--gold);
   border-radius: 14px;
-}
-.m1-site-footer-note {
-  margin: 0 0 0.85rem;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-  line-height: 1.5;
 }
 .m1-site-footer-row {
   display: flex;
