@@ -115,6 +115,8 @@
     "high egg": ["high egg", "egg", "eggs", "egg intake", "egg consumption"],
     meat: ["meat", "red meat", "processed meat"],
     fish: ["fish", "seafood"],
+    "young adults": ["young adults", "young adult", "college-aged"],
+    protein: ["protein", "protein source"],
   };
 
   function synonyms(concept) {
@@ -1320,6 +1322,7 @@
     setStep(1);
     setStatus("");
     renderUnderstanding();
+    paintConceptMap();
     startSearch({ scroll: false });
     setStep(2);
     if (opts.scroll) {
@@ -1610,6 +1613,7 @@
     state.activeQuestion = (state.activeQuestion || state.meaning || state.question).trim();
     state.searching = true;
     state.searchStartedAt = Date.now();
+    paintConceptMap();
     state.papers = [];
     state.included = [];
     state.excluded = [];
@@ -1928,6 +1932,7 @@
     if (!coreN) {
       el.innerHTML = queryLine + "<p>No core matches for this question.</p>";
       paintRelated();
+      paintConceptMap();
       return;
     }
     var seed = readDossierSeed();
@@ -1951,6 +1956,7 @@
     bindCopy(el);
     bindCollapsedMore(el);
     paintRelated();
+    paintConceptMap();
   }
 
   var QUALITY_W = { strong: 3, moderate: 2, weak: 1 };
@@ -2284,6 +2290,451 @@
     if (!el) return;
     el.innerHTML = renderArticleHtml(model);
     paintRelated();
+    paintConceptMap();
+  }
+
+  var MAP_STOP = {
+    doi: 1, pmid: 1, pmc: 1, http: 1, https: 1, www: 1, copyright: 1,
+    license: 1, supplementary: 1, appendix: 1, university: 1, journal: 1,
+    however: 1, therefore: 1, including: 1, based: 1, using: 1, used: 1,
+    results: 1, methods: 1, method: 1, conclusion: 1, conclusions: 1,
+    background: 1, objective: 1, objectives: 1, purpose: 1, authors: 1,
+    author: 1, abstract: 1, introduction: 1, discussion: 1, analysis: 1,
+    data: 1, model: 1, models: 1, paper: 1, papers: 1, article: 1,
+    trial: 1, trials: 1, random: 1, randomized: 1, participants: 1,
+    patients: 1, patient: 1, years: 1, year: 1, age: 1, high: 1, low: 1,
+    risk: 1, total: 1, group: 1, groups: 1, level: 1, levels: 1,
+    association: 1, associated: 1, interval: 1, confidence: 1,
+    prospective: 1, cohort: 1, statistically: 1, significant: 1,
+    significantly: 1, relative: 1, hazard: 1, odds: 1, ratio: 1,
+    findings: 1, finding: 1, suggest: 1, suggests: 1, suggested: 1,
+    showed: 1, shown: 1, lower: 1, higher: 1, increased: 1,
+    decreased: 1, among: 1, related: 1, relationship: 1, factors: 1,
+    factor: 1, include: 1, included: 1, furthermore: 1, moreover: 1,
+    these: 1, those: 1, both: 1, other: 1, others: 1, also: 1,
+    each: 1, same: 1, such: 1, well: 1, many: 1, several: 1,
+    recommend: 1, recommended: 1, spline: 1, cubic: 1, restricted: 1,
+    proportional: 1, hazards: 1, regression: 1, multivariate: 1,
+    univariate: 1, adjusted: 1, adjustment: 1, estimate: 1,
+    estimates: 1, respectively: 1, overall: 1, according: 1,
+    consumption: 1, intake: 1, disease: 1, diseases: 1, diet: 1,
+    dietary: 1, food: 1, foods: 1, number: 1, numbers: 1,
+    associations: 1, processed: 1, united: 1, states: 1, females: 1,
+    aged: 1, controlled: 1, reduces: 1, reduce: 1, affects: 1,
+    affecting: 1, interventions: 1, conducted: 1, across: 1,
+    species: 1, adults: 1, clinicaltrials: 1, annual: 1,
+    percentage: 1, changes: 1, exceed: 1, exceeds: 1,
+    beneficial: 1, potential: 1, median: 1, benefits: 1,
+    "auto-regressive": 1, integrated: 1, moving: 1,
+  };
+
+  var MAP_TAIL_STOP = {
+    recommend: 1, recommended: 1, reduces: 1, reduce: 1, exceed: 1,
+    exceeds: 1, affects: 1, affecting: 1, conducted: 1, across: 1,
+    including: 1, using: 1, based: 1, aged: 1, changes: 1,
+    trials: 1, trial: 1,
+  };
+
+  function mapPaperBlobs() {
+    var papers = (state.included && state.included.length)
+      ? state.included
+      : (state.papers || []);
+    return papers.map(function (p) {
+      return ((p.title || "") + " " + (p.abstract || "")).toLowerCase();
+    }).filter(Boolean);
+  }
+
+  function mapTermHits(term, blobs) {
+    var needles = synonyms(term).map(function (s) { return String(s).toLowerCase(); });
+    var n = 0;
+    blobs.forEach(function (b) {
+      if (needles.some(function (s) { return s && b.indexOf(s) !== -1; })) n += 1;
+    });
+    return n;
+  }
+
+  function mapBlocked(concepts) {
+    var blocked = {};
+    (concepts || []).forEach(function (c) {
+      synonyms(c).forEach(function (s) { blocked[String(s).toLowerCase()] = 1; });
+      tokens(c).forEach(function (t) { blocked[t] = 1; });
+    });
+    Object.keys(MAP_STOP).forEach(function (k) { blocked[k] = 1; });
+    Object.keys(STOP).forEach(function (k) { blocked[k] = 1; });
+    return blocked;
+  }
+
+  function mapOrderedTokens(blob) {
+    return tokens(blob).filter(function (t) {
+      return t.length >= 4 && !STOP[t];
+    });
+  }
+
+  function mapPhraseOk(phrase, blocked) {
+    if (!phrase || (blocked && blocked[phrase]) || MAP_STOP[phrase]) return false;
+    var parts = String(phrase).split(/\s+/);
+    if (parts.length === 1) return phrase.length >= 6 && !MAP_STOP[phrase];
+    if (parts.some(function (p) { return MAP_TAIL_STOP[p]; })) return false;
+    return parts.some(function (p) { return !MAP_STOP[p]; });
+  }
+
+  function mapPhraseCounts(blobs, blocked) {
+    var uni = {};
+    var bi = {};
+    var tri = {};
+    blobs.forEach(function (b) {
+      var toks = mapOrderedTokens(b);
+      var seen = {};
+      function add(obj, phrase) {
+        if (!mapPhraseOk(phrase, blocked) || seen[phrase]) return;
+        seen[phrase] = 1;
+        obj[phrase] = (obj[phrase] || 0) + 1;
+      }
+      var i;
+      toks.forEach(function (t) { add(uni, t); });
+      for (i = 0; i < toks.length - 1; i++) {
+        var bg = toks[i] + " " + toks[i + 1];
+        if (b.indexOf(bg) !== -1) add(bi, bg);
+      }
+      for (i = 0; i < toks.length - 2; i++) {
+        var tg = toks[i] + " " + toks[i + 1] + " " + toks[i + 2];
+        if (b.indexOf(tg) !== -1) add(tri, tg);
+      }
+    });
+    return { uni: uni, bi: bi, tri: tri };
+  }
+
+  function mapTopPhrases(blobs, blocked, limit) {
+    var counts = mapPhraseCounts(blobs, blocked);
+    function top(obj, minN, n) {
+      return Object.keys(obj)
+        .filter(function (k) { return obj[k] >= minN; })
+        .sort(function (a, b) { return obj[b] - obj[a] || a.localeCompare(b); })
+        .slice(0, n)
+        .map(function (k) { return { term: k, hits: obj[k], kind: "literature" }; });
+    }
+    var minN = blobs.length >= 6 ? 2 : 1;
+    var usedWord = {};
+    var usedExact = {};
+    var out = [];
+    top(counts.tri, minN, 8).concat(top(counts.bi, minN, 10)).forEach(function (x) {
+      if (usedExact[x.term]) return;
+      usedExact[x.term] = 1;
+      out.push(x);
+      String(x.term).split(/\s+/).forEach(function (p) { usedWord[p] = 1; });
+    });
+    top(counts.uni, minN, 14).forEach(function (x) {
+      if (usedExact[x.term] || usedWord[x.term]) return;
+      usedExact[x.term] = 1;
+      out.push(x);
+    });
+    out = out.filter(function (x) {
+      return !out.some(function (y) {
+        return y.term !== x.term && y.term.indexOf(x.term) !== -1;
+      });
+    });
+    return out.slice(0, limit);
+  }
+
+  function mapConceptBranches(blobs, concepts) {
+    var matchingN = {};
+    var scored = [];
+    (concepts || []).forEach(function (concept) {
+      var blocked = mapBlocked([concept]);
+      var matching = blobs.filter(function (b) {
+        return synonyms(concept).some(function (s) {
+          return s && b.indexOf(String(s).toLowerCase()) !== -1;
+        });
+      });
+      matchingN[concept] = matching.length;
+      mapTopPhrases(matching, blocked, 12).forEach(function (x) {
+        scored.push({
+          concept: concept,
+          term: x.term,
+          hits: x.hits,
+          share: matching.length ? x.hits / matching.length : 0,
+        });
+      });
+    });
+    scored.sort(function (a, b) {
+      return (b.share - a.share) || (b.hits - a.hits) || a.term.localeCompare(b.term);
+    });
+    var usedTerm = {};
+    var byConcept = {};
+    (concepts || []).forEach(function (c) {
+      byConcept[c] = { concept: c, hits: matchingN[c] || 0, related: [] };
+    });
+    scored.forEach(function (row) {
+      if (usedTerm[row.term]) return;
+      var bucket = byConcept[row.concept];
+      if (!bucket || bucket.related.length >= 4) return;
+      usedTerm[row.term] = 1;
+      bucket.related.push({
+        term: row.term,
+        hits: row.hits,
+        kind: "literature",
+        parent: row.concept,
+      });
+    });
+    return (concepts || []).map(function (c) { return byConcept[c]; });
+  }
+
+  function mapWrap(text, maxChars, maxLines) {
+    var words = String(text || "").split(/\s+/).filter(Boolean);
+    var lines = [];
+    var line = "";
+    words.forEach(function (w) {
+      var test = line ? line + " " + w : w;
+      if (test.length <= maxChars) line = test;
+      else {
+        if (line) lines.push(line);
+        line = w;
+      }
+    });
+    if (line) lines.push(line);
+    if (lines.length > maxLines) {
+      lines = lines.slice(0, maxLines);
+      var last = lines[maxLines - 1];
+      lines[maxLines - 1] = last.replace(/[.,;:]*$/, "") + "…";
+    }
+    return lines;
+  }
+
+  function mapNodeRadius(hits, maxHits, kind) {
+    var t = maxHits > 0 ? hits / maxHits : 0;
+    if (kind === "literature") return 9 + t * 11;
+    return 15 + t * 14;
+  }
+
+  function mapLabelAnchor(angle) {
+    var c = Math.cos(angle);
+    if (c > 0.42) return "start";
+    if (c < -0.42) return "end";
+    return "middle";
+  }
+
+  function mapTextSVG(x, y, lines, opts) {
+    opts = opts || {};
+    var size = opts.size || 11;
+    var weight = opts.weight || 600;
+    var fill = opts.fill || "#1a2332";
+    var anchor = opts.anchor || "middle";
+    var lh = opts.lh || 13;
+    var startY = y;
+    if (anchor === "middle" && Math.sin(opts.angle || 0) < -0.35) {
+      startY = y - (lines.length - 1) * lh;
+    }
+    var tspans = lines.map(function (ln, i) {
+      return '<tspan x="' + x.toFixed(1) + '" dy="' + (i ? lh : 0) + '">' +
+        escapeHtml(ln) + "</tspan>";
+    }).join("");
+    return (
+      '<text x="' + x.toFixed(1) + '" y="' + startY.toFixed(1) +
+      '" text-anchor="' + anchor + '" fill="' + fill +
+      '" font-size="' + size + '" font-weight="' + weight + '">' +
+      tspans + "</text>"
+    );
+  }
+
+  function conceptMapHTML() {
+    var concepts = (state.concepts || []).slice(0, 8);
+    var blobs = mapPaperBlobs();
+    var branches = mapConceptBranches(blobs, concepts);
+    var qNodes = branches.map(function (br) {
+      return {
+        term: br.concept,
+        hits: br.hits || mapTermHits(br.concept, blobs),
+        kind: "question",
+        related: br.related || [],
+      };
+    });
+    var maxHits = 1;
+    qNodes.forEach(function (n) {
+      if (n.hits > maxHits) maxHits = n.hits;
+      n.related.forEach(function (r) {
+        if (r.hits > maxHits) maxHits = r.hits;
+      });
+    });
+    var W = 1280;
+    var H = 920;
+    var cx = W / 2;
+    var cy = H / 2;
+    var innerR = 215;
+    var outerR = 355;
+    var q = displayQuestion() || state.activeQuestion || "The research question";
+    var qLines = mapWrap(q, 30, 5);
+    var nQ = qNodes.length || 1;
+    var placedQ = qNodes.map(function (item, i) {
+      var a = (2 * Math.PI * i) / nQ - Math.PI / 2;
+      return {
+        item: item,
+        angle: a,
+        x: cx + innerR * Math.cos(a),
+        y: cy + innerR * Math.sin(a),
+      };
+    });
+    var placedR = [];
+    placedQ.forEach(function (parent) {
+      var rel = parent.item.related || [];
+      var m = rel.length;
+      if (!m) return;
+      var spread = m === 1 ? 0 : Math.min(0.52, 0.22 + m * 0.05);
+      rel.forEach(function (item, k) {
+        var a = parent.angle + (k - (m - 1) / 2) * spread;
+        placedR.push({
+          item: item,
+          parent: parent,
+          angle: a,
+          x: cx + outerR * Math.cos(a),
+          y: cy + outerR * Math.sin(a),
+        });
+      });
+    });
+    function nodeSVG(placed, fill, stroke, fromX, fromY) {
+      var item = placed.item;
+      var r = mapNodeRadius(item.hits, maxHits, item.kind);
+      var lines = mapWrap(item.term, item.kind === "question" ? 14 : 16, 3);
+      var title = item.term + " · " + item.hits + " record" + (item.hits === 1 ? "" : "s") +
+        (item.kind === "question"
+          ? " (from the question)"
+          : " (related to “" + (item.parent || "") + "”)");
+      var pad = r + 12;
+      var lx = placed.x + Math.cos(placed.angle) * pad;
+      var ly = placed.y + Math.sin(placed.angle) * pad;
+      var label = mapTextSVG(lx, ly, lines, {
+        size: item.kind === "question" ? 12 : 11,
+        weight: item.kind === "question" ? 700 : 600,
+        anchor: mapLabelAnchor(placed.angle),
+        angle: placed.angle,
+        lh: item.kind === "question" ? 14 : 13,
+      });
+      return (
+        '<g class="m1-cmap-node is-' + item.kind + '">' +
+        '<line x1="' + fromX.toFixed(1) + '" y1="' + fromY.toFixed(1) +
+        '" x2="' + placed.x.toFixed(1) + '" y2="' + placed.y.toFixed(1) +
+        '" stroke="' + stroke + '" stroke-opacity="0.4" stroke-width="' +
+        (item.kind === "question" ? "1.6" : "1.15") + '"></line>' +
+        '<circle cx="' + placed.x.toFixed(1) + '" cy="' + placed.y.toFixed(1) +
+        '" r="' + r + '" fill="' + fill + '" stroke="' + stroke +
+        '" stroke-width="1.5"><title>' + escapeHtml(title) + "</title></circle>" +
+        label + "</g>"
+      );
+    }
+    var qFill = "#f3ead2";
+    var qStroke = "#c4a35a";
+    var lFill = "#e6f0ea";
+    var lStroke = "#2f6f4e";
+    var hubH = 42 + qLines.length * 16;
+    var hubY = cy - hubH / 2;
+    var hubText = qLines.map(function (ln, i) {
+      return '<tspan x="' + cx + '" dy="' + (i ? 16 : 0) + '">' + escapeHtml(ln) + "</tspan>";
+    }).join("");
+    if (!qNodes.length) {
+      return '<p class="m1-empty">No concepts extracted from this question yet.</p>';
+    }
+    var glossary = placedQ.map(function (p) {
+      var rel = p.item.related || [];
+      var chips = rel.length
+        ? rel.map(function (r) {
+            return '<span class="m1-cmap-chip" title="' + escapeHtml(r.term) +
+              " · " + r.hits + ' records">' + escapeHtml(r.term) + "</span>";
+          }).join("")
+        : '<span class="m1-cmap-chip is-empty">thin in this scan</span>';
+      return (
+        '<div class="m1-cmap-row">' +
+        '<span class="m1-cmap-qterm">' + escapeHtml(p.item.term) + "</span>" +
+        '<span class="m1-cmap-arrow" aria-hidden="true">→</span>' +
+        '<span class="m1-cmap-chips">' + chips + "</span></div>"
+      );
+    }).join("");
+    return (
+      '<div class="m1-cmap">' +
+      '<p class="m1-cmap-legend">' +
+      '<span class="m1-cmap-key is-question">In the question</span>' +
+      '<span class="m1-cmap-key is-literature">Related terms in the papers</span>' +
+      '<span class="m1-cmap-count">' + blobs.length + " record" +
+      (blobs.length === 1 ? "" : "s") + " counted</span>" +
+      '<button type="button" class="m1-cmap-download" id="m1-cmap-download">Download map</button></p>' +
+      '<svg class="m1-cmap-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' +
+      W + " " + H +
+      '" role="img" aria-label="Concept map: each question term with related phrases from the scan.">' +
+      placedR.map(function (p) {
+        return nodeSVG(p, lFill, lStroke, p.parent.x, p.parent.y);
+      }).join("") +
+      placedQ.map(function (p) { return nodeSVG(p, qFill, qStroke, cx, cy); }).join("") +
+      '<rect x="' + (cx - 148) + '" y="' + hubY + '" width="296" height="' + hubH +
+      '" rx="12" fill="#fff" stroke="#1a2332" stroke-width="2"></rect>' +
+      '<text x="' + cx + '" y="' + (hubY + 18) +
+      '" text-anchor="middle" fill="#3d4a5c" font-size="10" font-weight="700" letter-spacing="0.08em">THE QUESTION</text>' +
+      '<text x="' + cx + '" y="' + (hubY + 36) +
+      '" text-anchor="middle" fill="#1a2332" font-size="13" font-weight="650" font-family="Fraunces, Georgia, serif">' +
+      hubText + "</text></svg>" +
+      '<div class="m1-cmap-glossary" aria-label="Question terms and related vocabulary">' +
+      glossary + "</div></div>"
+    );
+  }
+
+  function conceptMapPendingHTML() {
+    return (
+      '<div class="m1-cmap m1-cmap-pending" role="status" aria-live="polite">' +
+      '<div class="m1-cmap-spinner" aria-hidden="true"></div>' +
+      '<p class="m1-cmap-pending-label">Mapping this question against the scan…</p>' +
+      '<p class="m1-cmap-pending-hint">The map fills in after titles and abstracts are in.</p></div>'
+    );
+  }
+
+  function downloadConceptMap() {
+    var svg = document.querySelector(".m1-cmap-svg");
+    if (!svg) return;
+    var clone = svg.cloneNode(true);
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    var xml = new XMLSerializer().serializeToString(clone);
+    var img = new Image();
+    img.onload = function () {
+      var box = svg.viewBox && svg.viewBox.baseVal;
+      var w = (box && box.width) || svg.clientWidth || 1280;
+      var h = (box && box.height) || svg.clientHeight || 920;
+      var canvas = document.createElement("canvas");
+      canvas.width = Math.round(w * 2);
+      canvas.height = Math.round(h * 2);
+      var ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(function (blob) {
+        if (!blob) return;
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "question-map.png";
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+      }, "image/png");
+    };
+    img.onerror = function () {};
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
+  }
+
+  function bindMapDownload(host) {
+    var btn = host && host.querySelector("#m1-cmap-download");
+    if (!btn || btn.getAttribute("data-bound")) return;
+    btn.setAttribute("data-bound", "1");
+    btn.addEventListener("click", downloadConceptMap);
+  }
+
+  function paintConceptMap() {
+    var host = $("#m1-concept-body");
+    if (!host) return;
+    var sec = $("#concept-map");
+    if (sec) sec.hidden = false;
+    var blobs = mapPaperBlobs();
+    if (!blobs.length) {
+      host.innerHTML = state.pipelineStage === "done"
+        ? '<div class="m1-cmap m1-cmap-pending"><p class="m1-cmap-pending-label">No titles or abstracts to map yet.</p></div>'
+        : conceptMapPendingHTML();
+      return;
+    }
+    host.innerHTML = conceptMapHTML();
+    bindMapDownload(host);
   }
 
   function paintRelated() {
@@ -2318,7 +2769,7 @@
     function apply(theme) {
       if (theme === "press") document.documentElement.setAttribute("data-m1-theme", "press");
       else document.documentElement.removeAttribute("data-m1-theme");
-      btn.textContent = theme === "press" ? "Switch to reading view" : "Switch to print view";
+      btn.textContent = theme === "press" ? "Reading view" : "Print view";
       try { localStorage.setItem("m1-theme", theme); } catch (e) {}
     }
     apply("paper");
