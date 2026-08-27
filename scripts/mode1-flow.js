@@ -4,9 +4,9 @@
   "use strict";
 
   var STEPS = [
-    { n: 1, action: "See the restatement", name: "Restatement" },
-    { n: 2, action: "See the results", name: "Results" },
-    { n: 3, action: "Read the briefing", name: "The Briefing" },
+    { n: 1, action: "The question", name: "Restatement · PICO" },
+    { n: 2, action: "Results", name: "Screening → Synthesis" },
+    { n: 3, action: "Briefing", name: "Interpretation" },
   ];
 
   var PIPELINE = [
@@ -97,7 +97,7 @@
   }
 
   var state = emptyState();
-  var STACK_PREVIEW = 4;
+  var STACK_PREVIEW = 3;
   var RANK_PREVIEW = 9;
   var EXTRACT_PREVIEW = 6;
 
@@ -504,6 +504,27 @@
     return p.hint;
   }
 
+  function renderKpis() {
+    var host = $("#m1-kpis");
+    if (!host) return;
+    var harvested = (state.papers || []).length;
+    var coreN = (state.included || []).length;
+    var extractedN = (state.extracted || []).length;
+    var supporting = (state.synthesis && state.synthesis.supporting) || [];
+    var contradicting = (state.synthesis && state.synthesis.contradicting) || [];
+    var weighed = supporting.length + contradicting.length;
+    var items = [
+      { n: harvested || "—", l: "Records found" },
+      { n: coreN || "—", l: "Screened in" },
+      { n: extractedN || "—", l: "Abstracts extracted" },
+      { n: weighed || "—", l: "Weighed" },
+    ];
+    host.innerHTML = items.map(function (k) {
+      return '<div class="m1-kpi"><div class="n">' + escapeHtml(String(k.n)) +
+        '</div><div class="l">' + escapeHtml(k.l) + "</div></div>";
+    }).join("");
+  }
+
   function renderBehindFlow() {
     var host = $("#m1-behind-flow");
     if (!host) return;
@@ -536,6 +557,7 @@
       var spec = PIPELINE.filter(function (p) { return p.id === pid; })[0];
       if (hint && spec) hint.textContent = pipelineHint(spec);
     });
+    renderKpis();
     updateStickyTip();
   }
 
@@ -569,7 +591,8 @@
       el.addEventListener("click", function () {
         var sn = parseInt(el.getAttribute("data-step"), 10);
         if (sn <= state.step) {
-          var target = $('[data-m1-section="' + sn + '"]');
+          var map = { 1: "#restatement", 2: "#evidence", 3: "#briefing" };
+          var target = $(map[sn] || ('[data-m1-section="' + sn + '"]'));
           if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       });
@@ -814,7 +837,7 @@
   }
 
   function bindCollapsedMore(root) {
-    $all(".m1-synth-more", root).forEach(function (btn) {
+    $all(".m1-synth-more, .m1-show-all", root).forEach(function (btn) {
       if (btn.getAttribute("data-bound")) return;
       btn.setAttribute("data-bound", "1");
       btn.addEventListener("click", function () {
@@ -1298,6 +1321,7 @@
     setStatus("");
     renderUnderstanding();
     startSearch({ scroll: false });
+    setStep(2);
     if (opts.scroll) {
       var host = $("#m1-understand");
       if (host) host.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1553,19 +1577,25 @@
 
   function relatedPapersHTML() {
     var items = state.relatedPopular || [];
-    if (!items.length) return "";
+    if (!items.length) {
+      return '<p class="m1-footnote">No widely cited field papers were returned for this scan.</p>';
+    }
     var extra = Math.max(0, items.length - 6);
     var more = extra
-      ? '<button type="button" class="btn m1-synth-more" data-expand="popular">Show more</button>'
-      : "";
+      ? '<div class="m1-list-meta"><button type="button" class="btn m1-synth-more" data-expand="popular">Show ' +
+        Math.min(6, extra) + ' more</button>' +
+        (extra > 6
+          ? '<button type="button" class="m1-show-all" data-expand="popular">Show all ' +
+            items.length + "</button>"
+          : "") +
+        '<span class="m1-list-count">Showing 6 of ' + items.length + " papers</span></div>"
+      : '<p class="m1-list-count">Showing ' + items.length + " of " + items.length + " papers</p>";
     return (
-      '<section class="m1-related-section">' +
-      "<h3>Related papers in this field</h3>" +
-      '<p class="m1-footnote">Widely cited papers and work from major journals in the same research area — the kind that often get written up beyond academia. Citation counts come from OpenAlex. This is not a direct test of your exact question, and it is not a news or forum ranking.</p>' +
+      '<p class="m1-footnote">Widely cited work from major journals in the same research area. Citation counts come from OpenAlex. These are not a direct test of the question.</p>' +
       '<div class="m1-related-grid' + (extra ? " is-collapsed" : "") +
       '" data-col="popular">' +
       items.map(popularCardHTML).join("") +
-      "</div>" + more + "</section>"
+      "</div>" + more
     );
   }
 
@@ -1740,7 +1770,7 @@
         finishResults();
         setStatus("");
         if (shouldScroll) {
-          var resultsHost = $("#m1-results");
+          var resultsHost = $("#evidence") || $("#m1-results");
           if (resultsHost) resultsHost.scrollIntoView({ behavior: "smooth", block: "start" });
         }
         return enrichUnpaywall(state.included.slice(0, 15));
@@ -1896,13 +1926,14 @@
         ". Search used: <code>" + escapeHtml(state.query) + "</code></p>"
       : "";
     if (!coreN) {
-      el.innerHTML = behindTheResultsHTML() + queryLine + "<p>No core matches for this question.</p>" + relatedPapersHTML();
+      el.innerHTML = queryLine + "<p>No core matches for this question.</p>";
+      paintRelated();
       return;
     }
+    var seed = readDossierSeed();
     el.innerHTML =
-      behindTheResultsHTML() +
       queryLine +
-      '<p class="m1-footnote">This is a simplified <strong>direction-of-effect synthesis</strong> — a real systematic-review technique used when studies are too different to pool statistically. Grouping comes from language in each paper’s abstract, not from a meta-analytic model. The bar is weighted by study quality (strong / moderate / weak). Papers whose abstracts are unclear on direction are left off this bar. <span class="m1-tip" title="Direction-of-effect synthesis counts whether each study’s result points for or against, instead of combining numbers into one pooled estimate.">?</span></p>' +
+      '<p class="m1-footnote">A simplified <strong>direction-of-effect synthesis</strong> — the technique used when studies are too different to pool statistically. Grouped by what each abstract implies, then weighted by study quality. Papers whose abstracts are unclear on direction are left off this bar.</p>' +
       '<div class="arena-bar-wrap m1-synth-bar-wrap">' +
       '<div class="arena-bar" role="img" aria-label="Supporting ' + pct[0] +
       " percent, contradicting " + pct[1] + ' percent">' +
@@ -1914,12 +1945,12 @@
       '<span class="against">Contradicting — weighted ' + pct[1] + "%</span>" +
       "</p></div>" +
       '<div class="m1-synth-cols">' +
-      synthColumnHTML("Evidence supporting", "for", "for", supporting, "support") +
-      synthColumnHTML("Evidence contradicting", "against", "against", contradicting, "against") +
-      "</div>" +
-      relatedPapersHTML();
+      synthColumnHTML("Evidence supporting", "for", "for", supporting, "support", seed.supportBlurb) +
+      synthColumnHTML("Evidence contradicting", "against", "against", contradicting, "against", seed.contraBlurb) +
+      "</div>";
     bindCopy(el);
     bindCollapsedMore(el);
+    paintRelated();
   }
 
   var QUALITY_W = { strong: 3, moderate: 2, weak: 1 };
@@ -1988,16 +2019,24 @@
     );
   }
 
-  function synthColumnHTML(title, headingClass, side, items, colId) {
+  function synthColumnHTML(title, headingClass, side, items, colId, blurb) {
     var sorted = sortSynthItems(items);
-    return collapsedColumn(
+    var html = collapsedColumn(
       title,
       headingClass,
       sorted,
       colId,
       "None in this first extract.",
-      function (x) { return synthCardHTML(x, side); }
+      function (x) { return synthCardHTML(x, side); },
+      3
     );
+    if (blurb) {
+      html = html.replace(
+        "</h3>",
+        "</h3><p class=\"m1-col-blurb\">" + escapeHtml(blurb) + "</p>"
+      );
+    }
+    return html;
   }
 
   function synthPercents(weights) {
@@ -2234,11 +2273,59 @@
       article: model,
     };
     var el = $("#m1-verdict-body");
+    var lede = $("#m1-briefing-lede");
+    if (lede) lede.textContent = model.paragraph || "";
+    var conf = $("#m1-confidence-body");
+    if (conf) {
+      conf.innerHTML = bayesGraphHTML();
+      var confSec = $("#confidence");
+      if (confSec) confSec.hidden = false;
+    }
     if (!el) return;
-    el.innerHTML =
-      '<p class="m1-confidence">How sure is this scan? <strong>' + escapeHtml(confidence) + "</strong></p>" +
-      renderArticleHtml(model) +
-      bayesGraphHTML();
+    el.innerHTML = renderArticleHtml(model);
+    paintRelated();
+  }
+
+  function paintRelated() {
+    var relatedHost = $("#m1-related-body");
+    if (relatedHost) {
+      relatedHost.innerHTML = relatedPapersHTML();
+      bindCollapsedMore(relatedHost);
+      var relatedSec = $("#related");
+      if (relatedSec) relatedSec.hidden = false;
+    }
+  }
+
+  function bindCollapseToggles() {
+    $all(".m1-collapse-btn").forEach(function (btn) {
+      if (btn.getAttribute("data-bound")) return;
+      btn.setAttribute("data-bound", "1");
+      btn.addEventListener("click", function () {
+        var key = btn.getAttribute("data-collapse");
+        var panel = $('[data-collapse-panel="' + key + '"]');
+        if (!panel) return;
+        var hidden = panel.hasAttribute("hidden");
+        if (hidden) panel.removeAttribute("hidden");
+        else panel.setAttribute("hidden", "");
+        btn.textContent = hidden ? "Hide" : "Show";
+      });
+    });
+  }
+
+  function bindThemeToggle() {
+    var btn = $("#m1-theme-toggle");
+    if (!btn) return;
+    function apply(theme) {
+      if (theme === "press") document.documentElement.setAttribute("data-m1-theme", "press");
+      else document.documentElement.removeAttribute("data-m1-theme");
+      btn.textContent = theme === "press" ? "Switch to reading view" : "Switch to print view";
+      try { localStorage.setItem("m1-theme", theme); } catch (e) {}
+    }
+    apply("paper");
+    btn.addEventListener("click", function () {
+      var now = document.documentElement.getAttribute("data-m1-theme") === "press" ? "press" : "paper";
+      apply(now === "press" ? "paper" : "press");
+    });
   }
 
   function logGamma(z) {
@@ -2311,28 +2398,89 @@
     };
   }
 
+  function bayesZoomWindow(m) {
+    var i;
+    var peak = 0;
+    var ys = [];
+    for (i = 1; i < 200; i++) {
+      var x = i / 200;
+      var y = betaPdf(x, m.a, m.b);
+      ys.push({ x: x, y: y });
+      if (y > peak) peak = y;
+    }
+    if (peak <= 0) peak = 1;
+    var thresh = peak * 0.05;
+    var lo = 0;
+    var hi = 1;
+    for (i = 0; i < ys.length; i++) {
+      if (ys[i].y >= thresh) { lo = ys[i].x; break; }
+    }
+    for (i = ys.length - 1; i >= 0; i--) {
+      if (ys[i].y >= thresh) { hi = ys[i].x; break; }
+    }
+    lo = Math.min(lo, m.lo);
+    hi = Math.max(hi, m.hi);
+    var pad = Math.max(0.03, (hi - lo) * 0.22);
+    lo = Math.max(0, lo - pad);
+    hi = Math.min(1, hi + pad);
+    if (hi - lo < 0.28) {
+      var mid = (lo + hi) / 2;
+      lo = Math.max(0, mid - 0.14);
+      hi = Math.min(1, mid + 0.14);
+      if (hi - lo < 0.28) {
+        if (lo <= 0) hi = Math.min(1, 0.28);
+        if (hi >= 1) lo = Math.max(0, 0.72);
+      }
+    }
+    return { lo: lo, hi: hi, peak: peak };
+  }
+
+  function bayesTicks(x0, x1) {
+    var span = x1 - x0;
+    var step = span > 0.8 ? 0.25 : span > 0.45 ? 0.1 : 0.05;
+    var start = Math.ceil(x0 / step) * step;
+    var ticks = [];
+    var t;
+    for (t = start; t <= x1 + 1e-9; t += step) {
+      ticks.push(Math.round(t * 100) / 100);
+    }
+    if (ticks[0] === undefined || Math.abs(ticks[0] - x0) > step * 0.4) {
+      ticks.unshift(x0);
+    }
+    if (Math.abs(ticks[ticks.length - 1] - x1) > step * 0.4) {
+      ticks.push(x1);
+    }
+    return ticks;
+  }
+
   function bayesGraphHTML() {
     var m = bayesModel();
-    var W = 640;
-    var H = 236;
-    var padL = 36;
-    var padR = 16;
-    var padT = 16;
-    var padB = 52;
+    var zoom = bayesZoomWindow(m);
+    var x0 = zoom.lo;
+    var x1 = zoom.hi;
+    var span = Math.max(0.08, x1 - x0);
+    var W = 900;
+    var H = 420;
+    var padL = 44;
+    var padR = 20;
+    var padT = 18;
+    var padB = 56;
     var plotW = W - padL - padR;
     var plotH = H - padT - padB;
     var xs = [];
     var i;
-    var peak = 0;
-    for (i = 1; i < 120; i++) {
-      var x = i / 120;
+    var n = 180;
+    var visPeak = 0;
+    for (i = 0; i <= n; i++) {
+      var x = x0 + (i / n) * span;
+      x = Math.min(0.999, Math.max(0.001, x));
       var y = betaPdf(x, m.a, m.b);
       xs.push({ x: x, y: y });
-      if (y > peak) peak = y;
+      if (y > visPeak) visPeak = y;
     }
-    if (peak <= 0) peak = 1;
-    function X(p) { return padL + p * plotW; }
-    function Y(v) { return padT + plotH - (v / peak) * plotH; }
+    if (visPeak <= 0) visPeak = zoom.peak || 1;
+    function X(p) { return padL + ((p - x0) / span) * plotW; }
+    function Y(v) { return padT + plotH - (v / visPeak) * plotH * 0.92; }
     var line = xs.map(function (pt, idx) {
       return (idx ? "L" : "M") + X(pt.x).toFixed(1) + " " + Y(pt.y).toFixed(1);
     }).join(" ");
@@ -2345,21 +2493,23 @@
         }).join(" ") +
         " L" + X(band[band.length - 1].x).toFixed(1) + " " + Y(0).toFixed(1) + " Z";
     }
-    var ticks = [0, 0.25, 0.5, 0.75, 1].map(function (t) {
+    var ticks = bayesTicks(x0, x1).map(function (t) {
       return (
         '<line x1="' + X(t).toFixed(1) + '" y1="' + (padT + plotH) +
-        '" x2="' + X(t).toFixed(1) + '" y2="' + (padT + plotH + 5) +
+        '" x2="' + X(t).toFixed(1) + '" y2="' + (padT + plotH + 6) +
         '" stroke="#3d4a5c" />' +
-        '<text x="' + X(t).toFixed(1) + '" y="' + (padT + plotH + 16) +
-        '" text-anchor="middle" fill="#3d4a5c" font-size="11">' +
+        '<text x="' + X(t).toFixed(1) + '" y="' + (padT + plotH + 22) +
+        '" text-anchor="middle" fill="#3d4a5c" font-size="14">' +
         Math.round(t * 100) + "%</text>"
       );
     }).join("");
     var meanPct = Math.round(m.mean * 100);
     var loPct = Math.round(m.lo * 100);
     var hiPct = Math.round(m.hi * 100);
-    var barX = function (p) { return 36 + p * 568; };
+    var showHalf = 0.5 >= x0 && 0.5 <= x1;
+    var barX = function (p) { return padL + ((p - x0) / span) * plotW; };
     var diamond = barX(m.mean);
+    var barY = 32;
     return (
       '<section class="m1-bayes" aria-label="Bayesian posterior for scan direction">' +
       "<h3>Posterior confidence</h3>" +
@@ -2369,34 +2519,40 @@
       " percent, 95 percent credible interval " + loPct + " to " + hiPct + ' percent.">' +
       '<rect x="' + padL + '" y="' + padT + '" width="' + plotW + '" height="' + plotH +
       '" fill="#fff" stroke="#ddd8ce"></rect>' +
-      (area ? '<path d="' + area + '" fill="#c4a35a" fill-opacity="0.28"></path>' : "") +
-      '<path d="' + line + '" fill="none" stroke="#2f6f4e" stroke-width="2.4"></path>' +
+      (area ? '<path d="' + area + '" fill="#c4a35a" fill-opacity="0.32"></path>' : "") +
+      '<path d="' + line + '" fill="none" stroke="#2f6f4e" stroke-width="3.2"></path>' +
       '<line x1="' + X(m.mean).toFixed(1) + '" y1="' + padT + '" x2="' +
       X(m.mean).toFixed(1) + '" y2="' + (padT + plotH) +
-      '" stroke="#2f6f4e" stroke-width="1.5"></line>' +
-      '<line x1="' + X(0.5).toFixed(1) + '" y1="' + padT + '" x2="' +
-      X(0.5).toFixed(1) + '" y2="' + (padT + plotH) +
-      '" stroke="#3d4a5c" stroke-dasharray="4 4" stroke-opacity="0.45"></line>' +
+      '" stroke="#2f6f4e" stroke-width="2"></line>' +
+      (showHalf
+        ? '<line x1="' + X(0.5).toFixed(1) + '" y1="' + padT + '" x2="' +
+          X(0.5).toFixed(1) + '" y2="' + (padT + plotH) +
+          '" stroke="#3d4a5c" stroke-dasharray="5 5" stroke-opacity="0.45"></line>'
+        : "") +
       ticks +
-      '<text x="' + (padL + plotW / 2) + '" y="' + (H - 6) +
-      '" text-anchor="middle" fill="#3d4a5c" font-size="11">P(scan leans supporting)</text>' +
+      '<text x="' + (padL + plotW / 2) + '" y="' + (H - 8) +
+      '" text-anchor="middle" fill="#3d4a5c" font-size="14">P(scan leans supporting)</text>' +
       "</svg>" +
-      '<svg class="m1-bayes-interval" viewBox="0 0 640 56" role="img" aria-label="95 percent credible interval">' +
-      '<line x1="36" y1="28" x2="604" y2="28" stroke="#ddd8ce" stroke-width="6" stroke-linecap="round"></line>' +
-      '<line x1="' + barX(m.lo).toFixed(1) + '" y1="28" x2="' + barX(m.hi).toFixed(1) +
-      '" y2="28" stroke="#2f6f4e" stroke-width="6" stroke-linecap="round"></line>' +
-      '<polygon points="' + diamond.toFixed(1) + ',16 ' + (diamond + 9).toFixed(1) +
-      ",28 " + diamond.toFixed(1) + ",40 " + (diamond - 9).toFixed(1) +
-      ',28" fill="#1a2332"></polygon>' +
-      '<text x="36" y="50" fill="#3d4a5c" font-size="11">0%</text>' +
-      '<text x="604" y="50" text-anchor="end" fill="#3d4a5c" font-size="11">100%</text>' +
-      '<text x="' + diamond.toFixed(1) + '" y="12" text-anchor="middle" fill="#1a2332" font-size="12">' +
+      '<svg class="m1-bayes-interval" viewBox="0 0 ' + W + ' 64" role="img" aria-label="95 percent credible interval">' +
+      '<line x1="' + padL + '" y1="' + barY + '" x2="' + (padL + plotW) +
+      '" y2="' + barY + '" stroke="#ddd8ce" stroke-width="8" stroke-linecap="round"></line>' +
+      '<line x1="' + barX(m.lo).toFixed(1) + '" y1="' + barY + '" x2="' + barX(m.hi).toFixed(1) +
+      '" y2="' + barY + '" stroke="#2f6f4e" stroke-width="8" stroke-linecap="round"></line>' +
+      '<polygon points="' + diamond.toFixed(1) + ',' + (barY - 14) + " " +
+      (diamond + 11).toFixed(1) + "," + barY + " " + diamond.toFixed(1) + "," +
+      (barY + 14) + " " + (diamond - 11).toFixed(1) + "," + barY +
+      '" fill="#1a2332"></polygon>' +
+      '<text x="' + padL + '" y="58" fill="#3d4a5c" font-size="13">' +
+      Math.round(x0 * 100) + "%</text>" +
+      '<text x="' + (padL + plotW) + '" y="58" text-anchor="end" fill="#3d4a5c" font-size="13">' +
+      Math.round(x1 * 100) + "%</text>" +
+      '<text x="' + diamond.toFixed(1) + '" y="14" text-anchor="middle" fill="#1a2332" font-size="14">' +
       meanPct + "% · 95% CrI " + loPct + "–" + hiPct + "%</text>" +
       "</svg>" +
       '<p class="m1-bayes-stats">Prior Beta(1,1). Posterior Beta(' +
       (Math.round(m.a * 10) / 10) + ", " + (Math.round(m.b * 10) / 10) +
       "). Quality-weighted votes: supporting " + m.sw + ", contradicting " + m.cw +
-      ". Dashed line is 50% (equipoise). Shaded band is the 95% credible interval.</p>" +
+      ". Axis is zoomed to the posterior mass. Dashed line is 50% (equipoise) when it falls in view. Shaded band is the 95% credible interval.</p>" +
       "</section>"
     );
   }
@@ -2415,6 +2571,9 @@
 
   function boot() {
     if (!$("#m1-root")) return;
+    bindThemeToggle();
+    bindCollapseToggles();
+    bindCollapsedMore(document);
     renderStepper();
     bindStickyStepper();
     setStep(1);
@@ -2423,16 +2582,18 @@
 
   function readDossierSeed() {
     var node = $("#dossier-data");
-    if (!node) return { topic: "", originalTopic: "", discipline: "" };
+    if (!node) return { topic: "", originalTopic: "", discipline: "", supportBlurb: "", contraBlurb: "" };
     try {
       var data = JSON.parse(node.textContent || "{}");
       return {
         topic: String(data.topic || "").trim(),
         originalTopic: String(data.original_topic || "").trim(),
         discipline: String(data.discipline || "").trim(),
+        supportBlurb: String(data.support_blurb || "").trim(),
+        contraBlurb: String(data.contra_blurb || "").trim(),
       };
     } catch (e) {
-      return { topic: "", originalTopic: "", discipline: "" };
+      return { topic: "", originalTopic: "", discipline: "", supportBlurb: "", contraBlurb: "" };
     }
   }
 
