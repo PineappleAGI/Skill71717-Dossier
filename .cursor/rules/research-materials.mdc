@@ -14,13 +14,13 @@ When this rule is invoked, follow the phased workflow in `SKILL.md`:
 
 1. **Read `SKILL.md`** — complete phase-by-phase instructions
 2. **Phase 0:** Detect mode (live intake, example replay, or regenerate)
-3. **Phase 1:** Start `python scripts/intake-server.py --port 8765 --out .research-materials`. Tell the user to click **Start harvest**. **Do not end the turn.** Run `python scripts/wait-for-submission.py .research-materials --timeout 600`
+3. **Phase 1:** `python scripts/intake-server.py --stop` then `python scripts/mode1-server.py --port 8767 --out .research-materials` (form on 8767; opens at most once). **Do not** start port 8765. **Do not** open the URL yourself. Tell the user to click **Start harvest** at `http://127.0.0.1:8767/`. **Do not end the turn.** Run `python scripts/wait-for-submission.py .research-materials --timeout 600`
 4. **Phase 1b:** On submit, read `raw_submission.json`. Interpret the question (who / exposure / comparison / outcome). Write `original_topic` + sharpened `topic`, discipline, up to 4 title-like `seed_queries`, year sanity-check → `request.json`. Never harvest from the raw form sentence.
 5. **Phase 2:** `python scripts/harvest-sources.py .research-materials/request.json .research-materials`
 6. **Phase 3:** `python scripts/classify-claims.py …` if `ANTHROPIC_API_KEY` is set; otherwise skip and continue
 7. **Phase 3b:** Write `enrichment.json` (inquiry lens + gaps; no fabricated URLs)
-8. **Phase 4:** `python scripts/generate-dossier.py … --no-open`, then `python scripts/mode1-server.py --html <dossier.html> --port 8767` so the page opens at `http://127.0.0.1:8767/`. Never hand-edit HTML. Never wait for the user to ask you to open it. **Ask another question** on the dossier opens `http://127.0.0.1:8767/ask`. If they use it, run `python scripts/wait-for-submission.py .research-materials --timeout 600` and continue from Phase 1b.
-9. **Phase 5:** Stop the intake server and summarize (original wording, interpreted question, counts, gaps, URL)
+8. **Phase 4:** `python scripts/generate-dossier.py … --no-open`, then `python scripts/mode1-server.py --html <dossier.html> --port 8767 --no-open` (reload; **never** `--stop`). The waiting tab becomes the dossier. If that tab was closed, the reload opens the browser once. **Ask another question** is `/ask` on the same origin; after submit, wait and continue from Phase 1b, then `--html` reload again.
+9. **Phase 5:** Leave Mode 1 running. Summarize (original wording, interpreted question, counts, gaps, URL). Stop leftover `intake-server.py` only if port 8765 is still up.
 
 Do not stop after harvest. Do not ask “did you submit?”
 

@@ -3,9 +3,6 @@
 (function (root) {
   "use strict";
 
-  var DISCLAIMER =
-    "A conversation piece, not medical, legal, or financial advice.";
-
   function esc(s) {
     return String(s || "")
       .replace(/&/g, "&amp;")
@@ -124,183 +121,15 @@
     return 3;
   }
 
-  function catchHeadline(question) {
-    var q = String(question || "").replace(/\s+/g, " ").trim().replace(/\?+$/, "");
-    if (!q) return "What did this scan of the papers find?";
-
-    var pop = "";
-    var inM = q.match(/^In\s+([^,]{3,90}),\s+(.*)$/i);
-    if (inM && inM[2].length > 24) {
-      pop = inM[1]
-        .replace(/^college-aged young adults$/i, "college-aged adults")
-        .replace(/^young adults$/i, "young adults");
-      q = inM[2];
+  function readShareSummary() {
+    try {
+      var node = document.getElementById("dossier-data");
+      if (!node) return {};
+      var data = JSON.parse(node.textContent || "{}");
+      return (data && data.share_summary) || {};
+    } catch (err) {
+      return {};
     }
-
-    if (/^is college students?\s+eating\s+/i.test(q)) {
-      q = q.replace(/^is college students?\s+eating\s+/i, "Is eating ");
-      if (!pop) pop = "college students";
-    }
-
-    q = q
-      .replace(/\bhigh egg intake\b/gi, "eating a lot of eggs")
-      .replace(/\bas a protein source\b/gi, "for protein")
-      .replace(/\bas a source of protein\b/gi, "for protein")
-      .replace(/\bassociated with worse\b/gi, "worse for")
-      .replace(/\blong-term cardiovascular outcomes\b/gi, "long-term heart health")
-      .replace(/\bcardiovascular health for the long term\b/gi, "the heart in the long run")
-      .replace(/\bsafe for cardiovascular health\b/gi, "safe for the heart")
-      .replace(/\bfor the long term\b/gi, "in the long run")
-      .replace(/\bthan protein from\b/gi, "than")
-      .replace(/\bvs\.?\b/gi, "versus")
-      .replace(/\s{2,}/g, " ")
-      .trim();
-
-    q = q.replace(
-      /\s+versus\s+([^—,.]+?)\s+for protein\s+/i,
-      " for protein — versus $1 — "
-    );
-
-    if (pop && !new RegExp(pop.split(/\s+/)[0], "i").test(q)) {
-      if (/^(is|are|do|does|can|could|should)\b/i.test(q)) {
-        q = "For " + pop + ", " + q.charAt(0).toLowerCase() + q.slice(1);
-      }
-    }
-
-    q = q.charAt(0).toUpperCase() + q.slice(1);
-    if (!/\?$/.test(q)) q += "?";
-    return q;
-  }
-
-  function spokenQuestion(question) {
-    var q = String(question || "").replace(/\s+/g, " ").trim().replace(/\?+$/, "");
-    var m = q.match(/^In\s+[^,]{3,80},\s+(.*)$/i);
-    if (m && m[1].length > 24) q = m[1];
-    if (!q) return "this question";
-    q = q.charAt(0).toLowerCase() + q.slice(1);
-    if (!/[.!?]$/.test(q)) q += "?";
-    return q;
-  }
-
-  function aboutCollege(q) {
-    return /\bcollege|student|campus|dorm|freshman|undergrad\b/i.test(q);
-  }
-
-  function aboutHeart(q) {
-    return /\bheart|cardio|cholesterol|cardiovascular\b/i.test(q);
-  }
-
-  function aboutEggsMeatFish(q) {
-    return /\beggs?\b/i.test(q) && /\bmeat|fish|protein\b/i.test(q);
-  }
-
-  function heroCaption() {
-    return "Eggs, chicken, and salmon on one tray — the comparison the question keeps staging. Editorial photo, not a study figure.";
-  }
-
-  function chartCaption() {
-    return "An editorial sketch of how loud each worry feels in a dining line — not a study result, and not numbers from the papers.";
-  }
-
-  function sketchBars() {
-    return [
-      { label: "Cheap and fast", v: 0.90 },
-      { label: "Tastes good tonight", v: 0.72 },
-      { label: "Sounds like the healthy pick", v: 0.54 },
-      { label: "Heart in forty years", v: 0.18 },
-    ];
-  }
-
-  function heroFigureHtml() {
-    var src = root.M1_BLOG_HERO;
-    if (!src) return "";
-    var w = root.M1_BLOG_HERO_W || 1100;
-    var h = root.M1_BLOG_HERO_H || 733;
-    return (
-      '<figure class="m1-blog-hero">' +
-      '<img src="' + src + '" width="' + w + '" height="' + h +
-      '" alt="A breakfast tray with fried eggs, roasted chicken, and salmon">' +
-      "<figcaption>" + esc(heroCaption()) + "</figcaption>" +
-      "</figure>"
-    );
-  }
-
-  function sketchChartHtml() {
-    var bars = sketchBars();
-    var rowH = 54;
-    var top = 2;
-    var w = 640;
-    var h = top + bars.length * rowH;
-    var barH = 16;
-    var svg = bars.map(function (b, i) {
-      var y = top + i * rowH;
-      var bw = Math.max(10, Math.round(b.v * w));
-      return (
-        "<g>" +
-        '<text x="0" y="' + (y + 13) + '" fill="#3d4a5c" font-size="13" font-family="Source Sans 3, Helvetica, sans-serif">' +
-        esc(b.label) + "</text>" +
-        '<rect x="0" y="' + (y + 20) + '" width="' + w + '" height="' + barH + '" rx="4" fill="#ece7dc"></rect>' +
-        '<rect x="0" y="' + (y + 20) + '" width="' + bw + '" height="' + barH + '" rx="4" fill="#2f6f4e"></rect>' +
-        "</g>"
-      );
-    }).join("");
-    return (
-      '<figure class="m1-blog-chart-wrap">' +
-      '<p class="m1-blog-chart-title">What the dining line actually weighs</p>' +
-      '<svg class="m1-blog-chart" viewBox="0 0 ' + w + " " + h +
-      '" role="img" aria-label="Editorial sketch of dining-line priorities, not study data">' +
-      svg +
-      "</svg>" +
-      "<figcaption>" + esc(chartCaption()) + "</figcaption>" +
-      "</figure>"
-    );
-  }
-
-  function lightEssay(question, headline) {
-    var q = String(question || "") + " " + String(headline || "");
-    var paras = [];
-
-    paras.push(
-      "Some questions show up with a clipboard. This one usually shows up with a plate. " +
-      "You ask a roommate, a parent, or the internet at 11 p.m. — not because you want a lecture, but because tomorrow morning you have to choose something."
-    );
-
-    if (aboutCollege(q)) {
-      paras.push(
-        "College is when eating stops being a family script and starts being improvisation. The dining hall is open. The fridge is a rumor. Eggs are cheap, fast, and always there. Chicken looks like the “serious” option. Fish sounds like the adult in the room. You are not designing a diet so much as surviving a week."
-      );
-      paras.push(
-        "That is why the question nags. Four years of whatever-is-easy can quietly become the next forty years of whatever-is-normal. Nobody is thinking about their arteries in line for breakfast. They are thinking about class, sleep, and whether the hot sauce is out."
-      );
-    } else {
-      paras.push(
-        "The question sticks because it lives in repetition. You do the thing once because it is convenient. You do it again because it worked. Only later does it start to sound like a long-term plot."
-      );
-    }
-
-    if (aboutEggsMeatFish(q) && aboutHeart(q)) {
-      paras.push(
-        "Eggs have a whole folklore. They are the perfect food, or they are walking cholesterol, depending on who is talking and what year it is. Meat is comfort and suspicion in the same bite. Fish gets a halo it did not ask for. Protein is the alibi that lets the argument into the room."
-      );
-      paras.push(
-        "Then someone says the word heart, and a boring breakfast turns cinematic. As if one food were a villain and another a rescue. Real plates are messier. What else is on the tray. How the rest of the week looks. Whether “lots of eggs” means a careful habit or a three-carton week with no vegetables in sight. The comparison is sneakier than eggs versus fish, as if those were the only two characters in the story."
-      );
-      paras.push(
-        "People want a clean yes or no because the dining line does not offer footnotes. Food culture loves a simple moral: this is safe, that is dangerous, switch and be saved. A lighter way to hold the question is to treat it as a conversation with your future self, not a quiz you have to ace before lunch."
-      );
-      paras.push(
-        "So keep asking it, gently. Notice what you actually reach for when you are tired. Leave room for fish when you want it, eggs when they make the morning possible, and the idea that one protein source is rarely the whole plot. You do not need a verdict. You need a relationship with food that still feels like yours in ten years."
-      );
-    } else {
-      paras.push(
-        "The question is dressed as a comparison because comparisons feel actionable. One thing versus another. A better bet. A safer lean. Life rarely holds still long enough for that kind of scoreboard, which is exactly why the question keeps coming back."
-      );
-      paras.push(
-        "A lighter way to live with it: stay curious, stay un-dramatic, and notice what you do when nobody is grading you. You do not need a final answer tonight. You need a way of choosing that you can still respect when the hype moves on."
-      );
-    }
-
-    return paras;
   }
 
   function todayLabel() {
@@ -317,18 +146,23 @@
 
   function buildBlogArticle(ctx) {
     ctx = ctx || {};
-    var question = ctx.question || "";
-    var headline = catchHeadline(question);
-    var qAll = question + " " + headline;
+    var summary = ctx.share_summary || readShareSummary();
+    var question = ctx.question || summary.headline || "";
+    var paras = ctx.paras || summary.paras || [];
+    if (!paras.length) {
+      paras = [
+        "The article is not ready yet. Run the scan again and it will write itself from the findings.",
+      ];
+    }
     return {
-      headline: headline,
-      dek: "A lighter take on a question people actually ask.",
-      byline: "Pineapple 71717 · " + (todayLabel() || "a short read"),
-      paras: lightEssay(question, headline),
-      disclaimer: DISCLAIMER,
+      headline: ctx.headline || summary.headline || question || "The article",
+      dek: "",
+      byline: "Skill Dossier - by Pineapple Team · " + (todayLabel() || ""),
+      paras: paras,
+      disclaimer: "",
       refs: [],
-      showHero: aboutEggsMeatFish(qAll) && !!root.M1_BLOG_HERO,
-      showChart: aboutEggsMeatFish(qAll) && aboutHeart(qAll),
+      showHero: false,
+      showChart: false,
     };
   }
 
@@ -349,17 +183,12 @@
 
   function articleBodyHtml(article) {
     var html =
-      '<p class="m1-blog-dek">' + esc(article.dek) + "</p>" +
       '<p class="m1-blog-byline">' +
       '<span class="m1-blog-byline-meta">' + esc(article.byline) + "</span>" +
-      '<button type="button" class="m1-blog-copy-inline" id="m1-blog-copy-byline" title="Copy the full essay to paste into Medium, Substack, or any editor">Copy article</button>' +
       "</p>";
-    if (article.showHero) html += heroFigureHtml();
-    (article.paras || []).forEach(function (p, i) {
+    (article.paras || []).forEach(function (p) {
       html += "<p>" + esc(p) + "</p>";
-      if (i === 1 && article.showChart) html += sketchChartHtml();
     });
-    html += '<p class="m1-blog-disclaimer">' + esc(article.disclaimer) + "</p>";
     if (article.refs && article.refs.length) {
       html += "<h3>References</h3>" + renderRefs(article.refs);
     }
@@ -367,15 +196,7 @@
   }
 
   function articlePlainText(article) {
-    var parts = [article.headline, article.dek, article.byline];
-    if (article.showHero) parts.push(heroCaption());
-    (article.paras || []).forEach(function (p, i) {
-      parts.push(p);
-      if (i === 1 && article.showChart) {
-        parts.push("What the dining line actually weighs", chartCaption());
-      }
-    });
-    parts.push(article.disclaimer);
+    var parts = [article.headline, article.byline].concat(article.paras || []);
     return parts.filter(Boolean).join("\n\n");
   }
 
@@ -534,7 +355,7 @@
     var pages = [];
     var y = yStart;
     var cmds = [];
-    var jpeg = article.showHero ? jpegBytesFromHero() : null;
+    var jpeg = null;
 
     function startPage() {
       cmds = [];
@@ -562,69 +383,15 @@
       });
     }
 
-    function drawHero() {
-      if (!jpeg) return;
-      var natW = root.M1_BLOG_HERO_W || 1100;
-      var natH = root.M1_BLOG_HERO_H || 733;
-      var imgW = maxW;
-      var imgH = imgW * natH / natW;
-      if (imgH > 196) {
-        imgH = 196;
-        imgW = imgH * natW / natH;
-      }
-      ensure(imgH + 30);
-      cmds.push("q");
-      cmds.push(
-        imgW.toFixed(2) + " 0 0 " + imgH.toFixed(2) + " " +
-        margin.toFixed(2) + " " + (y - imgH).toFixed(2) + " cm"
-      );
-      cmds.push("/Im1 Do");
-      cmds.push("Q");
-      y -= imgH + 6;
-      addText(heroCaption(), "F3", 8, 11);
-      gap(10);
-    }
-
-    function drawSketchChart() {
-      var bars = sketchBars();
-      var chartH = 18 + bars.length * 32 + 36;
-      ensure(chartH);
-      addText("What the dining line actually weighs", "F1", 11, 15);
-      gap(2);
-      bars.forEach(function (b) {
-        ensure(32);
-        cmds.push(
-          "BT /F2 9 Tf 1 0 0 1 " + margin.toFixed(2) + " " + y.toFixed(2) +
-          " Tm (" + pdfEscape(b.label) + ") Tj ET"
-        );
-        y -= 12;
-        var barY = y - 8;
-        var barW = Math.max(8, b.v * maxW);
-        cmds.push("0.925 0.906 0.863 rg");
-        cmds.push(margin.toFixed(2) + " " + barY.toFixed(2) + " " + maxW.toFixed(2) + " 10 re f");
-        cmds.push("0.184 0.435 0.306 rg");
-        cmds.push(margin.toFixed(2) + " " + barY.toFixed(2) + " " + barW.toFixed(2) + " 10 re f");
-        cmds.push("0 0 0 rg");
-        y -= 20;
-      });
-      addText(chartCaption(), "F3", 8, 11);
-      gap(10);
-    }
-
     startPage();
     addText(article.headline, "F1", 16, 20);
     gap(6);
-    addText(article.dek, "F3", 11, 15);
     addText(article.byline, "F2", 10, 14);
     gap(10);
-    drawHero();
-    (article.paras || []).forEach(function (p, i) {
+    (article.paras || []).forEach(function (p) {
       addText(p, "F2", 11, 15);
       gap(8);
-      if (i === 1 && article.showChart) drawSketchChart();
     });
-    gap(6);
-    addText(article.disclaimer, "F2", 9, 13);
     if ((article.refs || []).length) {
       gap(14);
       addText("References", "F1", 13, 18);
@@ -638,7 +405,7 @@
     pages.forEach(function (pageCmds, i) {
       pageCmds.push(
         "BT /F2 8 Tf 1 0 0 1 " + margin.toFixed(2) + " 28 Tm (" +
-        pdfEscape("Pineapple 71717  ·  " + (i + 1) + " / " + pages.length) + ") Tj ET"
+        pdfEscape("Skill Dossier  ·  " + (i + 1) + " / " + pages.length) + ") Tj ET"
       );
     });
 
@@ -746,14 +513,13 @@
     var article = buildBlogArticle(ctx);
     return (
       '<section class="m1-blog" id="m1-blog-post">' +
-      '<p class="m1-blog-kicker">A lighter read</p>' +
+      '<p class="m1-blog-kicker">The article</p>' +
       "<h2>" + esc(article.headline) + "</h2>" +
       articleBodyHtml(article) +
       '<div class="m1-blog-actions">' +
-      '<button type="button" class="btn btn-primary" id="m1-blog-image">Download cover</button>' +
-      '<button type="button" class="btn btn-ghost" id="m1-blog-image-full">Download as Image</button>' +
-      '<button type="button" class="btn btn-ghost" id="m1-blog-pdf">Download PDF</button>' +
-      '<p class="m1-blog-share-hint">Cover is 1200×630 for LinkedIn and X. Download as Image is a tall PNG of the whole piece.</p>' +
+      '<button type="button" class="btn btn-ghost m1-blog-share-btn" id="m1-blog-copy-byline" title="Copy the findings summary">Copy article</button>' +
+      '<button type="button" class="btn btn-ghost m1-blog-share-btn" id="m1-blog-image-full">Download as Image</button>' +
+      '<button type="button" class="btn btn-ghost m1-blog-share-btn" id="m1-blog-pdf">Download PDF</button>' +
       "</div>" +
       "</section>"
     );
@@ -870,7 +636,7 @@
     ctx.fillRect(0, H - 72, W, 72);
     ctx.fillStyle = "#2f6f4e";
     ctx.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-    ctx.fillText("A lighter read from a literature scan  ·  not medical advice", 48, H - 32);
+    ctx.fillText("A short article from a literature scan", 48, H - 32);
 
     return canvas;
   }
@@ -882,133 +648,59 @@
     ctx.fill();
   }
 
-  function drawSketchChart(ctx, x, y, w) {
-    var bars = sketchBars();
-    var rowH = 52;
-    ctx.fillStyle = "#1a2332";
-    ctx.font = "650 22px Fraunces, Georgia, serif";
-    ctx.fillText("What the dining line actually weighs", x, y + 8);
-    y += 28;
-    bars.forEach(function (b) {
-      ctx.fillStyle = "#3d4a5c";
-      ctx.font = "400 16px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-      ctx.fillText(b.label, x, y + 14);
-      ctx.fillStyle = "#ece7dc";
-      fillRoundRect(ctx, x, y + 20, w, 16, 4);
-      ctx.fillStyle = "#2f6f4e";
-      fillRoundRect(ctx, x, y + 20, Math.max(10, w * b.v), 16, 4);
-      y += rowH;
-    });
-    ctx.fillStyle = "#3d4a5c";
-    ctx.font = "italic 14px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-    var cap = wrapCanvasText(ctx, chartCaption(), w);
-    cap.forEach(function (line) {
-      ctx.fillText(line, x, y + 12);
-      y += 20;
-    });
-    return y + 8;
-  }
-
-  function drawFullBlog(article, img) {
+  function drawFullBlog(article) {
     var W = 1200;
     var pad = 56;
     var maxW = W - pad * 2;
     var probe = document.createElement("canvas").getContext("2d");
     var y = pad + 8;
-    var heroH = 0;
-    if (img && article.showHero) {
-      heroH = Math.min(480, Math.round(maxW * img.height / img.width));
-    }
 
     probe.font = "650 40px Fraunces, Georgia, serif";
     var hed = wrapCanvasText(probe, article.headline, maxW);
-    probe.font = "400 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-    y += 28 + hed.length * 50 + 28 + 28 + 36;
-    if (heroH) y += heroH + 48;
-    (article.paras || []).forEach(function (p, i) {
+    y += 28 + hed.length * 50 + 28 + 36;
+    (article.paras || []).forEach(function (p) {
       probe.font = "400 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
       y += wrapCanvasText(probe, p, maxW).length * 34 + 18;
-      if (i === 1 && article.showChart) y += 28 + sketchBars().length * 52 + 80;
     });
-    probe.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-    y += wrapCanvasText(probe, article.disclaimer, maxW - 24).length * 28 + 120;
+    y += 48;
 
     var H = Math.ceil(y + pad);
     var canvas = document.createElement("canvas");
     canvas.width = W;
     canvas.height = H;
     var ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#f7f4ef";
+    ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#2f6f4e";
+    ctx.fillStyle = "#1f5fa8";
     ctx.fillRect(0, 0, 10, H);
 
     var cy = pad;
-    ctx.fillStyle = "#c4a35a";
+    ctx.fillStyle = "#8a6d1f";
     ctx.font = "700 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-    ctx.fillText("A LIGHTER READ  ·  PINEAPPLE 71717", pad, cy + 8);
+    ctx.fillText("THE ARTICLE  ·  SKILL DOSSIER", pad, cy + 8);
     cy += 36;
 
-    ctx.fillStyle = "#1a2332";
+    ctx.fillStyle = "#111417";
     ctx.font = "650 40px Fraunces, Georgia, serif";
     hed.forEach(function (line) {
       ctx.fillText(line, pad, cy);
       cy += 50;
     });
     cy += 8;
-    ctx.fillStyle = "#3d4a5c";
-    ctx.font = "400 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-    ctx.fillText(article.dek || "", pad, cy);
-    cy += 32;
+    ctx.fillStyle = "#4a5158";
     ctx.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
     ctx.fillText(article.byline || "", pad, cy);
     cy += 36;
 
-    if (img && article.showHero) {
-      drawCover(ctx, img, pad, cy, maxW, heroH);
-      cy += heroH + 12;
-      ctx.fillStyle = "#3d4a5c";
-      ctx.font = "italic 14px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-      wrapCanvasText(ctx, heroCaption(), maxW).forEach(function (line) {
-        ctx.fillText(line, pad, cy + 12);
-        cy += 20;
-      });
-      cy += 16;
-    }
-
-    (article.paras || []).forEach(function (p, i) {
-      ctx.fillStyle = "#1a2332";
+    (article.paras || []).forEach(function (p) {
+      ctx.fillStyle = "#111417";
       ctx.font = "400 22px 'Source Sans 3', 'Helvetica Neue', sans-serif";
       wrapCanvasText(ctx, p, maxW).forEach(function (line) {
         ctx.fillText(line, pad, cy);
         cy += 34;
       });
       cy += 18;
-      if (i === 1 && article.showChart) {
-        ctx.fillStyle = "#ffffff";
-        var chartTop = cy;
-        var chartH = 36 + sketchBars().length * 52 + 64;
-        fillRoundRect(ctx, pad - 12, chartTop - 8, maxW + 24, chartH, 12);
-        cy = drawSketchChart(ctx, pad, cy, maxW);
-        cy += 20;
-      }
     });
-
-    ctx.fillStyle = "#f3ead2";
-    ctx.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-    var discLines = wrapCanvasText(ctx, article.disclaimer, maxW - 24);
-    var boxH = discLines.length * 26 + 28;
-    fillRoundRect(ctx, pad - 8, cy, maxW + 16, boxH, 10);
-    ctx.fillStyle = "#1a2332";
-    ctx.font = "600 18px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-    discLines.forEach(function (line) {
-      ctx.fillText(line, pad + 12, cy + 28);
-      cy += 26;
-    });
-    cy += 36;
-    ctx.fillStyle = "#2f6f4e";
-    ctx.font = "600 16px 'Source Sans 3', 'Helvetica Neue', sans-serif";
-    ctx.fillText("Full essay from a literature scan  ·  not medical advice", pad, cy + 8);
 
     return canvas;
   }
@@ -1066,9 +758,7 @@
       ? document.fonts.ready.catch(function () {})
       : Promise.resolve();
     return fonts.then(function () {
-      return loadHeroImage();
-    }).then(function (img) {
-      return canvasPngBlob(drawFullBlog(article, article.showHero ? img : null));
+      return canvasPngBlob(drawFullBlog(article));
     }).then(function (blob) {
       triggerBlobDownload(blob, slugImageName(article.headline, "full"));
       return { ok: true, data: { filename: slugImageName(article.headline, "full") } };

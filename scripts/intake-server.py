@@ -26,8 +26,11 @@ from urllib.parse import parse_qs
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = SKILL_ROOT / ".research-materials"
 PID_FILE = SKILL_ROOT / ".intake-server.pid"
+MODE1_PID_FILE = SKILL_ROOT / ".mode1-server.pid"
+SERVING_FILE = SKILL_ROOT / ".mode1-serving"
 CSS_PATH = SKILL_ROOT / "visualization-base.css"
 FOCUS_JS_PATH = SKILL_ROOT / "scripts" / "desktop-focus.js"
+RESULT_ORIGIN = "http://127.0.0.1:8767"
 
 
 def _load_css() -> str:
@@ -119,9 +122,14 @@ def _form_html() -> str:
 """
 
 
-def _confirm_html() -> str:
+def _confirm_html(*, result_origin: str = "") -> str:
+    """Waiting page that becomes the dossier in this same tab."""
     css = _load_css()
     focus_js = _desktop_focus_js()
+    ready_url = "/ready" if not result_origin else result_origin.rstrip("/") + "/ready"
+    result_url = "/" if not result_origin else result_origin.rstrip("/") + "/"
+    ready_js = json.dumps(ready_url)
+    result_js = json.dumps(result_url)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -142,9 +150,28 @@ def _confirm_html() -> str:
       <a class="brand-mark" href="https://github.com/PineappleAGI/Skill71717-Dossier" target="_blank" rel="noopener noreferrer">Pineapple 71717</a>
     </div>
     <h1>Request submitted</h1>
-    <p class="lede">Your topic was saved. Return to Cursor — the assistant will harvest sources and rebuild the dossier. You can close this tab.</p>
+    <p class="lede">Your topic was saved. This tab will show the dossier when it is ready. Do not open another window.</p>
     <p class="wait-note">Wait time is approximately <strong>5–10 minutes</strong>.</p>
   </div>
+  <script>
+  (function () {{
+    var readyUrl = {ready_js};
+    var resultUrl = {result_js};
+    function tick() {{
+      fetch(readyUrl, {{ cache: "no-store" }})
+        .then(function (r) {{ return r.json(); }})
+        .then(function (j) {{
+          if (j && j.dossier) {{
+            location.replace(resultUrl);
+            return;
+          }}
+          setTimeout(tick, 1500);
+        }})
+        .catch(function () {{ setTimeout(tick, 1500); }});
+    }}
+    tick();
+  }})();
+  </script>
 </body>
 </html>
 """
@@ -247,10 +274,34 @@ class Handler(BaseHTTPRequestHandler):
         out_path.write_text(json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         # Signal file for agents that prefer a simple existence check
         (self.out_dir / "RAW_SUBMISSION_READY").write_text("1\n", encoding="utf-8")
-        self._send(200, _confirm_html().encode("utf-8"))
+        _clear_serving_pointer()
+        self._send(200, _confirm_html(result_origin=RESULT_ORIGIN).encode("utf-8"))
+
+
+def _stop_pid_file(pid_file: Path) -> bool:
+    if not pid_file.is_file():
+        return False
+    try:
+        pid = int(pid_file.read_text(encoding="utf-8").strip())
+        os.kill(pid, signal.SIGTERM)
+    except (ValueError, ProcessLookupError, PermissionError):
+        pass
+    try:
+        pid_file.unlink(missing_ok=True)
+    except OSError:
+        pass
+    return True
+
+
+def _clear_serving_pointer() -> None:
+    try:
+        SERVING_FILE.unlink(missing_ok=True)
+    except OSError:
+        pass
 
 
 def _stop_existing() -> bool:
+    return _stop_pid_file(PID_FILE)
     if not PID_FILE.is_file():
         return False
     try:
@@ -279,6 +330,8 @@ def main() -> int:
         return 0
 
     _stop_existing()
+    _stop_pid_file(MODE1_PID_FILE)
+    _clear_serving_pointer()
     out_dir = args.out.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     # Clear stale submission so the agent waits for a fresh submit

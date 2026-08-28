@@ -88,12 +88,12 @@ Find research materials on retrieval-augmented generation evaluation
 
 Then sit back. The assistant will:
 
-1. Start a tiny local intake page in your browser
+1. Open one local page in your browser — the question form
 2. Wait while you enter a topic and filters (year range, what to include, max results)
 3. Harvest candidates across tracks from OpenAlex, arXiv, CrossRef, and Semantic Scholar
 4. Enrich each item (relevance, short description, track confirmation, limitations)
 5. Generate a timestamped HTML dossier under `.research-materials/`
-6. Open the dossier in your browser
+6. Turn that same browser tab into the finished dossier (no second window)
 
 ---
 

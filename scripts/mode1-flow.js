@@ -2244,7 +2244,6 @@
       });
     }
     wire("#m1-blog-pdf", window.downloadMode1BlogPdf, "Building PDF…");
-    wire("#m1-blog-image", window.downloadMode1BlogImage, "Building cover…");
     wire("#m1-blog-image-full", window.downloadMode1BlogFullImage, "Building image…");
     wire("#m1-blog-copy-byline", window.copyMode1BlogText, "Copying…");
   }
@@ -2803,22 +2802,6 @@
     });
   }
 
-  function bindThemeToggle() {
-    var btn = $("#m1-theme-toggle");
-    if (!btn) return;
-    function apply(theme) {
-      if (theme === "press") document.documentElement.setAttribute("data-m1-theme", "press");
-      else document.documentElement.removeAttribute("data-m1-theme");
-      btn.textContent = theme === "press" ? "Reading view" : "Print view";
-      try { localStorage.setItem("m1-theme", theme); } catch (e) {}
-    }
-    apply("paper");
-    btn.addEventListener("click", function () {
-      var now = document.documentElement.getAttribute("data-m1-theme") === "press" ? "press" : "paper";
-      apply(now === "press" ? "paper" : "press");
-    });
-  }
-
   function logGamma(z) {
     var p = [
       0.99999999999980993, 676.5203681218851, -1259.1392167224028,
@@ -3062,7 +3045,6 @@
 
   function boot() {
     if (!$("#m1-root")) return;
-    bindThemeToggle();
     bindCollapseToggles();
     bindMapDownload();
     bindCollapsedMore(document);

@@ -2304,8 +2304,17 @@ a.m1-card-title-link:hover {
 .m1-blog-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.4rem;
   margin: 0.35rem 0 0.5rem;
+}
+.m1-blog-actions .m1-blog-share-btn {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.22rem 0.65rem;
+  line-height: 1.25;
+  border-radius: 999px;
 }
 .m1-blog-share-hint {
   flex: 1 0 100%;

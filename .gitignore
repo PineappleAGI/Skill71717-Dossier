@@ -30,4 +30,6 @@ Thumbs.db
 
 # Server pid / lock
 .intake-server.pid
+.mode1-serving
+.mode1-last-ready
 *.pid

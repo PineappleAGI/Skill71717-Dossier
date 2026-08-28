@@ -6,8 +6,15 @@ Browser pages opened as file:// cannot call PubMed/Europe PMC (CORS / opaque
 origin). This local server is part of the skill — no MCP, no extra accounts.
 
 Usage:
-  python scripts/mode1-server.py --html example/dossier.html --port 8766
+  python scripts/mode1-server.py --port 8767
+  python scripts/mode1-server.py --html example/dossier.html --port 8767
+  python scripts/mode1-server.py --html dossier.html --port 8767 --no-open
   python scripts/mode1-server.py --stop
+
+Live intake: start with no --html so `/` is the question form (opens once).
+After generate: `--html FILE --no-open` hot-reloads a running server. If the
+waiting tab is still polling `/ready`, it becomes the dossier. If that tab was
+closed, the reload opens the browser once so the dossier is visible.
 """
 
 from __future__ import annotations
@@ -18,6 +25,7 @@ import json
 import os
 import signal
 import sys
+import time
 import traceback
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -27,7 +35,11 @@ import re
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 PID_FILE = SKILL_ROOT / ".mode1-server.pid"
+INTAKE_PID_FILE = SKILL_ROOT / ".intake-server.pid"
+SERVING_FILE = SKILL_ROOT / ".mode1-serving"
+READY_AT_FILE = SKILL_ROOT / ".mode1-last-ready"
 INTAKE_OUT = SKILL_ROOT / ".research-materials"
+READY_IDLE_SECS = 8.0
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import evidence_apis as apis  # noqa: E402
 
@@ -49,8 +61,67 @@ def _json_err(message: str, status: int = 502) -> tuple[int, bytes]:
     return status, body
 
 
+def _set_serving_html(path: Path | None) -> None:
+    if path is None:
+        try:
+            SERVING_FILE.unlink(missing_ok=True)
+        except OSError:
+            pass
+        return
+    SERVING_FILE.write_text(str(path.resolve()) + "\n", encoding="utf-8")
+
+
+def _serving_html() -> Path | None:
+    if not SERVING_FILE.is_file():
+        return None
+    try:
+        raw = SERVING_FILE.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    if not raw:
+        return None
+    path = Path(raw)
+    return path if path.is_file() else None
+
+
+def _mark_ready_poll() -> None:
+    try:
+        READY_AT_FILE.write_text(str(time.time()), encoding="utf-8")
+    except OSError:
+        pass
+
+
+def _waiting_tab_alive() -> bool:
+    if not READY_AT_FILE.is_file():
+        return False
+    try:
+        last = float(READY_AT_FILE.read_text(encoding="utf-8").strip())
+    except (OSError, ValueError):
+        return False
+    return (time.time() - last) < READY_IDLE_SECS
+
+
+def _open_browser(url: str) -> None:
+    try:
+        webbrowser.open(url)
+    except Exception:
+        pass
+
+
+def _dossier_ready() -> dict:
+    html = _serving_html()
+    if html is None:
+        return {"dossier": False}
+    sub = INTAKE_OUT / "raw_submission.json"
+    try:
+        if sub.is_file() and html.stat().st_mtime + 0.05 < sub.stat().st_mtime:
+            return {"dossier": False, "path": str(html)}
+    except OSError:
+        return {"dossier": False}
+    return {"dossier": True, "path": str(html)}
+
+
 class Handler(BaseHTTPRequestHandler):
-    html_path: Path = SKILL_ROOT / "example" / "dossier.html"
     intake = None
 
     def log_message(self, fmt: str, *args: object) -> None:
@@ -90,15 +161,23 @@ class Handler(BaseHTTPRequestHandler):
         q = {k: v[0] if v else "" for k, v in parse_qs(parsed.query).items()}
 
         if path in ("/", "/index.html", "/dossier.html"):
-            html = self.html_path.read_bytes() if self.html_path.is_file() else b"<h1>dossier.html missing</h1>"
-            self._send(200 if self.html_path.is_file() else 404, html)
+            html_path = _serving_html()
+            if html_path is not None and _dossier_ready().get("dossier"):
+                self._send(200, html_path.read_bytes())
+                return
+            self._send(200, self._intake()._form_html().encode("utf-8"))
             return
         if path in ("/ask", "/intake"):
             self._clear_ready_flag()
             self._send(200, self._intake()._form_html().encode("utf-8"))
             return
+        if path == "/ready":
+            _mark_ready_poll()
+            self._send(200, json.dumps(_dossier_ready()).encode("utf-8"), "application/json")
+            return
         if path == "/health":
-            self._send(200, b'{"ok":true}', "application/json")
+            payload = {"ok": True, **_dossier_ready()}
+            self._send(200, json.dumps(payload).encode("utf-8"), "application/json")
             return
 
         if path.startswith("/api/"):
@@ -144,7 +223,8 @@ class Handler(BaseHTTPRequestHandler):
             name = (name or Path(fallback).stem) + ext
         dest_dir = Path.home() / "Downloads"
         if not dest_dir.is_dir():
-            dest_dir = self.html_path.parent
+            served = _serving_html()
+            dest_dir = served.parent if served is not None else INTAKE_OUT
         dest = dest_dir / name
         n = 1
         stem = dest.stem
@@ -171,6 +251,7 @@ class Handler(BaseHTTPRequestHandler):
         out_path = INTAKE_OUT / "raw_submission.json"
         out_path.write_text(json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         (INTAKE_OUT / "RAW_SUBMISSION_READY").write_text("1\n", encoding="utf-8")
+        _set_serving_html(None)
         self._send(200, intake._confirm_html().encode("utf-8"))
 
     def _api(self, path: str, q: dict[str, str]) -> tuple[int, bytes]:
@@ -223,46 +304,103 @@ class Handler(BaseHTTPRequestHandler):
         return _json_err("unknown endpoint", 404)
 
 
-def _stop_existing() -> bool:
-    if not PID_FILE.is_file():
+def _stop_pid_file(pid_file: Path) -> bool:
+    if not pid_file.is_file():
         return False
     try:
-        pid = int(PID_FILE.read_text(encoding="utf-8").strip())
+        pid = int(pid_file.read_text(encoding="utf-8").strip())
         os.kill(pid, signal.SIGTERM)
     except (ValueError, ProcessLookupError, PermissionError):
         pass
     try:
-        PID_FILE.unlink(missing_ok=True)
+        pid_file.unlink(missing_ok=True)
     except OSError:
         pass
     return True
 
 
+def _pid_is_alive(pid_file: Path) -> bool:
+    if not pid_file.is_file():
+        return False
+    try:
+        pid = int(pid_file.read_text(encoding="utf-8").strip())
+        os.kill(pid, 0)
+        return True
+    except (ValueError, ProcessLookupError, PermissionError, OSError):
+        return False
+
+
+def _stop_existing() -> bool:
+    return _stop_pid_file(PID_FILE)
+
+
+def _clear_stale_submission(out_dir: Path) -> None:
+    for name in ("raw_submission.json", "RAW_SUBMISSION_READY", "request.json", "REQUEST_READY"):
+        p = out_dir / name
+        if p.exists():
+            try:
+                p.unlink()
+            except OSError:
+                pass
+
+
 def main() -> int:
+    global INTAKE_OUT
     parser = argparse.ArgumentParser(description="Mode 1 evidence-synthesis server")
-    parser.add_argument("--port", type=int, default=8766)
-    parser.add_argument("--html", type=Path, default=SKILL_ROOT / "example" / "dossier.html")
+    parser.add_argument("--port", type=int, default=8767)
+    parser.add_argument("--html", type=Path, default=None, help="Dossier HTML. Omit to serve the question form.")
+    parser.add_argument("--out", type=Path, default=INTAKE_OUT)
     parser.add_argument("--no-open", action="store_true")
     parser.add_argument("--stop", action="store_true")
     args = parser.parse_args()
+
+    INTAKE_OUT = args.out.resolve()
 
     if args.stop:
         print("stopped" if _stop_existing() else "not running")
         return 0
 
+    html_path = args.html.resolve() if args.html is not None else None
+    if html_path is not None and not html_path.is_file():
+        print(f"html not found: {html_path}", file=sys.stderr)
+        return 2
+
+    # Same port: swap form/dossier. Reopen only if the waiting tab is gone.
+    if _pid_is_alive(PID_FILE):
+        if html_path is None:
+            _set_serving_html(None)
+            _clear_stale_submission(INTAKE_OUT)
+            print("reloaded question form")
+        else:
+            _set_serving_html(html_path)
+            print(f"reloaded {html_path}")
+        url = f"http://127.0.0.1:{args.port}/"
+        if html_path is not None and not _waiting_tab_alive():
+            _open_browser(url)
+            print("opened browser — no waiting tab")
+        else:
+            print("mode1 already listening — not opening a browser")
+        return 0
+
     _stop_existing()
-    html_path = args.html.resolve()
-    Handler.html_path = html_path
+    _stop_pid_file(INTAKE_PID_FILE)
+    INTAKE_OUT.mkdir(parents=True, exist_ok=True)
+
+    if html_path is None:
+        _set_serving_html(None)
+        _clear_stale_submission(INTAKE_OUT)
+        serving_note = "question form"
+    else:
+        _set_serving_html(html_path)
+        serving_note = str(html_path)
+
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     PID_FILE.write_text(str(os.getpid()), encoding="utf-8")
     url = f"http://127.0.0.1:{args.port}/"
     print(f"mode1 listening on {url}")
-    print(f"serving {html_path}")
+    print(f"serving {serving_note}")
     if not args.no_open:
-        try:
-            webbrowser.open(url)
-        except Exception:
-            pass
+        _open_browser(url)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

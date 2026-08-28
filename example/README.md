@@ -2,7 +2,7 @@
 
 Offline demo of Pineapple 71717 for the topic:
 
-> Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only
+> Is ChatGPT better than Claude? — capability, safety, and human-preference comparisons of GPT-4-class models vs Anthropic Claude
 
 ## Quick look
 
@@ -18,7 +18,11 @@ python3 scripts/generate-dossier.py \
 open example/dossier.html
 ```
 
-Or open [`dossier.html`](dossier.html) if it is already up to date.
+Or serve it over HTTP (Mode 1 cannot run as `file://`):
+
+```bash
+python3 scripts/mode1-server.py --html example/dossier.html --port 8767
+```
 
 ## What's inside
 

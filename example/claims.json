@@ -1,504 +1,458 @@
 {
-  "research_question": "Multimodal world models and video generation for planning — Sora-class video models used as simulators vs. generative media only",
+  "research_question": "On capability, safety, and human-preference evaluations, do ChatGPT (GPT-4-class) models outperform Anthropic Claude models, or does the ranking depend on task family?",
   "stance_definitions": {
-    "supports": "evidence backing the idea that video generation models function as genuine world simulators for planning",
-    "contradicts": "evidence that video generation models are media-generation only, or that simulator claims don't hold up under testing"
+    "supports": "evidence that ChatGPT or GPT-4-class models outperform Claude on capability, coding, reasoning, preference, or safety metrics",
+    "contradicts": "evidence that Claude matches or outperforms ChatGPT, or that which model is better depends on task family rather than a global ranking"
   },
-  "model": "offline-example-cache",
-  "classified_at": "2026-08-18T04:45:28Z",
+  "model": "assistant-from-title-abstract",
+  "classified_at": "2026-08-28T02:06:00Z",
   "stats": {
     "harvested": 50,
-    "classified_now": 0,
-    "reused_cache": 49,
-    "skipped_broken_abstract": 1
+    "classified_now": 55,
+    "reused_cache": 0,
+    "skipped_broken_abstract": 0,
+    "note": "ANTHROPIC_API_KEY missing; stances assigned from titles and abstracts only."
   },
   "items": {
-    "arxiv:2301.04104": {
-      "stance": "supports",
-      "confidence": 88,
-      "evidence_strength": "strong",
-      "evidence_strength_reason": "canonical world-model RL agent; latent imagination, not RGB video",
-      "one_line_claim": "DreamerV3 learns environment dynamics and improves behavior by imagining future trajectories, treating generation as a planner rather than a media engine.",
-      "relevance": "high"
-    },
-    "arxiv:2402.15391": {
-      "stance": "supports",
-      "confidence": 90,
-      "evidence_strength": "strong",
-      "evidence_strength_reason": "flagship interactive generative environment from unlabeled video",
-      "one_line_claim": "Genie learns action-controllable virtual worlds from unlabeled Internet videos, making generative models into interactive simulators rather than one-shot clips.",
-      "relevance": "high"
-    },
-    "arxiv:2302.02648": {
-      "stance": "supports",
-      "confidence": 96,
-      "evidence_strength": "strong",
-      "evidence_strength_reason": "peer-reviewed method that closes video generation into control",
-      "one_line_claim": "UniPi casts sequential decision making as text-conditioned video generation, then infers actions from the generated frames.",
-      "relevance": "high"
-    },
-    "arxiv:2405.12399": {
-      "stance": "test_condition",
-      "confidence": 84,
-      "evidence_strength": "moderate",
-      "evidence_strength_reason": "Atari-scale diffusion world model; tests visual fidelity as a planning variable",
-      "one_line_claim": "DIAMOND argues that high-fidelity visual detail in imagined rollouts is what makes a diffusion world model useful for planning, not clip quality alone.",
-      "relevance": "high"
-    },
-    "arxiv:2309.17080": {
-      "stance": "supports",
-      "confidence": 91,
-      "evidence_strength": "moderate",
-      "evidence_strength_reason": "industry tech report; action-conditioned driving video, proprietary data",
-      "one_line_claim": "GAIA-1 generates realistic driving futures from video, text, and action so the video model can serve as a scenario simulator for autonomous driving.",
-      "relevance": "high"
-    },
-    "arxiv:2501.03575": {
-      "stance": "supports",
-      "confidence": 82,
-      "evidence_strength": "moderate",
-      "evidence_strength_reason": "lab platform paper; Physical AI claim without independent physics tests",
-      "one_line_claim": "NVIDIA Cosmos presents world foundation models meant to support embodied simulation workflows, not entertainment video.",
-      "relevance": "high"
-    },
-    "web:openai-sora-world-simulators": {
-      "stance": "supports",
-      "confidence": 94,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "position note; no independent evaluation of simulator claims",
-      "one_line_claim": "OpenAI argues that video generation models such as Sora are progressing toward general-purpose world simulators rather than remaining clip generators.",
-      "relevance": "high"
-    },
-    "arxiv:2408.14837": {
-      "stance": "supports",
-      "confidence": 86,
-      "evidence_strength": "moderate",
-      "evidence_strength_reason": "interactive DOOM demo; limited domain, not real-world physics",
-      "one_line_claim": "GameNGen shows a diffusion model can simulate DOOM in real time, treating generative dynamics as an interactive engine rather than a rendered clip.",
-      "relevance": "high"
-    },
-    "arxiv:2312.14125": {
-      "stance": "contradicts",
+    "openalex:W4393065402": {
+      "stance": "neutral",
       "confidence": 80,
       "evidence_strength": "moderate",
-      "evidence_strength_reason": "strong zero-shot video model with no action/planning loop",
-      "one_line_claim": "VideoPoet is a language-model recipe for zero-shot video generation, i.e. media synthesis without a planner or action-conditioned world.",
-      "relevance": "high"
-    },
-    "openalex:W4389473504": {
-      "stance": "neutral",
-      "confidence": 62,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "dissertation on trust-region RL; adjacent control methods only",
-      "one_line_claim": "The thesis develops trust-region policy optimization for sample-efficient reinforcement learning and does not test video models as simulators.",
+      "evidence_strength_reason": "broad LLM-agent survey, not a bake-off",
+      "one_line_claim": "Surveys how LLM-based autonomous agents are built and evaluated, without a ChatGPT-versus-Claude result.",
       "relevance": "low"
     },
-    "openalex:W3140854437": {
+    "openalex:W4317796310": {
       "stance": "neutral",
-      "confidence": 15,
+      "confidence": 97,
       "evidence_strength": "weak",
-      "evidence_strength_reason": "generic deep-learning survey; no world-model or video-planning content",
-      "one_line_claim": "This survey reviews CNN architectures and deep-learning practice in general and does not address video world models or planning.",
+      "evidence_strength_reason": "telecom architecture tutorial",
+      "one_line_claim": "A tutorial on O-RAN wireless architecture, unrelated to assistant comparison.",
       "relevance": "off_topic"
     },
-    "openalex:W2995022099": {
+    "openalex:W4390490761": {
       "stance": "neutral",
-      "confidence": 10,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "federated-learning survey; unrelated to video simulators",
-      "one_line_claim": "The paper surveys federated learning with decentralized clients and a central server, not generative video or world models.",
-      "relevance": "off_topic"
-    },
-    "openalex:W3168997536": {
-      "stance": "neutral",
-      "confidence": 12,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "CNN survey; citation count is not topical relevance",
-      "one_line_claim": "This is a general survey of convolutional networks in vision and NLP, not a study of video models as simulators.",
-      "relevance": "off_topic"
-    },
-    "openalex:W3153990350": {
-      "stance": "neutral",
-      "confidence": 10,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "introductory ML/DL overview",
-      "one_line_claim": "The article explains machine learning and deep learning as general automation methods and does not engage the simulator-versus-media question.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4386142022": {
-      "stance": "neutral",
-      "confidence": 12,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "XAI review; no video-world-model evaluation",
-      "one_line_claim": "This review covers methods for interpreting black-box ML models and does not test whether video generators simulate physics or plans.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4206484811": {
-      "stance": "neutral",
-      "confidence": 18,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "metaverse taxonomy; not action-conditioned video planning",
-      "one_line_claim": "The paper taxonomizes metaverse components and Generation-Z social VR, not video generation used as a world simulator.",
-      "relevance": "off_topic"
-    },
-    "openalex:W3003667836": {
-      "stance": "neutral",
-      "confidence": 58,
+      "confidence": 78,
       "evidence_strength": "moderate",
-      "evidence_strength_reason": "modeling survey of digital twins; conceptual cousin of simulators, no video generators",
-      "one_line_claim": "A digital twin is defined as a data-enabled virtual copy of a physical asset used for prediction and control, which is simulator infrastructure rather than generative video.",
-      "relevance": "medium"
-    },
-    "openalex:W2953303875": {
-      "stance": "neutral",
-      "confidence": 22,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "autonomous-driving survey; no generative world-model video",
-      "one_line_claim": "This ADS survey covers common practices and robustness gaps in automated driving and does not evaluate video generators as driving simulators.",
-      "relevance": "off_topic"
-    },
-    "openalex:W3154736008": {
-      "stance": "neutral",
-      "confidence": 14,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "VR cybersickness review",
-      "one_line_claim": "The review catalogs nausea and related symptoms in current VR headsets and is not about video models as planning simulators.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4402155831": {
-      "stance": "neutral",
-      "confidence": 16,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "clinical multimodal LLMs; different 'multimodal' problem",
-      "one_line_claim": "The paper discusses multimodal clinical data (MRI, wearables) for health-care LLMs, not video world models for planning.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4324290234": {
-      "stance": "neutral",
-      "confidence": 14,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "blockchain-and-metaverse survey",
-      "one_line_claim": "This survey maps blockchain to metaverse digital-asset management and does not test generative video as a physics or planning simulator.",
-      "relevance": "off_topic"
-    },
-    "openalex:W3083484791": {
-      "stance": "neutral",
-      "confidence": 12,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "VR teaching review",
-      "one_line_claim": "The article reviews multimodal teaching in virtual reality classrooms, not video-generation models used for agent planning.",
-      "relevance": "off_topic"
-    },
-    "openalex:W3016364508": {
-      "stance": "neutral",
-      "confidence": 8,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "K-12 e-learning chatbot study",
-      "one_line_claim": "This paper evaluates a hybrid K-12 e-learning assistant chatbot and is unrelated to world models or Sora-class video.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4385431115": {
-      "stance": "neutral",
-      "confidence": 40,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "open-set 3D mapping; spatial reasoning without video world models",
-      "one_line_claim": "ConceptFusion fuses language, image, and audio features into 3D SLAM maps for zero-shot spatial reasoning, not for video-based rollouts.",
+      "evidence_strength_reason": "explainability methods, not product ranking",
+      "one_line_claim": "Catalogues explanation techniques for Transformer LLMs rather than ranking ChatGPT against Claude.",
       "relevance": "low"
     },
-    "openalex:W3153454949": {
+    "openalex:W4385430679": {
       "stance": "neutral",
-      "confidence": 14,
+      "confidence": 96,
       "evidence_strength": "weak",
-      "evidence_strength_reason": "surveillance video anomaly detection",
-      "one_line_claim": "The framework recognizes anomalies in smart-city surveillance video and does not treat generators as world simulators.",
+      "evidence_strength_reason": "robotics transformer paper",
+      "one_line_claim": "RT-1 is a robotics control model, not a chat-assistant comparison.",
       "relevance": "off_topic"
     },
-    "openalex:W4398238904": {
+    "openalex:W4406779522": {
       "stance": "neutral",
-      "confidence": 18,
+      "confidence": 70,
       "evidence_strength": "weak",
-      "evidence_strength_reason": "Gemini-as-education-tool review",
-      "one_line_claim": "This emerging-technology report describes Google Gemini as a multimodal educational tool, not as a video world simulator.",
+      "evidence_strength_reason": "open-model vulnerability study; title/abstract mismatch risk",
+      "one_line_claim": "Asks whether open LLMs can detect and classify software vulnerabilities, not whether ChatGPT beats Claude.",
+      "relevance": "low"
+    },
+    "openalex:W3038822267": {
+      "stance": "neutral",
+      "confidence": 95,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "classic model-based RL survey",
+      "one_line_claim": "Survey of model-based reinforcement learning, unrelated to chat assistants.",
       "relevance": "off_topic"
     },
-    "openalex:W4391610180": {
-      "stance": "neutral",
-      "confidence": 10,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "generative AI for drug discovery",
-      "one_line_claim": "The review covers generative models for small-molecule design and does not address video simulators or planning.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4378746725": {
-      "stance": "neutral",
-      "confidence": 20,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "multimodal HRI survey; no video world models",
-      "one_line_claim": "The paper surveys multimodal human–robot interaction techniques for usability and acceptance, not generative video as a planner.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4389266910": {
-      "stance": "neutral",
-      "confidence": 20,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "HRI for smart manufacturing survey",
-      "one_line_claim": "This survey covers multimodal communication and control for human–robot manufacturing and does not evaluate Sora-class simulators.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4394606408": {
-      "stance": "neutral",
+    "openalex:W4394828156": {
+      "stance": "supports",
       "confidence": 55,
       "evidence_strength": "moderate",
-      "evidence_strength_reason": "foundations survey of multimodal ML; methods background only",
-      "one_line_claim": "The authors survey principles and open questions in multimodal machine learning across language, audio, and vision, without testing video models as simulators.",
+      "evidence_strength_reason": "ChatGPT-only robotics capability study",
+      "one_line_claim": "Shows ChatGPT can drive several robotics tasks when prompts and a function library are designed carefully; Claude is not a condition.",
       "relevance": "medium"
     },
-    "openalex:W4406412004": {
+    "openalex:W4401306886": {
       "stance": "neutral",
-      "confidence": 8,
+      "confidence": 90,
       "evidence_strength": "weak",
-      "evidence_strength_reason": "CNN applications in agriculture",
-      "one_line_claim": "This review applies CNNs to weed, disease, and yield tasks in smart agriculture and is off the simulator-versus-media question.",
+      "evidence_strength_reason": "title and abstract appear mismatched; neither is a bake-off",
+      "one_line_claim": "Harvest record is off-topic (location semantics / CPS anomaly detection).",
       "relevance": "off_topic"
     },
-    "openalex:W4394806371": {
+    "openalex:W4402909345": {
+      "stance": "test_condition",
+      "confidence": 72,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "human-eval framework for healthcare LLMs",
+      "one_line_claim": "Reviews how humans should evaluate LLMs in healthcare — a protocol for ‘better,’ not a ChatGPT-versus-Claude scoreboard.",
+      "relevance": "medium"
+    },
+    "openalex:W4353091694": {
       "stance": "neutral",
-      "confidence": 16,
+      "confidence": 96,
       "evidence_strength": "weak",
-      "evidence_strength_reason": "AGI/TESCREAL critique; not an empirical video-simulator test",
-      "one_line_claim": "The essay critiques AGI-utopia narratives bundled as TESCREAL and does not evaluate video generation models as world simulators.",
+      "evidence_strength_reason": "NeuroAI manifesto",
+      "one_line_claim": "Argues for NeuroAI and an embodied Turing test; not an assistant bake-off.",
       "relevance": "off_topic"
     },
-    "openalex:W3015928967": {
+    "openalex:W7140705274": {
+      "stance": "contradicts",
+      "confidence": 74,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "multi-model Science paper on a shared failure mode",
+      "one_line_claim": "Sycophancy is widespread across 11 frontier models and can reduce prosocial intentions — so winning preference may not mean ‘better’.",
+      "relevance": "high"
+    },
+    "openalex:W4400260578": {
+      "stance": "contradicts",
+      "confidence": 68,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "head-to-head radiology diagnosis study; abstract does not name a single winner",
+      "one_line_claim": "Puts GPT-4o, Claude 3 Opus, and Gemini 1.5 Pro on the same Diagnosis Please cases — a task-specific bake-off rather than a global ChatGPT win.",
+      "relevance": "high"
+    },
+    "openalex:W4391175800": {
+      "stance": "contradicts",
+      "confidence": 70,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "clinical scenario comparison includes both families",
+      "one_line_claim": "Compares ChatGPT-3.5, ChatGPT-4.0, and Claude 2 on breast-cancer clinical scenarios; ranking is task- and version-specific.",
+      "relevance": "high"
+    },
+    "openalex:W4390486238": {
       "stance": "neutral",
-      "confidence": 8,
+      "confidence": 75,
       "evidence_strength": "weak",
-      "evidence_strength_reason": "social-media depression detection",
-      "one_line_claim": "The study analyzes multimodal social-media signals for depression detection, unrelated to world models or video planning.",
+      "evidence_strength_reason": "enterprise LLM architecture essay",
+      "one_line_claim": "Describes implementing generative-AI services on enterprise data, not a ChatGPT–Claude verdict.",
+      "relevance": "low"
+    },
+    "openalex:W4378716928": {
+      "stance": "neutral",
+      "confidence": 96,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "metaverse survey",
+      "one_line_claim": "Survey of metaverse trends, unrelated to assistant comparison.",
       "relevance": "off_topic"
     },
-    "openalex:W3199015608": {
+    "openalex:W4391940723": {
       "stance": "neutral",
-      "confidence": 14,
+      "confidence": 72,
       "evidence_strength": "weak",
-      "evidence_strength_reason": "multimodal classification taxonomy",
-      "one_line_claim": "The paper taxonomizes multimodal classification datasets (satellite, biometrics, medicine) and does not discuss video world simulators.",
+      "evidence_strength_reason": "forecasting/anomaly LLM review",
+      "one_line_claim": "Reviews LLMs for forecasting and anomaly detection, not chat-assistant ranking.",
+      "relevance": "low"
+    },
+    "openalex:W4406628184": {
+      "stance": "contradicts",
+      "confidence": 66,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "multi-model EHR extraction bake-off",
+      "one_line_claim": "Evaluates multiple LLMs on extracting data from synthetic EHR notes — performance is model- and field-specific rather than a single ChatGPT win.",
+      "relevance": "high"
+    },
+    "openalex:W4399363436": {
+      "stance": "test_condition",
+      "confidence": 70,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "Anthropic public-input alignment method",
+      "one_line_claim": "Collective Constitutional AI asks whose values define a ‘better’ aligned model, using public input rather than vendor defaults.",
+      "relevance": "medium"
+    },
+    "openalex:W4378882632": {
+      "stance": "neutral",
+      "confidence": 97,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "astronomy neural-net history",
+      "one_line_claim": "History of neural networks in astronomy, unrelated to ChatGPT versus Claude.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4413312755": {
+      "stance": "neutral",
+      "confidence": 68,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "medical MLLM review",
+      "one_line_claim": "Reviews multimodal LLMs in medical imaging; not a ChatGPT–Claude scoreboard.",
+      "relevance": "low"
+    },
+    "openalex:W4401170130": {
+      "stance": "test_condition",
+      "confidence": 76,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "24-model political-orientation battery",
+      "one_line_claim": "Runs 11 political-orientation tests on 24 conversational LLMs, showing embedded preferences differ by model family.",
+      "relevance": "high"
+    },
+    "openalex:W4387299593": {
+      "stance": "supports",
+      "confidence": 48,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "ChatGPT-only lexicography review",
+      "one_line_claim": "Reviews ChatGPT for dictionary writing; Claude is not a condition.",
+      "relevance": "low"
+    },
+    "openalex:W4385719938": {
+      "stance": "neutral",
+      "confidence": 88,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "Gemini-in-education policy note",
+      "one_line_claim": "Education-policy piece on Google Gemini, not a ChatGPT–Claude comparison.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4404782882": {
+      "stance": "test_condition",
+      "confidence": 82,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "EMNLP critical review of LLM evaluation",
+      "one_line_claim": "Surveys why current LLM evaluations are hard to trust and what a fair comparison protocol would need.",
+      "relevance": "high"
+    },
+    "crossref:10.2139/ssrn.4448091": {
+      "stance": "supports",
+      "confidence": 50,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "ChatGPT/GPT-4 translation essay",
+      "one_line_claim": "Explores ChatGPT and GPT-4 for professional translation; no Claude arm.",
+      "relevance": "low"
+    },
+    "openalex:W4406230527": {
+      "stance": "contradicts",
+      "confidence": 64,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "multi-LLM professional exam",
+      "one_line_claim": "Compares several LLMs on the registered-dietitian exam; accuracy depends on prompting and the model chosen.",
+      "relevance": "high"
+    },
+    "crossref:10.2139/ssrn.4593895": {
+      "stance": "neutral",
+      "confidence": 70,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "GPT-family survey that defines the ChatGPT side",
+      "one_line_claim": "Surveys the GPT-3 family including ChatGPT and GPT-4; Claude is outside the family definition.",
+      "relevance": "medium"
+    },
+    "openalex:W4405010262": {
+      "stance": "neutral",
+      "confidence": 94,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "sexuality literature review",
+      "one_line_claim": "Reviews generative AI and human sexuality, not assistant ranking.",
       "relevance": "off_topic"
     },
     "openalex:W4402890475": {
       "stance": "neutral",
-      "confidence": 68,
-      "evidence_strength": "moderate",
-      "evidence_strength_reason": "robotics foundation-model survey; flags decision-data scarcity",
-      "one_line_claim": "The survey argues that robotics foundation models are limited by scarce action-labelled data, so scaling generators into decision-making remains an open transfer problem.",
-      "relevance": "medium"
-    },
-    "openalex:W4393177776": {
-      "stance": "contradicts",
-      "confidence": 64,
+      "confidence": 85,
       "evidence_strength": "weak",
-      "evidence_strength_reason": "social-media perception study; not a physics or planning eval",
-      "one_line_claim": "Public discussion treats Sora as a generative video tool for HCI, not as a tested world simulator for planning.",
-      "relevance": "medium"
-    },
-    "openalex:W4409365815": {
-      "stance": "supports",
-      "confidence": 83,
-      "evidence_strength": "moderate",
-      "evidence_strength_reason": "driving world model for occupancy forecasting and planning",
-      "one_line_claim": "The authors use a vision-centric world model to forecast 4D occupancy and plan driving, i.e. generation in the service of control rather than media.",
-      "relevance": "high"
-    },
-    "openalex:W4392954640": {
-      "stance": "contradicts",
-      "confidence": 74,
-      "evidence_strength": "moderate",
-      "evidence_strength_reason": "text-to-video systems review (Sora, Lumiere, diffusion)",
-      "one_line_claim": "This review frames Sora, Stable Diffusion, and Lumiere as text-to-video generators — a media-synthesis problem — not as planners or physics engines.",
-      "relevance": "high"
-    },
-    "openalex:W4404717804": {
-      "stance": "supports",
-      "confidence": 92,
-      "evidence_strength": "moderate",
-      "evidence_strength_reason": "method paper adapting video diffusion into world models for decisions",
-      "one_line_claim": "AVID adapts pretrained video diffusion models into world models so they can be used for sequential decision-making despite scarce action labels.",
-      "relevance": "high"
-    },
-    "openalex:W3178685848": {
-      "stance": "neutral",
-      "confidence": 6,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "EFL textbook discourse analysis",
-      "one_line_claim": "The dissertation analyzes ideologies in a Korean university EFL textbook and has no bearing on video world models.",
+      "evidence_strength_reason": "robotics foundation-model survey",
+      "one_line_claim": "Surveys foundation models in robotics, not chat-assistant comparison.",
       "relevance": "off_topic"
     },
-    "openalex:W4313469377": {
+    "openalex:W4391591760": {
       "stance": "neutral",
-      "confidence": 28,
+      "confidence": 72,
       "evidence_strength": "weak",
-      "evidence_strength_reason": "temporal sentence grounding in video; retrieval not simulation",
-      "one_line_claim": "The thesis studies retrieving a video moment from a language query, which is localization rather than generating a world for planning.",
-      "relevance": "off_topic"
-    },
-    "openalex:W3013449349": {
-      "stance": "neutral",
-      "confidence": 10,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "multimodal emotion-recognition thesis",
-      "one_line_claim": "The thesis explores deep models for human emotion recognition and does not address video generators as simulators.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4321242134": {
-      "stance": "neutral",
-      "confidence": 8,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "disaster detection via remote sensing and social media",
-      "one_line_claim": "This dissertation fuses remote sensing and social media for natural-disaster assessment, unrelated to Sora-class world models.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4292589917": {
-      "stance": "neutral",
-      "confidence": 8,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "multimodal learning-analytics system design",
-      "one_line_claim": "The thesis designs a flexible multimodal learning-analytics system and does not evaluate video models as planners.",
-      "relevance": "off_topic"
-    },
-    "openalex:W3094484211": {
-      "stance": "neutral",
-      "confidence": 10,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "spherical-target multimodal sensor calibration",
-      "one_line_claim": "The thesis develops calibration of heterogeneous sensors with a spherical target, not generative video simulation.",
-      "relevance": "off_topic"
-    },
-    "openalex:W3130054217": {
-      "stance": "neutral",
-      "confidence": 22,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "generic vision-and-language deep learning thesis",
-      "one_line_claim": "The thesis applies deep networks to images, videos, and text as media understanding, not as action-conditioned world simulators.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4392679398": {
-      "stance": "neutral",
-      "confidence": 24,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "Gemini 1.5 long-context multimodal report",
-      "one_line_claim": "Gemini 1.5 is presented as a long-context multimodal language model over documents and media, not a video world model for planning.",
-      "relevance": "off_topic"
-    },
-    "openalex:W4392341509": {
-      "stance": "test_condition",
-      "confidence": 78,
-      "evidence_strength": "moderate",
-      "evidence_strength_reason": "Sora survey of public reports; catalogs limitations rather than a new test",
-      "one_line_claim": "This Sora review says the model can generate realistic scenes and may simulate the physical world, while stressing that public reports and reverse engineering have not yet proven that claim.",
-      "relevance": "high"
-    },
-    "openalex:W4386655647": {
-      "stance": "contradicts",
-      "confidence": 60,
-      "evidence_strength": "weak",
-      "evidence_strength_reason": "any-to-any multimodal LLM; generation without a dynamics/planning loop",
-      "one_line_claim": "NExT-GPT aims to generate content in many modalities from many inputs, which is media transformation rather than a controllable world simulator.",
+      "evidence_strength_reason": "RL+LLM taxonomy",
+      "one_line_claim": "Taxonomy of how RL and LLMs combine; no ChatGPT-versus-Claude scores.",
       "relevance": "low"
     },
-    "openalex:W3163993681": {
-      "skipped": true,
-      "skip_reason": "empty_or_broken_abstract",
+    "openalex:W4389764468": {
+      "stance": "neutral",
+      "confidence": 70,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "reasoning-with-foundation-models survey",
+      "one_line_claim": "Surveys reasoning methods for foundation models, not a product bake-off.",
+      "relevance": "low"
+    },
+    "crossref:10.1111/1754-9485.13858": {
+      "stance": "contradicts",
+      "confidence": 78,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "direct Claude-versus-GPT radiology VLM study",
+      "one_line_claim": "Compares Anthropic Claude and OpenAI GPT vision-language models on basic radiological imaging tasks.",
+      "relevance": "high"
+    },
+    "openalex:W4409365815": {
+      "stance": "neutral",
+      "confidence": 96,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "autonomous-driving world model",
+      "one_line_claim": "Occupancy forecasting for driving, unrelated to chat assistants.",
       "relevance": "off_topic"
+    },
+    "openalex:W4414486064": {
+      "stance": "test_condition",
+      "confidence": 68,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "OpenAI safety-training note",
+      "one_line_claim": "Argues ChatGPT-class safety should move from hard refusals to safe-completions — a definition of ‘better’ safety, not a Claude comparison.",
+      "relevance": "medium"
+    },
+    "crossref:10.1111/eje.70121": {
+      "stance": "contradicts",
+      "confidence": 80,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "five-model dental-exam bake-off including both families",
+      "one_line_claim": "Compares ChatGPT 4o and o1, Claude 3.5 Sonnet, and two Gemini versions on the same Turkish dentistry specialization questions.",
+      "relevance": "high"
+    },
+    "openalex:W59455730": {
+      "stance": "neutral",
+      "confidence": 97,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "game-based learning thesis",
+      "one_line_claim": "Thesis on collaborative computer game-based learning, unrelated to LLMs.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4401510345": {
+      "stance": "neutral",
+      "confidence": 98,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "food-safety review",
+      "one_line_claim": "Review of staphylococcal enterotoxins in food, unrelated to the question.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4386410083": {
+      "stance": "neutral",
+      "confidence": 94,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "autonomous-driving RL thesis",
+      "one_line_claim": "Human-guided RL for autonomous driving, not assistant comparison.",
+      "relevance": "off_topic"
+    },
+    "openalex:W127643039": {
+      "stance": "neutral",
+      "confidence": 98,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "novice-driver psychology thesis",
+      "one_line_claim": "Psychology of novice drivers, unrelated to LLMs.",
+      "relevance": "off_topic"
+    },
+    "openalex:W2723085959": {
+      "stance": "neutral",
+      "confidence": 98,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "construction contractor-selection thesis",
+      "one_line_claim": "Contractor selection in Libyan construction, unrelated to the question.",
+      "relevance": "off_topic"
+    },
+    "openalex:W7126224880": {
+      "stance": "neutral",
+      "confidence": 98,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "dermatology review",
+      "one_line_claim": "Review of exosomes in skin rejuvenation, unrelated to LLMs.",
+      "relevance": "off_topic"
+    },
+    "openalex:W2767686769": {
+      "stance": "neutral",
+      "confidence": 98,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "electric-vehicle thesis",
+      "one_line_claim": "Evaluation of battery electric vehicles for commuting, unrelated to the question.",
+      "relevance": "off_topic"
+    },
+    "openalex:W112267011": {
+      "stance": "neutral",
+      "confidence": 98,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "antimicrobial discovery thesis",
+      "one_line_claim": "Discovery of antimicrobial agents, unrelated to assistant comparison.",
+      "relevance": "off_topic"
+    },
+    "openalex:W4362703233": {
+      "stance": "supports",
+      "confidence": 52,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "ChatGPT-centric NLP overview",
+      "one_line_claim": "Explores ChatGPT applications, advantages, and limits in NLP; Claude is not compared.",
+      "relevance": "medium"
+    },
+    "openalex:W4385774833": {
+      "stance": "test_condition",
+      "confidence": 80,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "alignment-evaluation guideline",
+      "one_line_claim": "Gives a guideline for evaluating LLM alignment — including OpenAI’s GPT-4 alignment process — before calling a model trustworthy.",
+      "relevance": "high"
+    },
+    "openalex:W4383473937": {
+      "stance": "contradicts",
+      "confidence": 72,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "canonical jailbreak analysis of early ChatGPT",
+      "one_line_claim": "Safety training on early ChatGPT still failed under jailbreaks — a limit on treating ChatGPT as the safer or better assistant.",
+      "relevance": "high"
+    },
+    "openalex:W4399357038": {
+      "stance": "test_condition",
+      "confidence": 68,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "code-generation LLM survey",
+      "one_line_claim": "Surveys LLMs for code generation, the usual arena where ‘ChatGPT vs Claude’ is claimed.",
+      "relevance": "medium"
+    },
+    "openalex:W4387994989": {
+      "stance": "neutral",
+      "confidence": 74,
+      "evidence_strength": "weak",
+      "evidence_strength_reason": "small aligned open model",
+      "one_line_claim": "Zephyr distills alignment into a smaller open model; not a ChatGPT–Claude bake-off.",
+      "relevance": "low"
+    },
+    "openalex:W4392679398": {
+      "stance": "contradicts",
+      "confidence": 58,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "third-family vendor card that complicates a two-horse race",
+      "one_line_claim": "Gemini 1.5 reports long-context multimodal results that sit beside, not inside, a ChatGPT-versus-Claude ranking.",
+      "relevance": "medium"
+    },
+    "crossref:10.1016/j.nlp.2023.100048": {
+      "stance": "neutral",
+      "confidence": 72,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "journal survey of the GPT-3/ChatGPT/GPT-4 family",
+      "one_line_claim": "Journal survey of GPT-3-family models including ChatGPT and GPT-4; Claude is outside scope.",
+      "relevance": "medium"
+    },
+    "web:lmarena": {
+      "stance": "contradicts",
+      "confidence": 76,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "live pairwise human-preference board used as the public ‘better’ metric",
+      "one_line_claim": "Chatbot Arena’s blind votes are the main public definition of which assistant people prefer; rankings move and are not a permanent ChatGPT win.",
+      "relevance": "high"
+    },
+    "web:anthropic-claude-3": {
+      "stance": "contradicts",
+      "confidence": 70,
+      "evidence_strength": "moderate",
+      "evidence_strength_reason": "vendor-reported Claude 3 Opus lead on then-available peer benchmarks",
+      "one_line_claim": "Anthropic reports Claude 3 Opus outperforming then-available commercial peers on MMLU, GPQA, GSM8K and related tests.",
+      "relevance": "high"
+    },
+    "web:gpt4-report": {
+      "stance": "supports",
+      "confidence": 74,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "canonical GPT-4 capability and exam write-up",
+      "one_line_claim": "OpenAI’s GPT-4 Technical Report is the standard capability, exam, and safety write-up for the model family behind ChatGPT.",
+      "relevance": "high"
+    },
+    "web:chatbot-arena-paper": {
+      "stance": "test_condition",
+      "confidence": 88,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "methods paper for the live preference comparison",
+      "one_line_claim": "Chatbot Arena (Chiang et al.) defines pairwise human preference and Elo as the operational comparison of GPT-class and Claude models.",
+      "relevance": "high"
+    },
+    "web:helm": {
+      "stance": "test_condition",
+      "confidence": 80,
+      "evidence_strength": "strong",
+      "evidence_strength_reason": "independent multi-metric evaluation platform",
+      "one_line_claim": "Stanford CRFM HELM evaluates language models across many scenarios and metrics instead of a single ‘better’ score.",
+      "relevance": "high"
     }
-  },
-  "prior": 0.5,
-  "rooms": [
-    {
-      "id": "sim-vs-media",
-      "group": "related",
-      "source": "harvest",
-      "category": "Machine learning",
-      "status": "ready",
-      "title": "Simulators or just clips?",
-      "question": "Do Sora-class video models work as world simulators for planning, or only as generative media?",
-      "blurb": "Labs pitch video models as world simulators; critics say they still just generate plausible clips.",
-      "for_ids": [
-        "arxiv:2301.04104",
-        "arxiv:2402.15391",
-        "arxiv:2302.02648",
-        "arxiv:2309.17080",
-        "arxiv:2501.03575",
-        "web:openai-sora-world-simulators",
-        "arxiv:2408.14837",
-        "openalex:W4409365815",
-        "openalex:W4404717804"
-      ],
-      "against_ids": [
-        "arxiv:2312.14125",
-        "openalex:W4393177776",
-        "openalex:W4392954640",
-        "openalex:W4386655647"
-      ]
-    },
-    {
-      "id": "can-video-plan",
-      "group": "related",
-      "source": "harvest",
-      "category": "Machine learning",
-      "status": "ready",
-      "title": "Can a video model plan?",
-      "question": "Is generating a video enough to produce a usable plan, or is that still just media?",
-      "blurb": "Some papers treat generated video as a plan; others say planning needs structure the clip never had.",
-      "for_ids": ["arxiv:2302.02648", "openalex:W4404717804", "arxiv:2301.04104"],
-      "against_ids": ["arxiv:2312.14125", "openalex:W4392954640"]
-    },
-    {
-      "id": "lab-claims",
-      "group": "related",
-      "source": "harvest",
-      "category": "Machine learning",
-      "status": "ready",
-      "title": "Do the lab demos count?",
-      "question": "Should Sora/Cosmos-style lab notes be treated as evidence that video models simulate the world?",
-      "blurb": "Company tech notes claim simulator status; peer-reviewed work often treats those claims as unproven.",
-      "for_ids": ["web:openai-sora-world-simulators", "arxiv:2501.03575", "arxiv:2309.17080"],
-      "against_ids": ["openalex:W4392341509", "openalex:W4393177776", "openalex:W4392954640"]
-    },
-    {
-      "id": "interactive-worlds",
-      "group": "related",
-      "source": "harvest",
-      "category": "Machine learning",
-      "status": "ready",
-      "title": "Playable world or one-shot clip?",
-      "question": "Does interactivity (actions in, next frame out) make a generator a simulator?",
-      "blurb": "Action-conditioned next-frame models look like simulators; one-shot generators still aren't worlds you can query.",
-      "for_ids": ["arxiv:2402.15391", "arxiv:2408.14837"],
-      "against_ids": ["arxiv:2312.14125", "openalex:W4386655647"]
-    },
-    {
-      "id": "pixels-or-physics",
-      "group": "related",
-      "source": "harvest",
-      "category": "Machine learning",
-      "status": "ready",
-      "title": "Pretty pixels or usable physics?",
-      "question": "Does visual fidelity in generated video actually help planning, or just look convincing?",
-      "blurb": "Photorealism looks like understanding; planning may only need coarse dynamics.",
-      "for_ids": ["arxiv:2405.12399", "arxiv:2408.14837"],
-      "against_ids": ["openalex:W4392341509", "openalex:W4392954640"]
-    },
-    {
-      "id": "robots-and-roads",
-      "group": "related",
-      "source": "harvest",
-      "category": "Machine learning",
-      "status": "ready",
-      "title": "Will it transfer to cars and robots?",
-      "question": "Do action-conditioned video world models help real driving or robotics, or stay in demo-land?",
-      "blurb": "Driving and robot demos suggest transfer; the leap from video to real control is still contested.",
-      "for_ids": ["arxiv:2309.17080", "openalex:W4409365815", "arxiv:2501.03575"],
-      "against_ids": ["openalex:W4402890475"]
-    }
-  ]
+  }
 }
