@@ -4,6 +4,10 @@ A downloadable agent skill for **anyone who wants to research specific topics** 
 
 > Point it at a research question. You get an article you can share, the evidence for and against, what’s missing, and the papers behind it — triage for a literature review, not a finished bibliography.
 
+
+<img width="1056" height="791" alt="Screenshot 2026-08-28 at 12 44 11" src="https://github.com/user-attachments/assets/d9170136-d4dc-4136-beaf-67d6868351ec" />
+<img width="1035" height="857" alt="Screenshot 2026-08-28 at 12 44 35" src="https://github.com/user-attachments/assets/b4ec723a-3da2-45fb-904d-1f67093a332c" />
+
 ---
 
 ## Get It From GitHub
