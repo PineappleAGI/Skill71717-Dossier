@@ -490,7 +490,8 @@
     var contradicting = (state.synthesis && state.synthesis.contradicting) || [];
     if (state.pipelineStage !== "done") return p.hint;
     if (p.id === "search" && harvested) {
-      return harvested + " unique record" + (harvested === 1 ? "" : "s") + " from live databases.";
+      var from = readDossierSeed().static ? "the saved harvest" : "live databases";
+      return harvested + " unique record" + (harvested === 1 ? "" : "s") + " from " + from + ".";
     }
     if (p.id === "screen" && harvested) {
       var dropped = Math.max(0, harvested - coreN);
@@ -1280,11 +1281,20 @@
     var blob = [paper.title, paper.abstract, paper.fullTextSnippet].filter(Boolean).join(" ");
     var pico = sniffPico(blob, question);
     var eff = effectDirection(paper.abstract, question);
+    if (paper.stance === "supports" || paper.stance === "contradicts") {
+      eff = { dir: paper.stance, note: paper.oneLineClaim || eff.note };
+    } else if (paper.stance) {
+      eff = { dir: "unclear", note: paper.oneLineClaim || eff.note };
+    }
     var n = extractPopulation(blob).n;
     var first = (paper.authors && paper.authors[0]) || "Authors unavailable";
     var last = first.split(" ").pop();
     var pop = (pico.population || "").trim();
     var aims = questionRelevantAims(paper);
+    var quality = qualityFlag(type);
+    if (paper.quality === "strong" || paper.quality === "moderate" || paper.quality === "weak") {
+      quality = paper.quality;
+    }
     return {
       paper: paper,
       study: last + (paper.year ? " " + paper.year : ""),
@@ -1297,7 +1307,7 @@
       effectNote: eff.note,
       studyType: type || "Not reported",
       sampleSize: n,
-      quality: qualityFlag(type),
+      quality: quality,
       relevance: paper.tier || paper.relevance,
     };
   }
@@ -3031,6 +3041,53 @@
     );
   }
 
+  function renderUnderstandingStatic() {
+    var el = $("#m1-understand-body");
+    if (!el) return;
+    el.innerHTML =
+      '<p class="m1-restate-kicker">Here’s what I understand you’re asking</p>' +
+      '<p class="m1-restate">' + escapeHtml(state.restatement) + "</p>" +
+      '<p class="m1-lead">Saved example — this page does not search live databases.</p>';
+  }
+
+  function applyStaticSnapshot(seed) {
+    var q = (($("#m1-question") || {}).value || seed.topic || "").trim();
+    var sit = (($("#m1-situation") || {}).value || seed.discipline || "").trim();
+    state.question = q;
+    state.situation = sit;
+    var understood = buildRestatement(q, state.situation, "");
+    state.restatement = understood.text;
+    state.meaning = understood.meaning;
+    state.concepts = understood.concepts;
+    state.central = understood.central;
+    state.query = "Saved harvest (static example)";
+    state.activeQuestion = understood.meaning || q;
+    state.searching = false;
+    var papers = (seed.papers || []).map(function (p) {
+      var copy = {};
+      Object.keys(p || {}).forEach(function (k) { copy[k] = p[k]; });
+      copy.tier = copy.tier || "related";
+      copy.relevance = copy.tier;
+      copy.sourceApis = copy.sourceApis || ["harvest"];
+      copy.pubTypes = copy.pubTypes || [];
+      return copy;
+    });
+    state.papers = papers;
+    state.included = papers.filter(function (p) { return p.tier === "core"; });
+    if (!state.included.length) state.included = papers.slice();
+    state.excluded = papers.filter(function (p) { return p.tier !== "core"; });
+    state.relatedPopular = [];
+    var ask = $("#m1-new-q");
+    if (ask) ask.hidden = true;
+    showSearchLive(false);
+    setStep(1);
+    setStatus("");
+    renderUnderstandingStatic();
+    paintConceptMap();
+    setStep(2);
+    finishResults();
+  }
+
   function bootFromSeed() {
     var seed = readDossierSeed();
     var q = $("#m1-question");
@@ -3038,6 +3095,10 @@
     if (q && seed.topic && !String(q.value || "").trim()) q.value = seed.topic;
     if (sit && seed.discipline && !String(sit.value || "").trim()) sit.value = seed.discipline;
     renderLeadBlog();
+    if (seed.static) {
+      applyStaticSnapshot(seed);
+      return;
+    }
     if (q && String(q.value || "").trim()) {
       beginUnderstanding({ scroll: false });
     }
@@ -3054,9 +3115,21 @@
     bootFromSeed();
   }
 
+  function emptyDossierSeed() {
+    return {
+      topic: "",
+      originalTopic: "",
+      discipline: "",
+      supportBlurb: "",
+      contraBlurb: "",
+      static: false,
+      papers: [],
+    };
+  }
+
   function readDossierSeed() {
     var node = $("#dossier-data");
-    if (!node) return { topic: "", originalTopic: "", discipline: "", supportBlurb: "", contraBlurb: "" };
+    if (!node) return emptyDossierSeed();
     try {
       var data = JSON.parse(node.textContent || "{}");
       return {
@@ -3065,9 +3138,11 @@
         discipline: String(data.discipline || "").trim(),
         supportBlurb: String(data.support_blurb || "").trim(),
         contraBlurb: String(data.contra_blurb || "").trim(),
+        static: !!data.static,
+        papers: Array.isArray(data.papers) ? data.papers : [],
       };
     } catch (e) {
-      return { topic: "", originalTopic: "", discipline: "", supportBlurb: "", contraBlurb: "" };
+      return emptyDossierSeed();
     }
   }
 

@@ -5,8 +5,11 @@ Generate a self-contained research dossier HTML for Skill71717.
 Usage:
   python scripts/generate-dossier.py <harvest.json> <enrichment.json> <output.html> [--no-open]
   python scripts/generate-dossier.py ... --claims claims.json --no-open
+  python scripts/generate-dossier.py ... --static --no-open
 
 If --claims is omitted, looks for claims.json next to harvest.json.
+--static embeds the harvest so the HTML is a finished snapshot (no live search).
+Writing to example/dossier.html always uses --static.
 """
 
 from __future__ import annotations
@@ -494,6 +497,55 @@ def _is_off_topic(claim: dict) -> bool:
     return (claim.get("relevance") or "").strip().lower() == "off_topic"
 
 
+_SNAPSHOT_ABS_CAP = 1600
+
+
+def _snapshot_papers(shown: list[dict], claims_by_id: dict[str, dict]) -> list[dict]:
+    """Compact paper objects for a static dossier (no live API search)."""
+    out: list[dict] = []
+    for m in shown:
+        if not isinstance(m, dict) or not (m.get("title") or "").strip():
+            continue
+        claim = _claim_entry(claims_by_id, m.get("id"))
+        stance = (claim.get("stance") or "neutral").strip().lower()
+        rel = (claim.get("relevance") or "medium").strip().lower()
+        strength = (claim.get("evidence_strength") or "moderate").strip().lower()
+        if strength not in ("strong", "moderate", "weak"):
+            strength = "moderate"
+        if stance in ("supports", "contradicts") or rel == "high":
+            tier = "core"
+        else:
+            tier = "related"
+        abstract = (m.get("abstract") or "").strip()
+        if len(abstract) > _SNAPSHOT_ABS_CAP:
+            cut = abstract[:_SNAPSHOT_ABS_CAP].rsplit(" ", 1)[0]
+            abstract = (cut or abstract[:_SNAPSHOT_ABS_CAP]) + "…"
+        authors = m.get("authors") or []
+        if isinstance(authors, str):
+            authors = [authors]
+        out.append(
+            {
+                "id": m.get("id") or "",
+                "title": m.get("title") or "",
+                "authors": authors,
+                "year": m.get("year"),
+                "venue": m.get("venue") or "",
+                "abstract": abstract,
+                "url": m.get("url") or "",
+                "doi": m.get("doi") or "",
+                "pmid": m.get("pmid") or "",
+                "pubTypes": [m.get("type") or "article"],
+                "sourceApis": m.get("source_apis") or ["harvest"],
+                "citationCount": m.get("citation_count"),
+                "tier": tier,
+                "stance": stance,
+                "oneLineClaim": (claim.get("one_line_claim") or "").strip(),
+                "quality": strength,
+            }
+        )
+    return out
+
+
 def _confidence_class(conf: int) -> str:
     if conf >= 75:
         return "high"
@@ -750,7 +802,9 @@ def _chip(strong: str, label: str) -> str:
     )
 
 
-def _restatement_html(topic: str, original_topic: str, request: dict, generated: str) -> str:
+def _restatement_html(
+    topic: str, original_topic: str, request: dict, generated: str, static: bool = False
+) -> str:
     topic = (topic or "").strip()
     original = (original_topic or "").strip()
     heading = f"<h1>{_esc(topic)}</h1>"
@@ -775,6 +829,8 @@ def _restatement_html(topic: str, original_topic: str, request: dict, generated:
     if tracks:
         chips.append(_chip("Tracks", tracks))
     chips.append(_chip("Generated", generated))
+    if static:
+        chips.append(_chip("Page", "Saved example"))
     return f"""
 <header class="hero" id="restatement" data-m1-section="1">
   {question}
@@ -986,9 +1042,15 @@ def _mode1_html(
     classification_html: str = "",
     briefing_main: str = "",
     briefing_side: str = "",
+    static: bool = False,
 ) -> str:
     topic = (topic or "").strip()
     situation = (situation or "").strip()
+    ask_html = (
+        ""
+        if static
+        else '<a class="btn btn-primary m1-new-q" id="m1-new-q" href="/ask">Ask another question</a>'
+    )
     return """
 <div id="m1-root" class="m1-root">
   <textarea id="m1-question" name="question" hidden>""" + _esc(topic) + """</textarea>
@@ -999,7 +1061,7 @@ def _mode1_html(
   <div id="m1-stepper" class="m1-stepper">
     <div class="m1-stepper-head">
       <p class="m1-prisma"><strong>Follows PRISMA</strong>, the reporting standard for systematic reviews</p>
-      <a class="btn btn-primary m1-new-q" id="m1-new-q" href="/ask">Ask another question</a>
+      """ + ask_html + """
     </div>
     <ol id="m1-steps" class="m1-steps"></ol>
   </div>
@@ -1101,7 +1163,9 @@ def _mode1_html(
 """
 
 
-def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str:
+def generate(
+    harvest: dict, enrichment: dict, claims: dict | None = None, *, static: bool = False
+) -> str:
     request = harvest.get("request") or enrichment.get("request") or {}
     materials = list(harvest.get("materials") or [])
     enr_map = _by_id(enrichment)
@@ -1160,7 +1224,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     bib = "\n\n".join(_to_bibtex(m) for m in ordered_for_bib)
 
     classification_html = _render_classification(enrichment)
-    restatement_html = _restatement_html(topic, original_topic, request, generated)
+    restatement_html = _restatement_html(topic, original_topic, request, generated, static=static)
     key_refs = _key_refs_html(shown, enr_map)
     briefing_main = f"""
           <h2>Key references</h2>
@@ -1187,6 +1251,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
         classification_html,
         briefing_main,
         briefing_side,
+        static=static,
     )
 
     payload = {
@@ -1203,6 +1268,9 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
             topic, original_topic, shown, claims_by_id, enrichment, dropped
         ),
     }
+    if static:
+        payload["static"] = True
+        payload["papers"] = _snapshot_papers(shown, claims_by_id)
     payload_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
 
     css = _load_css()
@@ -1249,12 +1317,13 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
 def main() -> int:
     raw = sys.argv[1:]
     no_open = "--no-open" in raw
+    static = "--static" in raw
     claims_path: Path | None = None
     args: list[str] = []
     i = 0
     while i < len(raw):
         tok = raw[i]
-        if tok == "--no-open":
+        if tok in ("--no-open", "--static"):
             i += 1
             continue
         if tok == "--claims" and i + 1 < len(raw):
@@ -1266,7 +1335,7 @@ def main() -> int:
     if len(args) < 3:
         print(
             "Usage: python scripts/generate-dossier.py <harvest.json> <enrichment.json> <output.html> "
-            "[--claims claims.json] [--no-open]",
+            "[--claims claims.json] [--static] [--no-open]",
             file=sys.stderr,
         )
         return 2
@@ -1274,6 +1343,8 @@ def main() -> int:
     harvest_path = Path(args[0])
     enrichment_path = Path(args[1])
     output_path = Path(args[2])
+    if output_path.name == "dossier.html" and output_path.parent.name == "example":
+        static = True
     if claims_path is None:
         candidate = harvest_path.parent / "claims.json"
         if candidate.is_file():
@@ -1282,7 +1353,7 @@ def main() -> int:
     harvest = json.loads(harvest_path.read_text(encoding="utf-8"))
     enrichment = json.loads(enrichment_path.read_text(encoding="utf-8"))
     claims = json.loads(claims_path.read_text(encoding="utf-8")) if claims_path and claims_path.is_file() else {}
-    html_doc = generate(harvest, enrichment, claims)
+    html_doc = generate(harvest, enrichment, claims, static=static)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(html_doc, encoding="utf-8")
     print(f"wrote {output_path.resolve()}")

@@ -26,7 +26,7 @@ Generate a single interactive HTML **research dossier** from a topic: URLs, shor
 - Enrichment `relevance_score` is an integer 0–100 with a one-sentence `relevance_rationale`.
 - Prefer publisher/DOI landing pages over bare arXiv links when both exist.
 - Industry items MUST have a real verified URL and an organization when known.
-- Generate with `generate-dossier.py --no-open`. Serve over HTTP via `scripts/mode1-server.py` (not `file://`).
+- Generate with `generate-dossier.py --no-open`. Live dossiers must be served over HTTP via `scripts/mode1-server.py` (not `file://`). The committed `example/dossier.html` is a **static snapshot** and can be opened as a file.
 - **Browser contract:** the user sees only two surfaces — the question form, then the result dossier — in one tab at `http://127.0.0.1:8767/`. After **Start harvest**, that same tab waits and becomes the dossier. Do not open a second URL, a second port, or a second window **if the waiting tab is still polling**. If the user closed that tab, `--html` reload opens the browser once so the dossier is visible.
 - **MUST NOT** call `webbrowser`, Cursor `open_resource`, or any other opener from the agent. `mode1-server.py` opens the form at most once (first start only). Reloading `--html` opens a browser only when no waiting tab has polled `/ready` recently.
 - Do not start `intake-server.py` on port 8765 for live mode. Do not `mode1-server.py --stop` between form and result — that kills the waiting tab.
@@ -258,18 +258,18 @@ If Mode 1 is already running this prints `reloaded …` and exits. The waiting f
 
 If Mode 1 is down (crash), that same command starts it with `--no-open` so the waiting tab can connect — still do not open a second window.
 
-The generated page must prefill the interpreted `topic` (and show `original_topic` when it differs). Mode 1 auto-starts the live search from that question.
+The generated page must prefill the interpreted `topic` (and show `original_topic` when it differs). Live dossiers auto-start the live search from that question. The committed `example/dossier.html` is static: it hydrates from the embedded harvest and does not call APIs.
 
 Tell the user the dossier is at `http://127.0.0.1:8767/` (same tab as the form). Do not open it again.
 
 Dossier UI contracts:
 
-- The dossier is a single Mode 1 PRISMA flow matching the Claude Design layout. The research question comes from the Phase 1 form (`original_topic` / interpreted `topic`). **Ask another question** sits on the sticky PRISMA bar and opens `http://127.0.0.1:8767/ask` in the same tab; after submit, wait for a new `raw_submission.json` with `wait-for-submission.py` (it ignores a prior run’s file) and rerun Phase 1b → harvest → generate → `--html … --no-open` (never `--stop`; reopen the browser only if the waiting tab is gone). Page order: restatement card (You typed / Interpreted as, field/years/tracks chips) → collapsible **The article** → jump nav → **The evidence** (pipeline + KPIs + two-column supporting/contradicting cards) → **How confident is this?** (Beta posterior) → **Related papers** → **Briefing and what's missing** (pull-quote, inquiry framework, key references, BibTeX, gaps) → **How this question maps** (each question term with related phrases from harvested titles/abstracts; **Download map** saves a PNG of the graph) → Pineapple Project footer. The top bar is stacked **Pineapple 71717 / RESEARCH DOSSIER** (the wordmark links to https://github.com/PineappleAGI/Skill71717-Dossier) and a gold **Built by The Pineapple Project Nº 71717** stamp on the right. There is no Print/Reading toggle; the page is always `data-m1-theme="press"`. The footer includes **Pineapple 71717 on GitHub** and **The Pineapple Project on X**. The PRISMA bar (**Follows PRISMA** + The question / Results / Briefing) sticks after you scroll past it and highlights the section in view. The article is written from harvest/claims/enrichment in magazine prose: the everyday question, the scientific question it maps to, evidence for and against, and what is still missing — not a methods ledger and not keyword-matched lifestyle copy. Share controls sit together and stay small: **Copy article**, **Download as Image**, **Download PDF**. Never `window.print()`. Pipeline work behind Results is **Search** → **Screen & rank** → **Extract** → **Evaluate**, live in the evidence section. Restatement has no “Not quite” / “Use my correction” gate. Unclear abstracts are omitted from the bar. Related papers use OpenAlex `cited_by_count`, not news or forum rankings. Search starts as soon as the restatement is shown. Mode 1 does not offer a second question rewrite or a Boolean editor. Serve via `scripts/mode1-server.py`.
+- The dossier is a single Mode 1 PRISMA flow matching the Claude Design layout. The research question comes from the Phase 1 form (`original_topic` / interpreted `topic`). **Ask another question** sits on the sticky PRISMA bar and opens `http://127.0.0.1:8767/ask` in the same tab; after submit, wait for a new `raw_submission.json` with `wait-for-submission.py` (it ignores a prior run’s file) and rerun Phase 1b → harvest → generate → `--html … --no-open` (never `--stop`; reopen the browser only if the waiting tab is gone). Page order: restatement card (You typed / Interpreted as, field/years/tracks chips) → collapsible **The article** → jump nav → **The evidence** (pipeline + KPIs + two-column supporting/contradicting cards) → **How confident is this?** (Beta posterior) → **Related papers** → **Briefing and what's missing** (pull-quote, inquiry framework, key references, BibTeX, gaps) → **How this question maps** (each question term with related phrases from harvested titles/abstracts; **Download map** saves a PNG of the graph) → Pineapple Project footer. The top bar is stacked **Pineapple 71717 / RESEARCH DOSSIER** (the wordmark links to https://github.com/PineappleAGI/Skill71717-Dossier) and a gold **Built by The Pineapple Project Nº 71717** stamp on the right. There is no Print/Reading toggle; the page is always `data-m1-theme="press"`. The footer includes **Pineapple 71717 on GitHub** and **The Pineapple Project on X**. The PRISMA bar (**Follows PRISMA** + The question / Results / Briefing) sticks after you scroll past it and highlights the section in view. The article is written from harvest/claims/enrichment in magazine prose: the everyday question, the scientific question it maps to, evidence for and against, and what is still missing — not a methods ledger and not keyword-matched lifestyle copy. Share controls sit together and stay small: **Copy article**, **Download as Image**, **Download PDF**. Never `window.print()`. Pipeline work behind Results is **Search** → **Screen & rank** → **Extract** → **Evaluate**, live in the evidence section. Restatement has no “Not quite” / “Use my correction” gate. Unclear abstracts are omitted from the bar. Related papers use OpenAlex `cited_by_count`, not news or forum rankings. Search starts as soon as the restatement is shown, except the committed example, which hydrates from embedded papers. Mode 1 does not offer a second question rewrite or a Boolean editor. Live dossiers are served via `scripts/mode1-server.py`. The example HTML is a static snapshot — open the file; do not re-search.
 - No audience chip; **Generated** is date-only (`YYYY-MM-DD`)
 - Confidence is a dot + thin bar, not a large score chip
 - Debate Arena is not in this version; a prior snapshot is `example/older-version/`
 
-Example mode may write to `example/dossier.html` or open the committed file.
+Example mode may regenerate `example/dossier.html` with `--static` (or just write to that path; the generator treats it as static) and open the committed file. Do not start Mode 1 just to preview the example.
 
 ---
 
@@ -302,9 +302,10 @@ python scripts/classify-claims.py example/harvest.json example --enrichment exam
 3. Regenerate (do not hand-edit HTML):
 
 ```bash
-python scripts/generate-dossier.py example/harvest.json example/enrichment.json example/dossier.html --no-open
-python scripts/mode1-server.py --html example/dossier.html --port 8767
+python scripts/generate-dossier.py example/harvest.json example/enrichment.json example/dossier.html --static --no-open
 ```
+
+Then open `example/dossier.html` in a browser. It is a frozen result page, not a live scan.
 
 ---
 

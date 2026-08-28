@@ -6,6 +6,8 @@ Offline demo of Pineapple 71717 for the topic:
 
 ## Quick look
 
+`dossier.html` is a **static snapshot** of a finished result. Open it in a browser (a file is fine). It does not search live APIs.
+
 Regenerate then open (do not hand-edit the HTML):
 
 ```bash
@@ -13,15 +15,10 @@ python3 scripts/generate-dossier.py \
   example/harvest.json \
   example/enrichment.json \
   example/dossier.html \
+  --static \
   --no-open
 
 open example/dossier.html
-```
-
-Or serve it over HTTP (Mode 1 cannot run as `file://`):
-
-```bash
-python3 scripts/mode1-server.py --html example/dossier.html --port 8767
 ```
 
 ## What's inside
@@ -32,7 +29,7 @@ python3 scripts/mode1-server.py --html example/dossier.html --port 8767
 | `harvest.json` | Mixed tracks: key references, research, industry, thesis, preprints |
 | `enrichment.json` | Relevance scores and descriptions |
 | `claims.json` | Cached stance classifications (supporting / contradicting / test / background) |
-| `dossier.html` | Generated HTML dossier (Mode 1 evidence synthesis) |
+| `dossier.html` | Static snapshot of a finished Mode 1 dossier (no live search) |
 | `older-version/` | Snapshot of the prior build with Debate Arena, Live debate, and Belief Timeline |
 
 ## Ask the assistant

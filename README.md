@@ -1,8 +1,8 @@
 # Skill71717: Pineapple Research Materials
 
-A downloadable agent skill for **anyone who wants to research specific topics** (students, researchers, etc.). You describe a research topic in a small local form; the skill harvests scholarly materials from public academic APIs, the assistant scores relevance and writes short descriptions, and you get **one self-contained HTML dossier** you can open in any browser.
+A downloadable agent skill for **anyone who wants to research specific topics** (students, researchers, etc.). You type a question in a small local form; the skill harvests scholarly sources from public academic APIs, sorts them by how they speak to the question (supports / contradicts / test conditions / background), and builds **one self-contained HTML dossier** served in your browser.
 
-> Point it at a research question. It returns a curated list of papers, preprints, and related links — with URLs, short descriptions, relevance scores, reading order, and coverage gaps — ready for a literature review or course project.
+> Point it at a research question. You get an article you can share, the evidence for and against, what’s missing, and the papers behind it — triage for a literature review, not a finished bibliography.
 
 ---
 
@@ -49,22 +49,7 @@ The skill is now available as `/pineapple-research-materials` inside Claude Code
 
 ### First: try the built-in example
 
-There's a prebuilt dossier already inside `example/`. Run the skill on it first so you can see what the output looks like before starting a live search.
-
-**In Cursor**, open the chat sidebar and paste:
-
-```text
-Run Pineapple 71717 on the example request
-```
-
-**In Claude Code**, type:
-
-```text
-/pineapple-research-materials
-Run it on the example request
-```
-
-Or open `example/dossier.html` in your browser — that's what a finished run looks like, without calling the live APIs.
+The example is based on **Is ChatGPT better than Claude?** Open `example/dossier.html` in your browser to see a finished page (no live APIs).
 
 ### Then: run a live research scan
 
@@ -72,12 +57,6 @@ Or open `example/dossier.html` in your browser — that's what a finished run lo
 
 ```text
 Run Pineapple 71717 research materials
-```
-
-or:
-
-```text
-Find research materials on retrieval-augmented generation evaluation
 ```
 
 **In Claude Code:**
@@ -88,12 +67,15 @@ Find research materials on retrieval-augmented generation evaluation
 
 Then sit back. The assistant will:
 
-1. Open one local page in your browser — the question form
-2. Wait while you enter a topic and filters (year range, what to include, max results)
-3. Harvest candidates across tracks from OpenAlex, arXiv, CrossRef, and Semantic Scholar
-4. Enrich each item (relevance, short description, track confirmation, limitations)
-5. Generate a timestamped HTML dossier under `.research-materials/`
-6. Turn that same browser tab into the finished dossier (no second window)
+1. Open one local page at **http://127.0.0.1:8767/** — the question form
+2. Wait while you enter a question and filters (year range, what to include, max results) and click **Start harvest**
+3. Rewrite a chatty question into a searchable scientific one (you still see both on the page)
+4. Harvest candidates from OpenAlex, arXiv, CrossRef, and Semantic Scholar
+5. Label each paper’s stance toward the question, drop off-topic items, and note gaps
+6. Generate a timestamped HTML dossier under `.research-materials/`
+7. Turn that same browser tab into the finished dossier
+
+Keep the waiting tab open if you can. If you close it after submit, the dossier reopens once when it is ready. **Ask another question** on the page stays in the same tab.
 
 ---
 
@@ -101,17 +83,15 @@ Then sit back. The assistant will:
 
 | Section | What you'll find |
 |---|---|
-| **Summary** | Topic, filters, material count, year span, open-access %, top venues |
-| **Key references** | Widely recognized or highly cited starting points |
-| **Research papers** | Peer-reviewed journal and conference work |
-| **Industry reports** | Lab tech reports and company research notes |
-| **Theses** | Dissertations |
-| **Preprints** | Preprints (e.g. arXiv) not filed under another section |
-| **What's missing from this list** | Gaps so you know where the pack is thin |
-| **Searches to try next** | Follow-up queries for another harvest |
-| **BibTeX** | Copy-friendly citations generated from harvested metadata |
+| **You typed / Interpreted as** | Everyday wording, the scientific question, field, years, tracks |
+| **The article** | A short shareable piece: the question, the yes case, the no case, what’s missing. **Copy article**, **Download as Image**, **Download PDF** |
+| **The evidence** | Supporting vs contradicting / limiting papers, with a PRISMA-style pipeline behind the results |
+| **How confident is this?** | A simple read of how split the closer evidence is |
+| **Related papers** | Nearby highly cited work |
+| **Briefing** | Key references, BibTeX, gaps, searches to try next |
+| **How this question maps** | Terms from the question and related phrases in the harvested titles/abstracts, with **Download map** |
 
-Empty material sections are hidden. Each card includes relevance, a short description, why it matters, and limitations when available.
+This is triage from titles and abstracts, not a finished systematic review. Verify primary sources before you cite.
 
 ---
 

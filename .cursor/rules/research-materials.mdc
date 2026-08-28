@@ -52,4 +52,4 @@ Do not stop after harvest. Do not ask “did you submit?”
 
 ## Built-in Example
 
-If the user wants to try the skill without live APIs, use `example/` at the project root. Serve `example/dossier.html` with `scripts/mode1-server.py`, or regenerate from the committed JSON fixtures.
+If the user wants to try the skill without live APIs, open `example/dossier.html` (static snapshot; no server). Regenerate from the committed JSON fixtures with `generate-dossier.py --static`.
