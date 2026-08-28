@@ -1,679 +1,738 @@
 {
   "coverage_gaps": [
-    "Independent tests that try to prove or disprove whether Sora-class models are true physics simulators are still scarce.",
-    "Few apples-to-apples comparisons of pretty video quality versus success when an agent actually plans with the model.",
-    "Robotics transfer from foundation video world models into the real world is thinner than the demo videos suggest."
+    "Almost no harvested journal paper runs a matched, current ChatGPT (GPT-4o / o-series) versus current Claude (Sonnet / Opus) protocol on the same items. The live Arena board and vendor blogs carry that comparison more than journals.",
+    "Safety, cost, latency, tool-use, and long-context recall are thin; ‘better’ in this scan mostly means exam scores or human preference.",
+    "Thesis retrieval drifted into driving, construction, dermatology, and food safety — those records were dropped as off-topic.",
+    "arXiv returned HTTP 429 during harvest, so recent preprints (including some bake-offs) are under-sampled."
   ],
   "suggested_next_queries": [
-    "video world model action conditioning physics consistency benchmark",
-    "Sora world simulator critique counterfactual planning evaluation",
-    "sim-to-real robotics generative video world foundation model"
+    "Chatbot Arena Chiang Zheng human preference GPT-4 Claude Elo",
+    "HELM Holistic Evaluation of Language Models GPT-4 Claude",
+    "Claude 3.5 Sonnet vs GPT-4o MMLU GPQA HumanEval independent replication",
+    "safety alignment comparative evaluation Anthropic OpenAI system card"
   ],
   "inquiry_classification": {
     "title": "Research Question Framework",
     "core_inquiry": {
       "label": "Comparative / Benchmarking",
-      "detail": "Primary lens: Sora-class video as a world simulator for planning versus generative media that only produces clips. Secondary: applied feasibility (sim-to-real) and stress-tests of lab claims."
+      "detail": "Primary lens: is ChatGPT systematically better than Claude on capability, human preference, and safety? Secondary: when ‘better’ is task-specific or reversed."
     },
     "epistemic_rigor": {
-      "label": "Mixed foundational + frontier",
-      "detail": "High-citation world-model baselines (DreamerV3, UniPi, Genie) sit beside lab notes and preprints (Sora, GAIA-1, Cosmos, GameNGen)."
+      "label": "Frontier, weakly controlled",
+      "detail": "A handful of peer-reviewed domain bake-offs (radiology, dentistry, breast-cancer scenarios) sit beside vendor cards, a live preference leaderboard, and many off-topic high-citation surveys."
     },
     "scope_boundary": {
-      "label": "Video-for-planning, 2020–2026",
-      "detail": "Machine learning, robotics, and computer vision. In: action-conditioned video, latent imagination, interactive generative environments. Out: generic world-model surveys with no video/planning tension."
+      "label": "Chat assistants, 2023–2026",
+      "detail": "NLP / LLM evaluation. In: papers or pages that mention ChatGPT/GPT-4-class and/or Claude, or that define how those two are compared. Out: O-RAN, robotics world models, driving theses, and generic surveys with no bake-off."
     }
   },
   "materials": [
     {
-      "id": "arxiv:2301.04104",
+      "id": "openalex:W4393065402",
       "track": "key_reference",
-      "relevance_score": 96,
-      "relevance_rationale": "Canonical modern world-model RL agent: generation is for imagined planning, not media.",
-      "short_description": "DreamerV3 learns environment dynamics and improves behavior by imagining futures across many domains. Best academic starting point for the simulator-for-control side of this debate.",
+      "relevance_score": 42,
+      "relevance_rationale": "Useful LLM-agent background, but not a ChatGPT–Claude comparison.",
+      "short_description": "A widely cited survey of LLM-based autonomous agents: construction, applications, and evaluation strategies.",
       "key_claims": [
-        "A single world-model agent can master diverse domains",
-        "Planning in latent imagination is practical at scale"
+        "LLM agents are reviewed as a field with shared evaluation challenges."
       ],
-      "limitations": "Latent dynamics rather than Sora-scale RGB video.",
-      "best_for": "Problem framing"
+      "limitations": "Does not rank ChatGPT against Claude.",
+      "best_for": "Background on evaluation of LLM systems"
     },
     {
-      "id": "arxiv:2402.15391",
+      "id": "openalex:W4317796310",
       "track": "key_reference",
-      "relevance_score": 95,
-      "relevance_rationale": "Flagship interactive generative environment — simulator framing made explicit.",
-      "short_description": "Genie learns action-controllable virtual worlds from unlabeled videos. Widely cited when distinguishing interactive world models from one-shot generative media.",
-      "key_claims": [
-        "Latent actions can be learned without ground-truth controls",
-        "Generative models can yield interactive environments"
-      ],
-      "limitations": "Playable domains remain constrained versus photoreal foundation video.",
-      "best_for": "Interactive simulator vs clip generator"
+      "relevance_score": 4,
+      "relevance_rationale": "Telecom architecture; harvest noise from the word ‘open’ / ‘security’.",
+      "short_description": "Tutorial on O-RAN architecture, interfaces, and research challenges.",
+      "key_claims": [],
+      "limitations": "Unrelated to language-model comparison.",
+      "best_for": "Drop"
     },
     {
-      "id": "arxiv:2302.02648",
+      "id": "openalex:W4390490761",
+      "track": "key_reference",
+      "relevance_score": 40,
+      "relevance_rationale": "Explainability methods, not product bake-off.",
+      "short_description": "Survey of local and global explanation techniques for Transformer LLMs and how those explanations are evaluated.",
+      "key_claims": [
+        "Transparency methods are catalogued for fine-tuned and prompted LLMs."
+      ],
+      "limitations": "No ChatGPT-versus-Claude scores.",
+      "best_for": "Methods framing if you care about interpretability"
+    },
+    {
+      "id": "openalex:W4385430679",
+      "track": "key_reference",
+      "relevance_score": 6,
+      "relevance_rationale": "Robotics transformer, not a chat assistant.",
+      "short_description": "RT-1 trains a transformer policy on large-scale real-robot data.",
+      "key_claims": [],
+      "limitations": "Off-topic for ChatGPT versus Claude.",
+      "best_for": "Drop"
+    },
+    {
+      "id": "openalex:W4406779522",
+      "track": "key_reference",
+      "relevance_score": 28,
+      "relevance_rationale": "Open-model vulnerability detection; not a ChatGPT–Claude ranking.",
+      "short_description": "Asks whether open LLMs can detect insecure code and classify vulnerabilities by taxonomy.",
+      "key_claims": [
+        "The paper treats vulnerability classification as an LLM evaluation task."
+      ],
+      "limitations": "Closed ChatGPT/Claude products are not the stated object of study.",
+      "best_for": "Only if you widen ‘better’ to security tooling"
+    },
+    {
+      "id": "openalex:W3038822267",
+      "track": "key_reference",
+      "relevance_score": 5,
+      "relevance_rationale": "Classic RL survey, not LLM assistants.",
+      "short_description": "Foundations-and-Trends survey of model-based reinforcement learning.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
+    },
+    {
+      "id": "openalex:W4394828156",
+      "track": "key_reference",
+      "relevance_score": 58,
+      "relevance_rationale": "Concrete ChatGPT capability study in robotics; one-sided.",
+      "short_description": "Microsoft researchers combine prompt-engineering patterns with a function library so ChatGPT can attempt aerial, manipulation, and embodied tasks. They also release PromptCraft.",
+      "key_claims": [
+        "ChatGPT can solve several robotics tasks from natural-language instructions when prompts and APIs are designed carefully."
+      ],
+      "limitations": "Claude is not in the experiment; robotics is a narrow slice of ‘better’.",
+      "best_for": "Applied ChatGPT capability, not a bake-off"
+    },
+    {
+      "id": "openalex:W4401306886",
+      "track": "key_reference",
+      "relevance_score": 8,
+      "relevance_rationale": "Title and abstract appear mismatched; neither is a bake-off.",
+      "short_description": "Harvest record titled as location representation; attached abstract discusses open-source LLMs for cyber-physical anomaly detection.",
+      "key_claims": [],
+      "limitations": "Metadata quality is poor; not a ChatGPT–Claude study.",
+      "best_for": "Drop"
+    },
+    {
+      "id": "openalex:W4402909345",
+      "track": "key_reference",
+      "relevance_score": 62,
+      "relevance_rationale": "Human-evaluation playbook for high-stakes LLM use.",
+      "short_description": "Literature-derived framework for human evaluation of LLMs in healthcare, arguing that automated scores are not enough for safety and effectiveness.",
+      "key_claims": [
+        "Human evaluation protocols are treated as essential before deploying LLMs in care."
+      ],
+      "limitations": "Does not report a ChatGPT-versus-Claude winner.",
+      "best_for": "Test conditions: how to score ‘better’ in a high-stakes domain"
+    },
+    {
+      "id": "openalex:W4353091694",
+      "track": "key_reference",
+      "relevance_score": 6,
+      "relevance_rationale": "NeuroAI manifesto.",
+      "short_description": "Calls for investment in NeuroAI and an embodied Turing test.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
+    },
+    {
+      "id": "openalex:W7140705274",
       "track": "research",
-      "relevance_score": 96,
-      "relevance_rationale": "Uses text-guided video generation as the planning representation.",
-      "short_description": "UniPi treats decision making as generating a video plan from text, then reading actions from frames — a core bridge between generative video and planning.",
+      "relevance_score": 90,
+      "relevance_rationale": "Shared failure mode that undercuts ‘better on preference’.",
+      "short_description": "Science paper showing sycophancy across 11 state-of-the-art models: systems affirm users’ actions and the behavior is linked to lower prosocial intentions and greater dependence.",
       "key_claims": [
-        "Video models can propose multi-step plans from language",
-        "Action extraction closes the loop to control"
+        "Sycophancy is widespread among frontier assistants.",
+        "Agreeableness can be socially costly even when users prefer it."
       ],
-      "limitations": "Scale lags frontier media models; limited evaluation domains.",
-      "best_for": "Methods: video-as-planner"
+      "limitations": "The abstract does not name ChatGPT or Claude as the unique worst case.",
+      "best_for": "Contradicting: preference wins are not the same as being better"
     },
     {
-      "id": "arxiv:2405.12399",
+      "id": "openalex:W4400260578",
+      "track": "research",
+      "relevance_score": 94,
+      "relevance_rationale": "Rare harvested paper that puts GPT-4o and Claude 3 Opus on the same cases.",
+      "short_description": "Japanese Journal of Radiology study of diagnostic performance of GPT-4o, Claude 3 Opus, and Gemini 1.5 Pro on ‘Diagnosis Please’ cases.",
+      "key_claims": [
+        "All three named models were evaluated on the same radiology diagnostic task."
+      ],
+      "limitations": "The harvested abstract does not report per-model scores; read the paper before citing a winner.",
+      "best_for": "Evidence: task-specific head-to-head"
+    },
+    {
+      "id": "openalex:W4391175800",
+      "track": "research",
+      "relevance_score": 93,
+      "relevance_rationale": "Clinical scenario comparison that includes both ChatGPT versions and Claude 2.",
+      "short_description": "International Journal of Surgery paper comparing ChatGPT-3.5, ChatGPT-4.0, and Claude 2 on breast-cancer clinical scenarios.",
+      "key_claims": [
+        "Three named assistants were scored in the same clinical-scenario protocol."
+      ],
+      "limitations": "Claude 2 is a 2023 model; abstract here does not list cell-by-cell scores.",
+      "best_for": "Evidence: medical head-to-head (older Claude)"
+    },
+    {
+      "id": "openalex:W4390486238",
+      "track": "research",
+      "relevance_score": 30,
+      "relevance_rationale": "Enterprise implementation note.",
+      "short_description": "Describes an architecture for generative-AI services using enterprise data and LLMs.",
+      "key_claims": [
+        "Enterprise RAG-style deployment is treated as an engineering problem."
+      ],
+      "limitations": "No ChatGPT-versus-Claude result.",
+      "best_for": "Industry-adjacent background"
+    },
+    {
+      "id": "openalex:W4378716928",
+      "track": "research",
+      "relevance_score": 4,
+      "relevance_rationale": "Metaverse survey.",
+      "short_description": "Review of emerging metaverse trends and challenges.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
+    },
+    {
+      "id": "openalex:W4391940723",
+      "track": "research",
+      "relevance_score": 32,
+      "relevance_rationale": "LLM applications in forecasting, not assistants.",
+      "short_description": "Systematic review of LLMs for forecasting and anomaly detection.",
+      "key_claims": [
+        "LLMs are being tried as time-series and anomaly tools."
+      ],
+      "limitations": "Not a ChatGPT–Claude ranking.",
+      "best_for": "Domain map"
+    },
+    {
+      "id": "openalex:W4406628184",
+      "track": "research",
+      "relevance_score": 86,
+      "relevance_rationale": "Multiple-model EHR extraction bake-off.",
+      "short_description": "BMJ Health & Care Informatics evaluation of several LLMs extracting structured fields from 50 synthetic English medical notes.",
+      "key_claims": [
+        "The authors treat extraction accuracy as a multi-model comparison, not a single-vendor claim."
+      ],
+      "limitations": "Confirm which named APIs were included before quoting a ChatGPT or Claude cell.",
+      "best_for": "Evidence: task-specific multi-model scores"
+    },
+    {
+      "id": "openalex:W4399363436",
+      "track": "research",
+      "relevance_score": 64,
+      "relevance_rationale": "Anthropic method for whose values count as ‘better’ alignment.",
+      "short_description": "Collective Constitutional AI lets public input shape LM behavior instead of leaving values solely to the developer.",
+      "key_claims": [
+        "Alignment targets can be set collectively rather than only by the lab."
+      ],
+      "limitations": "Method paper, not a GPT-versus-Claude benchmark table.",
+      "best_for": "Test conditions: what ‘better aligned’ means"
+    },
+    {
+      "id": "openalex:W4378882632",
+      "track": "research",
+      "relevance_score": 4,
+      "relevance_rationale": "Astronomy neural-net history.",
+      "short_description": "Review of connectionism and deep learning in astronomy.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
+    },
+    {
+      "id": "openalex:W4413312755",
+      "track": "research",
+      "relevance_score": 36,
+      "relevance_rationale": "Medical multimodal review.",
+      "short_description": "Reviews multimodal large language models in medical imaging and possible clinical roles.",
+      "key_claims": [
+        "MLLMs are framed as potential radiology partners."
+      ],
+      "limitations": "Not a ChatGPT-versus-Claude scoreboard.",
+      "best_for": "Domain background"
+    },
+    {
+      "id": "openalex:W4401170130",
+      "track": "research",
+      "relevance_score": 78,
+      "relevance_rationale": "Cross-model preference/values measurement.",
+      "short_description": "Administers 11 political-orientation tests to 24 closed and open conversational LLMs and reports systematic differences in embedded political preferences.",
+      "key_claims": [
+        "Political lean is treated as a measurable model property, not a single-vendor trait."
+      ],
+      "limitations": "Political tests are not capability or safety bake-offs.",
+      "best_for": "Test conditions: values differ by family"
+    },
+    {
+      "id": "openalex:W4387299593",
+      "track": "research",
+      "relevance_score": 34,
+      "relevance_rationale": "ChatGPT-for-lexicography only.",
+      "short_description": "Reviews early ChatGPT-in-lexicography papers and shows a short prompt can draft dictionary articles.",
+      "key_claims": [
+        "Generative AI can draft usable lexicographic articles under expert prompting."
+      ],
+      "limitations": "No Claude condition.",
+      "best_for": "Narrow applied ChatGPT study"
+    },
+    {
+      "id": "openalex:W4385719938",
+      "track": "research",
+      "relevance_score": 10,
+      "relevance_rationale": "Gemini education-policy note.",
+      "short_description": "Policy-oriented piece on using Google Gemini in education.",
+      "key_claims": [],
+      "limitations": "Wrong product family.",
+      "best_for": "Drop"
+    },
+    {
+      "id": "openalex:W4404782882",
       "track": "research",
       "relevance_score": 88,
-      "relevance_rationale": "Links diffusion visual fidelity to planning-relevant imagination.",
-      "short_description": "DIAMOND uses diffusion world modeling for Atari and argues visual detail in imagined rollouts matters for control.",
+      "relevance_rationale": "Best harvested methods paper on why LLM leaderboards mislead.",
+      "short_description": "EMNLP 2024 critical survey of LLM evaluation: reproducibility, contamination, prompt sensitivity, and recommendations for more trustworthy comparisons.",
       "key_claims": [
-        "Diffusion world models can be competitive for RL imagination",
-        "Discarding visual detail can hurt imagined-policy learning"
+        "Many published LLM scores are hard to compare across papers.",
+        "The authors give concrete recommendations for evaluation design."
       ],
-      "limitations": "Atari-scale results may not extrapolate to real-world physics.",
-      "best_for": "Fidelity vs planning utility"
+      "limitations": "Does not itself crown ChatGPT or Claude.",
+      "best_for": "Test conditions: how to run a fair bake-off"
     },
     {
-      "id": "arxiv:2309.17080",
-      "track": "industry",
-      "relevance_score": 92,
-      "relevance_rationale": "Industry world model in autonomous driving where planning stakes are real.",
-      "short_description": "Wayve's GAIA-1 generates driving futures conditioned on video, text, and action — world-model video for scenario simulation, not entertainment.",
-      "key_claims": [
-        "Action-conditioned video supports driving scenario synthesis",
-        "Multimodal conditioning enables controllable futures"
-      ],
-      "limitations": "Proprietary driving-data regime.",
-      "best_for": "Industry case study (AV)"
-    },
-    {
-      "id": "arxiv:2501.03575",
-      "track": "industry",
-      "relevance_score": 90,
-      "relevance_rationale": "Industry platform pitching world foundation models for Physical AI.",
-      "short_description": "NVIDIA Cosmos frames world foundation models as infrastructure for embodied/Physical AI simulation workflows.",
-      "key_claims": [
-        "World foundation models as transferable simulation priors",
-        "Physical AI needs more than media-generation APIs"
-      ],
-      "limitations": "Platform paper; read independent closed-loop benchmarks carefully.",
-      "best_for": "Industry / Physical-AI framing"
-    },
-    {
-      "id": "web:openai-sora-world-simulators",
-      "track": "industry",
-      "relevance_score": 94,
-      "relevance_rationale": "Primary industry claim that Sora-class video models are world simulators.",
-      "short_description": "OpenAI's public technical note arguing video generation models are progressing toward general-purpose world simulators — the industry claim this dossier interrogates.",
-      "key_claims": [
-        "Scaling video generation yields more coherent world dynamics",
-        "Simulators are framed as an aspirational capability of media models"
-      ],
-      "limitations": "Not a peer-reviewed empirical study; treat as a position/tech note.",
-      "best_for": "Industry claim to evaluate against"
-    },
-    {
-      "id": "arxiv:2408.14837",
-      "track": "preprint",
-      "relevance_score": 86,
-      "relevance_rationale": "Stress test of generative dynamics as a real-time interactive engine.",
-      "short_description": "GameNGen demonstrates real-time interactive simulation of DOOM with a diffusion model — evidence for the simulator thesis under interactivity constraints.",
-      "key_claims": [
-        "Neural simulators can run complex interactive environments in real time",
-        "Game engines are a proving ground for world-model fidelity"
-      ],
-      "limitations": "Game physics is not real-world Physical AI.",
-      "best_for": "Interactivity evidence"
-    },
-    {
-      "id": "arxiv:2312.14125",
-      "track": "preprint",
-      "relevance_score": 74,
-      "relevance_rationale": "High-quality video generation baseline for the media-model pole.",
-      "short_description": "VideoPoet showcases strong zero-shot video generation. Use as the generative-media reference when asking what extra structure a world simulator needs.",
-      "key_claims": [
-        "LLM-style architectures can generate coherent video zero-shot",
-        "Media quality is the primary optimization target"
-      ],
-      "limitations": "Not designed or evaluated as a planner/world model.",
-      "best_for": "Media-only contrast"
-    },
-    {
-      "id": "openalex:W4389473504",
-      "track": "thesis",
-      "relevance_score": 68,
-      "relevance_rationale": "Thesis-track depth on efficient RL policy optimization adjacent to world-model control.",
-      "short_description": "PhD thesis on trust-region policy optimization for sample-efficient reinforcement learning — useful dissertation-format background for control learning methods.",
-      "key_claims": [
-        "Trust-region methods improve stability of policy updates",
-        "Sample efficiency remains central for practical control learning"
-      ],
-      "limitations": "Not specifically about video generation as a simulator.",
-      "best_for": "Thesis-track / methods background"
-    },
-    {
-      "id": "openalex:W3140854437",
-      "track": "key_reference",
-      "relevance_score": 94,
-      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "In the last few years, the deep learning (DL) computing paradigm has been deemed the Gold Standard in the machine learning (ML) community. Moreover, it has gradually become the most widely used computational approach in the field of ML, thus achieving outstanding results on…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Starting point / related work"
-    },
-    {
-      "id": "openalex:W2995022099",
-      "track": "key_reference",
-      "relevance_score": 94,
-      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Federated learning (FL) is a machine learning setting where many clients (e.g., mobile devices or whole organizations) collaboratively train a model under the orchestration of a central server (e.g., service provider), while keeping the training data decentralized. FL embodies…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Starting point / related work"
-    },
-    {
-      "id": "openalex:W3168997536",
-      "track": "key_reference",
-      "relevance_score": 94,
-      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "A convolutional neural network (CNN) is one of the most significant networks in the deep learning field. Since CNN made impressive achievements in many areas, including but not limited to computer vision and natural language processing, it attracted much attention from both…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Starting point / related work"
-    },
-    {
-      "id": "openalex:W3153990350",
-      "track": "key_reference",
-      "relevance_score": 94,
-      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Abstract Today, intelligent systems that offer artificial intelligence capabilities often rely on machine learning. Machine learning describes the capacity of systems to learn from problem-specific training data to automate the process of analytical model building and solve…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Starting point / related work"
-    },
-    {
-      "id": "openalex:W4386142022",
-      "track": "key_reference",
-      "relevance_score": 94,
-      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Abstract Recent years have seen a tremendous growth in Artificial Intelligence (AI)-based methodological development in a broad range of domains. In this rapidly evolving field, large number of methods are being reported using machine learning (ML) and Deep Learning (DL) models.…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Starting point / related work"
-    },
-    {
-      "id": "openalex:W4206484811",
-      "track": "key_reference",
-      "relevance_score": 94,
-      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Unlike previous studies on the Metaverse based on Second Life, the current Metaverse is based on the social value of Generation Z that online and offline selves are not different. With the technological development of deep learning-based high-precision recognition models and…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Starting point / related work"
-    },
-    {
-      "id": "openalex:W3003667836",
-      "track": "key_reference",
-      "relevance_score": 95,
-      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Digital twin can be defined as a virtual representation of a physical asset enabled through data and simulators for real-time prediction, optimization, monitoring, controlling, and improved decision making. Recent advances in computational pipelines, multiphysics solvers,…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Starting point / related work"
-    },
-    {
-      "id": "openalex:W2953303875",
-      "track": "key_reference",
-      "relevance_score": 95,
-      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Automated driving systems (ADSs) promise a safe, comfortable and efficient driving experience. However, fatalities involving vehicles equipped with ADSs are on the rise. The full potential of ADSs cannot be realized unless the robustness of state-of-the-art is improved further.…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Starting point / related work"
-    },
-    {
-      "id": "openalex:W3154736008",
+      "id": "crossref:10.2139/ssrn.4448091",
       "track": "research",
-      "relevance_score": 75,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Abstract Cybersickness (CS) is a term used to refer to symptoms, such as nausea, headache, and dizziness that users experience during or after virtual reality immersion. Initially discovered in flight simulators, commercial virtual reality (VR) head-mounted displays (HMD) of the…",
+      "relevance_score": 38,
+      "relevance_rationale": "Translation-industry essay on OpenAI tools.",
+      "short_description": "Discusses use cases, strengths, and limits of ChatGPT and GPT-4 for professional translators and still requires human expertise.",
       "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
+        "LLMs can assist translators; human review remains necessary."
       ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
+      "limitations": "SSRN working paper; no Claude arm.",
+      "best_for": "Industry-adjacent OpenAI use case"
     },
     {
-      "id": "openalex:W4402155831",
+      "id": "openalex:W4406230527",
       "track": "research",
-      "relevance_score": 72,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "In the complex and multidimensional field of medicine, multimodal data are prevalent and crucial for informed clinical decisions. Multimodal data span a broad spectrum of data types, including medical images (eg, MRI and CT scans), time-series data (eg, sensor data from wearable…",
+      "relevance_score": 84,
+      "relevance_rationale": "Professional-exam protocol across LLMs.",
+      "short_description": "Scientific Reports study of LLM accuracy and consistency on the registered-dietitian exam, including prompt engineering and knowledge retrieval.",
       "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
+        "Exam performance is sensitive to prompting and retrieval, not only to the branded model."
       ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
+      "limitations": "Confirm the model list in the full paper before citing ChatGPT or Claude cells.",
+      "best_for": "Evidence: exam-style comparison"
     },
     {
-      "id": "openalex:W4324290234",
+      "id": "crossref:10.2139/ssrn.4593895",
       "track": "research",
-      "relevance_score": 72,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Envisioned to be the next-generation Internet, the metaverse has been attracting enormous attention from both the academia and industry. The metaverse can be viewed as a 3D immersive virtual world, where people use Augmented/Virtual Reality (AR/VR) devices to access and interact…",
+      "relevance_score": 62,
+      "relevance_rationale": "Broad GPT-family survey that defines the ChatGPT side.",
+      "short_description": "Survey of GPT-3-family models including ChatGPT and GPT-4: pretraining concepts, downstream tasks, robustness, and use as evaluators.",
       "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
+        "ChatGPT/GPT-4 are treated as the defining instruction-tuned GPT-3-family products."
       ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
+      "limitations": "Claude is outside the survey’s family definition.",
+      "best_for": "Related work: what the ChatGPT family is"
     },
     {
-      "id": "openalex:W3083484791",
+      "id": "openalex:W4405010262",
       "track": "research",
-      "relevance_score": 72,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "It is becoming increasingly prevalent in digital learning research to encompass an array of different meanings, spaces, processes, and teaching strategies for discerning a global perspective on constructing the student learning experience. Multimodality is an emergent phenomenon…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W3016364508",
-      "track": "research",
-      "relevance_score": 71,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "E-Learning has become more and more popular in recent years with the advance of new technologies. Using their mobile devices, people can expand their knowledge anytime and anywhere. E-Learning also makes it possible for people to manage their learning progression freely and…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W4385431115",
-      "track": "research",
-      "relevance_score": 73,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "modalities such as natural language, images, and audio.We demonstrate that pixel-aligned open-set features can be fused into 3D maps via traditional SLAM and multi-view fusion approaches.This enables effective zero-shot spatial reasoning, not needing any additional training or…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W3153454949",
-      "track": "research",
-      "relevance_score": 71,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Video anomaly recognition in smart cities is an important computer vision task that plays a vital role in smart surveillance and public safety but is challenging due to its diverse, complex, and infrequent occurrence in real-time surveillance environments. Various deep learning…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W4398238904",
-      "track": "research",
-      "relevance_score": 73,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Abstract This emerging technology report discusses Google Gemini as a multimodal generative AI tool and presents its revolutionary potential for future educational technology. It introduces Gemini and its features, including versatility in processing data from text, image,…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W4391610180",
-      "track": "research",
-      "relevance_score": 75,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "There are two main ways to discover or design small drug molecules. The first involves fine-tuning existing molecules or commercially successful drugs through quantitative structure-activity relationships and virtual screening. The second approach involves generating new…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W4378746725",
-      "track": "research",
-      "relevance_score": 71,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Robotics have advanced significantly over the years, and human-robot interaction (HRI) is now playing an important role in delivering the best user experience, cutting down on laborious tasks, and raising public acceptance of robots. New HRI approaches are necessary to promote…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W4389266910",
-      "track": "research",
-      "relevance_score": 71,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Human–robot interaction (HRI) has escalated in notability in recent years, and multimodal communication and control strategies are necessitated to guarantee a secure, efficient, and intelligent HRI experience. In spite of the considerable focus on multimodal HRI, comprehensive…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W4394606408",
-      "track": "research",
-      "relevance_score": 71,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Multimodal machine learning is a vibrant multi-disciplinary research field that aims to design computer agents with intelligent capabilities such as understanding, reasoning, and learning through integrating multiple communicative modalities, including linguistic, acoustic,…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W4406412004",
-      "track": "research",
-      "relevance_score": 71,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "This review explores the applications of Convolutional Neural Networks (CNNs) in smart agriculture, highlighting recent advancements across various applications including weed detection, disease detection, crop classification, water management, and yield prediction. Based on a…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W4394806371",
-      "track": "research",
-      "relevance_score": 71,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "The stated goal of many organizations in the field of artificial intelligence (AI) is to develop artificial general intelligence (AGI), an imagined system with more intelligence than anything we have ever seen. Without seriously questioning whether such a system can and should…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W3015928967",
-      "track": "research",
-      "relevance_score": 71,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Depression is a major public health concern in the U.S. and globally. While successful early identification and treatment can lead to many positive health and behavioral outcomes, depression, remains undiagnosed, untreated or undertreated due to several reasons, including denial…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
-    },
-    {
-      "id": "openalex:W3199015608",
-      "track": "research",
-      "relevance_score": 71,
-      "relevance_rationale": "Included in the research track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Multimodal classification research has been gaining popularity with new datasets in domains such as satellite imagery, biometrics, and medicine. Prior research has shown the benefits of combining data from multiple sources compared to traditional unimodal data that has led to…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Methods or evaluation section"
+      "relevance_score": 8,
+      "relevance_rationale": "Sexuality literature review.",
+      "short_description": "Five-year review of generative AI and human sexuality.",
+      "key_claims": [],
+      "limitations": "Off-topic for this question.",
+      "best_for": "Drop"
     },
     {
       "id": "openalex:W4402890475",
       "track": "industry",
-      "relevance_score": 76,
-      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "We survey applications of pretrained foundation models in robotics. Traditional deep learning models in robotics are trained on small datasets tailored for specific tasks, which limits their adaptability across diverse applications. In contrast, foundation models pretrained on…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Industry / applied framing"
+      "relevance_score": 18,
+      "relevance_rationale": "Robotics foundation-model survey.",
+      "short_description": "Survey of pretrained foundation models applied to robotics.",
+      "key_claims": [],
+      "limitations": "Not a chat-assistant comparison.",
+      "best_for": "Drop"
     },
     {
-      "id": "openalex:W4393177776",
+      "id": "openalex:W4391591760",
       "track": "industry",
-      "relevance_score": 81,
-      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "The rapid advancement of Generative AI (Gen-AI) is transforming Human-Computer Interaction (HCI), with significant implications across various sectors. This study investigates the public's perception of Sora OpenAI, a pioneering Gen-AI video generation tool, via social media…",
+      "relevance_score": 34,
+      "relevance_rationale": "RL+LLM methods map.",
+      "short_description": "JAIR taxonomy of how reinforcement learning and large language models interact.",
       "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
+        "Three interaction classes are proposed for the RL/LLM literature."
       ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Industry / applied framing"
+      "limitations": "No ChatGPT-versus-Claude scores.",
+      "best_for": "Background"
+    },
+    {
+      "id": "openalex:W4389764468",
+      "track": "industry",
+      "relevance_score": 36,
+      "relevance_rationale": "Reasoning survey.",
+      "short_description": "Survey of reasoning with foundation models, with an accompanying GitHub bibliography.",
+      "key_claims": [
+        "Reasoning is treated as a cross-model research program."
+      ],
+      "limitations": "Not a product bake-off.",
+      "best_for": "Background"
+    },
+    {
+      "id": "crossref:10.1111/1754-9485.13858",
+      "track": "industry",
+      "relevance_score": 95,
+      "relevance_rationale": "Direct Claude-versus-GPT vision-language radiology study.",
+      "short_description": "Journal of Medical Imaging and Radiation Oncology paper comparing Anthropic Claude and OpenAI GPT models on basic radiological imaging tasks.",
+      "key_claims": [
+        "Public VLMs from both vendors were scored on the same imaging tasks."
+      ],
+      "limitations": "Harvested abstract does not report which vendor won; retrieve the article for numbers.",
+      "best_for": "Strongest harvested imaging head-to-head"
     },
     {
       "id": "openalex:W4409365815",
       "track": "industry",
-      "relevance_score": 85,
-      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "World models envision potential future states based on various ego actions. They embed extensive knowledge about the driving environment, facilitating safe and scalable autonomous driving. Most existing methods primarily focus on either data generation or the pretraining…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Industry / applied framing"
+      "relevance_score": 6,
+      "relevance_rationale": "Driving world-model paper.",
+      "short_description": "AAAI paper on occupancy-world forecasting for autonomous driving.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
     },
     {
-      "id": "openalex:W4392954640",
+      "id": "openalex:W4414486064",
       "track": "industry",
-      "relevance_score": 83,
-      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "The generation of videos from textual input poses a significant computational challenge within computer science. Nonetheless, recent advancements in text-to-video artificial intelligence (AI) technologies have showcased notable progress within this domain. Foreseen advancements…",
+      "relevance_score": 66,
+      "relevance_rationale": "OpenAI’s current safety-training story for ChatGPT.",
+      "short_description": "OpenAI note arguing that ChatGPT-class models should move from a hard refuse/comply boundary to output-centric safe-completions.",
       "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
+        "Refusal-only training is treated as too coarse for dual-use prompts."
       ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Industry / applied framing"
+      "limitations": "Vendor document; Claude is not the control.",
+      "best_for": "Test conditions: how OpenAI now defines safer"
     },
     {
-      "id": "openalex:W4404717804",
+      "id": "crossref:10.1111/eje.70121",
       "track": "industry",
-      "relevance_score": 81,
-      "relevance_rationale": "Included in the industry track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Large-scale generative models have achieved remarkable success in a number of domains. However, for sequential decision-making problems, such as robotics, action-labelled data is often scarce and therefore scaling-up foundation models for decision-making remains a challenge. A…",
+      "relevance_score": 96,
+      "relevance_rationale": "Five-model exam including current ChatGPT and Claude 3.5 Sonnet.",
+      "short_description": "European Journal of Dental Education comparison of ChatGPT 4o, ChatGPT o1, Claude 3.5 Sonnet, Gemini Advanced 1.5 Pro, and Gemini Advanced 2.0 Exp on Turkish dentistry specialization-exam questions.",
       "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
+        "Both OpenAI and Anthropic current-generation models were run on the same item set."
       ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Industry / applied framing"
+      "limitations": "Abstract does not list scores here; read the article before naming a winner. Single-language dental exam.",
+      "best_for": "Best harvested current-generation written-exam bake-off"
     },
     {
-      "id": "openalex:W3178685848",
+      "id": "openalex:W59455730",
       "track": "thesis",
-      "relevance_score": 62,
-      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Textbooks are artifacts of a pedagogical culture, but in the context of English as a Foreign Language (EFL) education in Korean universities, that culture often forces instructors and students to use generic, global publications for reasons more political than pedagogical.…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Deep background chapter"
+      "relevance_score": 3,
+      "relevance_rationale": "Game-based learning thesis.",
+      "short_description": "Edinburgh Napier thesis on collaborative computer game-based learning in higher education.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
     },
     {
-      "id": "openalex:W4313469377",
+      "id": "openalex:W4401510345",
       "track": "thesis",
-      "relevance_score": 62,
-      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Temporal sentence grounding in videos (TSGV), a.k.a., natural language video localization (NLVL) or video moment retrieval (VMR), aims to retrieve a temporal moment (i.e., a fraction of a video) that semantically corresponds to a language query from an untrimmed video.…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Deep background chapter"
+      "relevance_score": 2,
+      "relevance_rationale": "Food-pathogen review mis-tagged as thesis.",
+      "short_description": "Review of staphylococcal enterotoxins in food.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
     },
     {
-      "id": "openalex:W3013449349",
+      "id": "openalex:W4386410083",
       "track": "thesis",
-      "relevance_score": 62,
-      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "This thesis investigates the use of deep learning techniques to address the problem of machine understanding of human affective behaviour and improve the accuracy of both unimodal and multimodal human emotion recognition. The objective was to explore how best to configure deep…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Deep background chapter"
+      "relevance_score": 8,
+      "relevance_rationale": "Driving RL thesis.",
+      "short_description": "NTU doctoral thesis on human-guided reinforcement learning for autonomous driving.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
     },
     {
-      "id": "openalex:W4321242134",
+      "id": "openalex:W127643039",
       "track": "thesis",
-      "relevance_score": 62,
-      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "For more than a decade, social media has emerged as a potential platform to generate and spread information about a natural disasters. Alternatively, a common way of conducting research into natural disasters is via remote sensing. However, remote sensing data comes with few…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Deep background chapter"
+      "relevance_score": 2,
+      "relevance_rationale": "Novice-driver psychology thesis.",
+      "short_description": "Psychological investigation of the novice driver problem.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
     },
     {
-      "id": "openalex:W4292589917",
+      "id": "openalex:W2723085959",
       "track": "thesis",
-      "relevance_score": 62,
-      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Dynamic data and continuously evolving sets of records are essential for a wide variety of today's data management applications. Such applications range from large, social, content-driven Internet applications, to highly focused data processing verticals like data intensive…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Deep background chapter"
+      "relevance_score": 2,
+      "relevance_rationale": "Construction-management thesis.",
+      "short_description": "Framework for contractor selection on major construction projects in Libya.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
     },
     {
-      "id": "openalex:W3094484211",
+      "id": "openalex:W7126224880",
       "track": "thesis",
-      "relevance_score": 64,
-      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Automatisierte Systeme werden mit einer zunehmenden Anzahl unterschied- licher Sensoren ausgestattet, um immer komplexere Aufgaben zu bewältigen. Präzise Sensorkalibrierung ist eine essentielle Voraussetzung, um die Informa- tionen der Sensoren zu fusionieren und wichtige…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Deep background chapter"
+      "relevance_score": 2,
+      "relevance_rationale": "Dermatology review.",
+      "short_description": "Systematic review of exosomes in skin rejuvenation.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
     },
     {
-      "id": "openalex:W3130054217",
+      "id": "openalex:W2767686769",
       "track": "thesis",
-      "relevance_score": 62,
-      "relevance_rationale": "Included in the thesis track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Digital technologies have become instrumental in transforming our society. Recent statistical methods have been successfully deployed to automate the processing of the growing amount of images, videos, and texts we produce daily. In particular, deep neural networks have been…",
+      "relevance_score": 2,
+      "relevance_rationale": "Electric-vehicle thesis.",
+      "short_description": "Critical evaluation of battery electric vehicles for sustainable mobility.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
+    },
+    {
+      "id": "openalex:W112267011",
+      "track": "thesis",
+      "relevance_score": 2,
+      "relevance_rationale": "Antimicrobial thesis.",
+      "short_description": "Discovery and evaluation of novel antimicrobial agents against nosocomial pathogens.",
+      "key_claims": [],
+      "limitations": "Off-topic.",
+      "best_for": "Drop"
+    },
+    {
+      "id": "openalex:W4362703233",
+      "track": "preprint",
+      "relevance_score": 55,
+      "relevance_rationale": "Early ChatGPT application survey.",
+      "short_description": "arXiv overview of ChatGPT applications, advantages, limitations, and future directions in NLP.",
       "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
+        "ChatGPT is treated as the reference instruction-tuned chatbot of 2023."
       ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Deep background chapter"
+      "limitations": "No Claude comparison; rapidly dated.",
+      "best_for": "Background on the ChatGPT side"
+    },
+    {
+      "id": "openalex:W4385774833",
+      "track": "preprint",
+      "relevance_score": 86,
+      "relevance_rationale": "Alignment-evaluation guideline that names GPT-4’s process.",
+      "short_description": "Survey and guideline for evaluating LLM alignment, noting OpenAI spent months iteratively aligning GPT-4 before release.",
+      "key_claims": [
+        "Alignment should be evaluated before deployment, not inferred from a single capability score."
+      ],
+      "limitations": "Guideline paper, not a ChatGPT-versus-Claude table.",
+      "best_for": "Test conditions: what ‘safer’ requires"
+    },
+    {
+      "id": "openalex:W4383473937",
+      "track": "preprint",
+      "relevance_score": 82,
+      "relevance_rationale": "Canonical limit on early ChatGPT safety.",
+      "short_description": "Jailbroken analyzes why safety training failed on early ChatGPT jailbreaks and what that implies for competing safety methods.",
+      "key_claims": [
+        "Safety-trained ChatGPT remained exploitable by adversarial prompts."
+      ],
+      "limitations": "Early-2023 ChatGPT; later models and Claude are not the experimental control.",
+      "best_for": "Contradicting / limiting: ChatGPT safety is not automatic"
+    },
+    {
+      "id": "openalex:W4399357038",
+      "track": "preprint",
+      "relevance_score": 60,
+      "relevance_rationale": "Code-generation survey — a common ‘which is better’ arena.",
+      "short_description": "Survey of large language models for code generation and related coding tasks.",
+      "key_claims": [
+        "Code generation is treated as a major LLM evaluation setting."
+      ],
+      "limitations": "Does not itself report a ChatGPT-versus-Claude winner.",
+      "best_for": "Test conditions: coding as a comparison axis"
+    },
+    {
+      "id": "openalex:W4387994989",
+      "track": "preprint",
+      "relevance_score": 32,
+      "relevance_rationale": "Small open aligned model.",
+      "short_description": "Zephyr distills alignment from larger models into a smaller intent-following LM.",
+      "key_claims": [
+        "Alignment can be transferred by distillation, not only by training a frontier chatbot."
+      ],
+      "limitations": "Not a ChatGPT–Claude comparison.",
+      "best_for": "Background"
     },
     {
       "id": "openalex:W4392679398",
-      "track": "preprint",
-      "relevance_score": 70,
-      "relevance_rationale": "Included in the preprint track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "In this report, we introduce the Gemini 1.5 family of models, representing the next generation of highly compute-efficient multimodal models capable of recalling and reasoning over fine-grained information from millions of tokens of context, including multiple long documents and…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Recent developments"
-    },
-    {
-      "id": "openalex:W4392341509",
-      "track": "preprint",
-      "relevance_score": 77,
-      "relevance_rationale": "Included in the preprint track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Sora is a text-to-video generative AI model, released by OpenAI in February 2024. The model is trained to generate videos of realistic or imaginative scenes from text instructions and show potential in simulating the physical world. Based on public technical reports and reverse…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Recent developments"
-    },
-    {
-      "id": "openalex:W4386655647",
-      "track": "preprint",
-      "relevance_score": 70,
-      "relevance_rationale": "Included in the preprint track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "While recently Multimodal Large Language Models (MM-LLMs) have made exciting strides, they mostly fall prey to the limitation of only input-side multimodal understanding, without the ability to produce content in multiple modalities. As we humans always perceive the world and…",
-      "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
-      ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Recent developments"
-    },
-    {
-      "id": "openalex:W3163993681",
       "track": "key_reference",
-      "relevance_score": 94,
-      "relevance_rationale": "Included in the key reference track for this 2020–2026 scan of multimodal world models and video-for-planning.",
-      "short_description": "Physics-informed machine learning — see the linked source for details.",
+      "relevance_score": 54,
+      "relevance_rationale": "Third-family vendor report that breaks a two-horse race.",
+      "short_description": "Google DeepMind Gemini 1.5 technical report on multimodal long-context models that recall over millions of tokens.",
       "key_claims": [
-        "Contributes evidence or framing related to generative dynamics, planning, or multimodal learning.",
-        "Should be verified against the primary PDF/page before citation."
+        "A third commercial family reports long-context results that sit beside GPT and Claude."
       ],
-      "limitations": "Auto-enriched from harvest metadata; skim the source before relying on details.",
-      "best_for": "Starting point / related work"
+      "limitations": "Vendor report; not an independent ChatGPT-versus-Claude trial.",
+      "best_for": "Scope caveat: the market is not two models"
+    },
+    {
+      "id": "crossref:10.1016/j.nlp.2023.100048",
+      "track": "key_reference",
+      "relevance_score": 64,
+      "relevance_rationale": "Journal survey of the GPT-3 / ChatGPT / GPT-4 family.",
+      "short_description": "Natural Language Processing Journal survey of GPT-3-family large language models including ChatGPT and GPT-4.",
+      "key_claims": [
+        "ChatGPT and GPT-4 are placed as the defining public GPT-3-family products."
+      ],
+      "limitations": "Claude is outside the family survey; harvested abstract is empty.",
+      "best_for": "Key reference: what ‘ChatGPT’ means as a model class"
+    },
+    {
+      "id": "web:lmarena",
+      "track": "industry",
+      "relevance_score": 96,
+      "relevance_rationale": "The live human-preference board that actually ranks current ChatGPT-class and Claude models.",
+      "short_description": "LMArena (lmarena.ai, formerly LMSYS Chatbot Arena) is the public pairwise battle site used to Elo-rank frontier chat models, including OpenAI GPT and Anthropic Claude entries. Rankings move as votes and new models arrive.",
+      "key_claims": [
+        "Blind pairwise human votes are the operational public definition of ‘which assistant is better’ for many practitioners.",
+        "The board is live; do not treat any screenshot as a permanent result."
+      ],
+      "limitations": "Crowdsourced, not a controlled academic trial; style and safety filters affect votes.",
+      "best_for": "Best current public answer to ‘which do people pick?’"
+    },
+    {
+      "id": "web:anthropic-claude-3",
+      "track": "industry",
+      "relevance_score": 80,
+      "relevance_rationale": "Vendor claim that Claude 3 Opus beat then-available peer models on standard exams.",
+      "short_description": "Anthropic’s 4 March 2024 Claude 3 announcement reports Opus leading then-available commercial peers on MMLU, GPQA, GSM8K and related tests, plus vision, fewer unnecessary refusals, and long-context recall. Comparisons are vendor-reported.",
+      "key_claims": [
+        "Anthropic reports Claude 3 Opus ahead of then-available commercial peers on several academic benchmarks.",
+        "The post emphasizes speed/cost tiers (Haiku/Sonnet/Opus) rather than a single ‘better’ model."
+      ],
+      "limitations": "In-house evals and prompt optimization; not an independent registered trial.",
+      "best_for": "Vendor counter-claim to ‘ChatGPT is better’"
+    },
+    {
+      "id": "web:gpt4-report",
+      "track": "key_reference",
+      "relevance_score": 92,
+      "relevance_rationale": "Canonical capability paper behind ChatGPT.",
+      "short_description": "OpenAI’s GPT-4 Technical Report (arXiv:2303.08774) is the standard starting citation for ChatGPT-class exams, professional benchmarks, and early safety evaluations.",
+      "key_claims": [
+        "GPT-4 is presented as a highly capable multimodal LLM with extensive academic and professional exam results."
+      ],
+      "limitations": "Vendor report; Claude is not a matched control in this document.",
+      "best_for": "Key reference: what ‘ChatGPT’ means as a model class"
+    },
+    {
+      "id": "web:chatbot-arena-paper",
+      "track": "research",
+      "relevance_score": 94,
+      "relevance_rationale": "Methods paper for the live GPT-versus-Claude preference comparison.",
+      "short_description": "Chiang et al., Chatbot Arena (arXiv:2403.04132), describe an open platform for pairwise human battles and Elo ratings across proprietary and open chat models, including GPT- and Claude-family systems.",
+      "key_claims": [
+        "Pairwise human preference plus Elo is offered as a scalable alternative to static exam suites."
+      ],
+      "limitations": "Crowd composition and prompt mix shape the ranking; numbers age quickly.",
+      "best_for": "Test conditions: the live comparison design"
+    },
+    {
+      "id": "web:helm",
+      "track": "research",
+      "relevance_score": 88,
+      "relevance_rationale": "Independent multi-metric evaluation that refuses a single winner.",
+      "short_description": "Stanford CRFM’s Holistic Evaluation of Language Models (HELM) scores many scenarios and metrics (accuracy, calibration, robustness, fairness, bias, toxicity, efficiency) instead of one leaderboard number.",
+      "key_claims": [
+        "‘Better’ is treated as a vector of metrics, not a single Elo or exam score."
+      ],
+      "limitations": "Scenario coverage and model list change; check the live site for current GPT and Claude rows.",
+      "best_for": "Test conditions: multi-metric alternative to Arena"
+    }
+  ],
+  "web_materials": [
+    {
+      "id": "web:lmarena",
+      "title": "LMArena — live pairwise battles and public LLM leaderboard",
+      "authors": ["LMArena / Arena"],
+      "year": 2026,
+      "venue": "lmarena.ai",
+      "organization": "Arena (formerly LMSYS Chatbot Arena)",
+      "url": "https://lmarena.ai/",
+      "doi": null,
+      "type": "web",
+      "track": "industry",
+      "open_access": true,
+      "citation_count": null,
+      "abstract": "Public site for blind pairwise human votes across frontier chat and multimodal models. GPT-class and Claude models are routinely ranked; standings change as votes and new models arrive.",
+      "source_apis": ["web"]
+    },
+    {
+      "id": "web:anthropic-claude-3",
+      "title": "Introducing the next generation of Claude",
+      "authors": ["Anthropic"],
+      "year": 2024,
+      "venue": "Anthropic News",
+      "organization": "Anthropic",
+      "url": "https://www.anthropic.com/news/claude-3-family",
+      "doi": null,
+      "type": "web",
+      "track": "industry",
+      "open_access": true,
+      "citation_count": null,
+      "abstract": "Launch note for Claude 3 Haiku, Sonnet, and Opus. Anthropic reports that Opus outperforms peer models available at the time on MMLU, GPQA, GSM8K and related cognitive benchmarks, and describes vision, refusal, and long-context results.",
+      "source_apis": ["web"]
+    },
+    {
+      "id": "web:gpt4-report",
+      "title": "GPT-4 Technical Report",
+      "authors": ["OpenAI"],
+      "year": 2023,
+      "venue": "arXiv",
+      "organization": "OpenAI",
+      "url": "https://arxiv.org/abs/2303.08774",
+      "doi": "10.48550/arXiv.2303.08774",
+      "type": "preprint",
+      "track": "key_reference",
+      "open_access": true,
+      "citation_count": null,
+      "abstract": "Technical report for GPT-4, the model family behind ChatGPT Plus at launch: exam results, professional benchmarks, and early safety evaluations.",
+      "source_apis": ["web"]
+    },
+    {
+      "id": "web:chatbot-arena-paper",
+      "title": "Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference",
+      "authors": ["Wei-Lin Chiang", "Lianmin Zheng", "Ying Sheng", "Anastasios Nikolas Angelopoulos", "Tianle Li", "Dacheng Li", "Hao Zhang", "Banghua Zhu", "Michael Jordan", "Joseph E. Gonzalez", "Ion Stoica"],
+      "year": 2024,
+      "venue": "arXiv",
+      "url": "https://arxiv.org/abs/2403.04132",
+      "doi": "10.48550/arXiv.2403.04132",
+      "type": "preprint",
+      "track": "research",
+      "open_access": true,
+      "citation_count": null,
+      "abstract": "Open platform for pairwise human battles and Elo ratings of chat models, widely used to compare GPT-class and Claude systems.",
+      "source_apis": ["web"]
+    },
+    {
+      "id": "web:helm",
+      "title": "Holistic Evaluation of Language Models (HELM)",
+      "authors": ["Stanford CRFM"],
+      "year": 2023,
+      "venue": "Stanford CRFM",
+      "organization": "Stanford Center for Research on Foundation Models",
+      "url": "https://crfm.stanford.edu/helm/",
+      "doi": null,
+      "type": "web",
+      "track": "research",
+      "open_access": true,
+      "citation_count": null,
+      "abstract": "Living evaluation of language models across many scenarios and metrics, intended as an alternative to a single leaderboard number.",
+      "source_apis": ["web"]
     }
   ]
 }

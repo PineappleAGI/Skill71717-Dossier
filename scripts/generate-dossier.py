@@ -276,11 +276,163 @@ def _blog_hero_js() -> str:
 
 
 def _load_js() -> str:
-    parts: list[str] = [_blog_hero_js()]
+    parts: list[str] = []
     for path in (MODE1_JS_PATH, MODE1_BLOG_JS_PATH):
         if path.is_file():
             parts.append(path.read_text(encoding="utf-8"))
     return "\n".join(p for p in parts if p)
+
+
+def _article_title(material: dict) -> str:
+    title = re.sub(r"\s+", " ", (material.get("title") or "Untitled").strip())
+    title = re.sub(r"<[^>]+>", "", title)
+    if len(title) > 72:
+        title = title[:69] + "…"
+    return title
+
+
+def _article_cite(material: dict) -> str:
+    title = _article_title(material)
+    year = material.get("year")
+    return f"{title} ({year})" if year else title
+
+
+def _pick_beats(
+    shown: list[dict],
+    claims_by_id: dict[str, dict],
+    stance: str,
+    limit: int = 2,
+) -> list[tuple[dict, dict]]:
+    ranked: list[tuple[int, dict, dict]] = []
+    for material in shown:
+        claim = _claim_entry(claims_by_id, material.get("id"))
+        if (claim.get("stance") or "").strip().lower() != stance:
+            continue
+        if not (claim.get("one_line_claim") or "").strip():
+            continue
+        rel = (claim.get("relevance") or "").strip().lower()
+        rank = 3 if rel == "high" else 2 if rel == "medium" else 1
+        rank = rank * 100 + int(claim.get("confidence") or 0)
+        ranked.append((rank, material, claim))
+    ranked.sort(key=lambda item: item[0], reverse=True)
+    return [(material, claim) for _rank, material, claim in ranked[:limit]]
+
+
+def _as_article_sentence(line: str) -> str:
+    line = (line or "").strip().rstrip(".")
+    if not line:
+        return ""
+    match = re.match(
+        r"^(shows|compares|surveys|reviews|argues|asks|describes|evaluates|puts|runs|gives|treats)\s+(.+)$",
+        line,
+        flags=re.I,
+    )
+    if match:
+        return f"It {match.group(1).lower()} {match.group(2)}."
+    return line + "."
+
+
+def _weave_beats(items: list[tuple[dict, dict]], opener: str) -> str:
+    sentences: list[str] = [opener]
+    hooks = ("Look at", "Then jump to")
+    for i, (material, claim) in enumerate(items):
+        line = (claim.get("one_line_claim") or "").strip()
+        if not line:
+            continue
+        hook = hooks[i] if i < len(hooks) else "And"
+        sentences.append(f"{hook} {_article_cite(material)}. {_as_article_sentence(line)}")
+    return " ".join(sentences)
+
+
+def _share_summary(
+    topic: str,
+    original_topic: str,
+    shown: list[dict],
+    claims_by_id: dict[str, dict],
+    enrichment: dict,
+    dropped: int,
+) -> dict:
+    """Magazine-style article: everyday question, scientific question, pro, con, gaps."""
+    asked = (original_topic or "").strip()
+    interpreted = (topic or "").strip()
+
+    def _pretty_q(q: str) -> str:
+        q = re.sub(r"\bchatgpt\b", "ChatGPT", q, flags=re.I)
+        q = re.sub(r"\bclaude\b", "Claude", q, flags=re.I)
+        q = q.strip()
+        if q and not q.endswith("?"):
+            q += "?"
+        if q:
+            q = q[0].upper() + q[1:]
+        return q
+
+    headline = _pretty_q(asked) or interpreted or "A short article"
+
+    paras: list[str] = []
+    asked_key = asked.rstrip("?").lower()
+    interpreted_key = interpreted.rstrip("?").lower()
+    q_asked = _pretty_q(asked)
+    if asked and interpreted and asked_key != interpreted_key:
+        paras.append(
+            f"Here it is, the question everyone actually types: {q_asked} "
+            "Short. Punchy. The kind of thing you fire at a friend and then argue about over dinner. "
+            f"Underneath that spark is a real scientific fight: {interpreted}"
+        )
+    else:
+        q = interpreted or q_asked
+        paras.append(
+            f"Here is the question that kicked this whole thing off: {q} "
+            "Everyday enough to ask out loud. Sharp enough that researchers will chase it."
+        )
+
+    counts = {"supports": 0, "contradicts": 0, "test_condition": 0, "neutral": 0}
+    for material in shown:
+        stance = (_claim_entry(claims_by_id, material.get("id")).get("stance") or "neutral").strip().lower()
+        counts[stance if stance in counts else "neutral"] += 1
+
+    n = len(shown)
+    if n:
+        lean = ""
+        if counts["contradicts"] > counts["supports"] + 1:
+            lean = " Plot twist: the papers that complicate a clean yes currently have the louder stack."
+        elif counts["supports"] > counts["contradicts"] + 1:
+            lean = " Early scoreboard: more of the closer papers lean yes — not a blowout, but a real lean."
+        elif counts["supports"] or counts["contradicts"]:
+            lean = " And it is a genuine scrap: the closer papers split, which is exactly why the question is fun."
+        aside = f" (we threw out {dropped} that wandered off into the weeds)" if dropped else ""
+        paras.append(
+            f"Good news: {n} source{'s' if n != 1 else ''} actually speak to it{aside}.{lean}"
+        )
+
+    pro = _pick_beats(shown, claims_by_id, "supports")
+    if pro:
+        paras.append(_weave_beats(pro, "Want the yes case? Here is the fun part."))
+    con = _pick_beats(shown, claims_by_id, "contradicts")
+    if con:
+        paras.append(_weave_beats(con, "Now the comeback — and it has energy."))
+    methods = _pick_beats(shown, claims_by_id, "test_condition", limit=1)
+    if methods and not pro and not con:
+        paras.append(
+            _weave_beats(methods, "The hunt is still on how to keep score, not who lifts the trophy.")
+        )
+
+    gaps = [str(g).strip().rstrip(".") for g in (enrichment.get("coverage_gaps") or []) if str(g).strip()]
+    if gaps:
+        gaps = [
+            re.sub(r"\bin this scan\b", "here", re.sub(r"\bharvested\s+", "", g, flags=re.I), flags=re.I)
+            for g in gaps
+        ]
+        first = gaps[0][0].lower() + gaps[0][1:] if gaps[0] and gaps[0][0].isupper() else gaps[0]
+        extra = f" {gaps[1]}." if len(gaps) > 1 else ""
+        paras.append(
+            f"The cliffhanger is what nobody has nailed yet: {first}.{extra} "
+            "That is not a dead end — it is the next dare. Go read the papers. Then pick a side, loudly, and stay curious."
+        )
+    else:
+        paras.append(
+            "This is the map. The papers are the adventure. Go read them — then pick a side and stay curious."
+        )
+    return {"headline": headline, "paras": paras}
 
 
 def _by_id(enrichment: dict) -> dict[str, dict]:
@@ -857,7 +1009,7 @@ def _mode1_html(
 
   <section class="m1-section m1-blog-lead" id="essay">
     <div class="m1-sec-head is-plain">
-      <h2>A lighter read</h2>
+      <h2>The article</h2>
       <button type="button" class="m1-collapse-btn" data-collapse="essay">Hide</button>
     </div>
     <div id="m1-blog-sec" data-collapse-panel="essay">
@@ -1047,6 +1199,9 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
         "next_queries": next_q,
         "support_blurb": stance_blurbs.get("supports") or "",
         "contra_blurb": stance_blurbs.get("contradicts") or "",
+        "share_summary": _share_summary(
+            topic, original_topic, shown, claims_by_id, enrichment, dropped
+        ),
     }
     payload_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
 
@@ -1054,7 +1209,7 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
     js = _load_js()
     focus_js = _desktop_focus_js()
     return f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-m1-theme="press">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -1075,7 +1230,6 @@ def generate(harvest: dict, enrichment: dict, claims: dict | None = None) -> str
       <div class="brand">
         <a class="brand-mark" href="{_esc(REPO_URL)}" target="_blank" rel="noopener noreferrer">Pineapple 71717</a>
         <span class="brand-sub">Research Dossier</span>
-        <button type="button" class="m1-theme-toggle" id="m1-theme-toggle" title="Switch the page between the reading theme and the print-friendly theme">Print view</button>
       </div>
       <span class="m1-stamp" aria-hidden="true">Built by<br>The Pineapple Project<br>Nº 71717</span>
     </div>
